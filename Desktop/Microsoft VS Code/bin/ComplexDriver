@@ -1,0 +1,23 @@
+class ComplexDriver {
+public:
+    static void runTests() {
+        Complex c1(3, 2);
+        Complex c2(1, 7);
+
+        std::cout << "c1: " << c1 << std::endl;
+        std::cout << "c2: " << c2 << std::endl;
+
+        std::cout << "Addition (c1 + c2): " << c1 + c2 << std::endl;
+        std::cout << "Subtraction (c1 - c2): " << c1 - c2 << std::endl;
+        std::cout << "Multiplication (c1 * c2): " << c1 * c2 << std::endl;
+        std::cout << "Division (c1 / c2): " << c1 / c2 << std::endl;
+
+        std::cout << "Magnitude of c1: " << c1.magnitude() << std::endl;
+        std::cout << "Phase of c1: " << c1.phase() << std::endl;
+    }
+};
+
+int main() {
+    ComplexDriver::runTests();
+    return 0;
+}
