@@ -1,0 +1,74 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Expense Manager</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container ion-padding">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Login</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form (ngSubmit)="login()">
+          <!-- Email Input -->
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 15px;">Email</ion-label>
+            <ion-input
+              [(ngModel)]="email"
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+            ></ion-input>
+          </ion-item>
+
+          <!-- Password Input -->
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 15px;">Password</ion-label>
+            <ion-input
+              [(ngModel)]="password"
+              type="password"
+              name="password"
+              required
+              autocomplete="current-password"
+            ></ion-input>
+          </ion-item>
+
+          <!-- Login Button -->
+          <div class="ion-padding-top">
+            <ion-button expand="block" type="submit" color="primary">
+              Login
+            </ion-button>
+          </div>
+
+          <!-- Registration Link -->
+          <div class="ion-text-center ion-padding-top">
+            Don't have an account? 
+            <ion-router-link routerLink="/register">
+              Register here
+            </ion-router-link>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
+
+<style>
+  .container {
+    max-width: 400px;
+    margin: auto;
+  }
+
+  ion-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  ion-card-title {
+    text-align: center;
+  }
+</style>

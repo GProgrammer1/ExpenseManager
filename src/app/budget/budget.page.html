@@ -1,0 +1,124 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="month-toggler-container">
+      <ion-buttons slot="start">
+        <ion-button (click)="toggleMonth('back')" color="primary">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title id="wrapped-title">{{ currentMonth.display }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleMonth('forward')" color="primary">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (!loading) {
+    @if ((budget$ | async) ; as budget) {
+      <h2 id="budget-title">Monthly budget for month {{selectedDate.getMonth() + 1}} of year {{selectedDate.getFullYear()}}</h2>
+      <ion-grid class="table">
+        <!-- Table Header -->
+        <ion-row class="header-row">
+          <ion-col class="header-cell"><strong>Category</strong></ion-col>
+          <ion-col class="header-cell"><strong>Amount</strong></ion-col>
+        </ion-row>
+
+        <!-- Table Data -->
+        <ion-row *ngFor="let spending of (budget.spendings | keyvalue)" class="data-row">
+          <ion-col class="data-cell">{{ spending.key }}</ion-col>
+          <ion-col class="data-cell">{{ spending.value | currency }}</ion-col>
+        </ion-row>
+        <ion-row class="data-row">
+          <ion-col class="data-cell"><strong>Total</strong></ion-col>
+          <ion-col class="data-cell"><strong>{{ budget.totalBudget | currency }}</strong></ion-col>
+        </ion-row>
+      </ion-grid>
+     } @else {
+      <p class="no-data">No data available</p>
+     }
+    }@else {
+      <ion-spinner name="crescent" id="spinner"></ion-spinner>
+    }
+
+    <div id="gray">
+      <ion-fab id="add-button" vertical="bottom" horizontal="center" slot="fixed">
+        <ion-fab-button (click)="addData()">
+          <ion-icon [src]="'../assets/add.svg'"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+</ion-content>
+
+
+
+<style>
+  ion-title {
+    font-size: 1.6em; /* Increased font size */
+    font-weight: bold;
+    text-align: center;
+    white-space: normal; /* Allow text wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 0 16px; /* Add padding for better spacing */
+  }
+
+  #wrapped-title {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 1.3rem; /* Larger for emphasis */
+    line-height: 1.2em; /* Adjust line height for readability */
+  }
+
+  .month-toggler-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .month-toggler-container ion-title {
+    flex-grow: 1;
+    text-align: center;
+    align-self: center;
+    margin-bottom: -7px;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+  .no-data {
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #fafafa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+  ion-content {
+    background-color: gray !important;
+    height: fit-content;
+    padding-bottom: 50px; /* Make sure there's space for the floating action button */
+  }
+
+  #budget-title {
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin: 16px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Optional: Add some padding or margin for the content section */
+  #budget-container {
+    padding: 16px;
+  }
+</style>

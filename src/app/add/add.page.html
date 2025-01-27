@@ -1,0 +1,160 @@
+
+
+<ion-content [fullscreen]="true" class="content">
+  
+
+  <!-- Navigation Tabs -->
+  <ion-tabs>
+    <ion-tab-bar slot="top" class="custom-tab-bar">
+      <ion-tab-button 
+        (click)="selectedData = 'Expense'" 
+        [ngClass]="{ 'active-tab': selectedData === 'Expense' }">
+        <ion-label>Expense</ion-label>
+      </ion-tab-button>
+      <ion-tab-button 
+        (click)="selectedData = 'Income'" 
+        [ngClass]="{ 'active-tab': selectedData === 'Income' }">
+        <ion-label>Income</ion-label>
+      </ion-tab-button>
+      <ion-tab-button 
+        (click)="selectedData = 'Budget'" 
+        [ngClass]="{ 'active-tab': selectedData === 'Budget' }">
+        <ion-label>Budget</ion-label>
+      </ion-tab-button>
+      <ion-tab-button 
+        (click)="selectedData = 'Payment'" 
+        [ngClass]="{ 'active-tab': selectedData === 'Payment' }">
+        <ion-label>Payments</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+  
+  
+
+  <!-- Expense Section -->
+  <div *ngIf="selectedData === 'Expense'" class="form-section">
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Amount</ion-label>
+      <ion-input type="number" placeholder="Enter amount" [(ngModel)]="amount" name="amount"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Category</ion-label>
+      <ion-select placeholder="Select category" name="category" value="category" [(ngModel)]="categ">
+        <ion-select-option *ngFor="let category of expense_categories" [value]="category">{{ category }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Description</ion-label>
+      <ion-textarea placeholder="Enter description" [(ngModel)]="description" name="description"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Date</ion-label>
+      <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="date"></ion-datetime>
+    </ion-item>
+  </div>
+
+  <!-- Income Section -->
+  <div *ngIf="selectedData === 'Income'" class="form-section">
+    
+      <ion-item>
+        <ion-label position="floating" style="margin-bottom: 12px;">Amount</ion-label>
+        <ion-input type="number" placeholder="Enter amount" [(ngModel)]="amount" name="amount"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating" style="margin-bottom: 12px;">Category</ion-label>
+        <ion-select placeholder="Select category" name="category" value="category" [(ngModel)]="categ">
+          <ion-select-option *ngFor="let category of income_categories" [value]="category">{{ category }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating" style="margin-bottom: 12px;">Description</ion-label>
+        <ion-textarea placeholder="Enter description" [(ngModel)]="description" name="description"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating" style="margin-bottom: 12px;">Date</ion-label>
+        <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="date" [value]="date"></ion-datetime>
+      </ion-item>
+    
+  </div>
+
+  <div *ngIf="selectedData === 'Budget'" class="form-section budget-section">Month:
+    <ion-select [(ngModel)]="selectedMonth" placeholder="Select month" (ionChange)="typeMonth()">
+      <ion-select-option [value]="1">1</ion-select-option>
+      <ion-select-option [value]="2">2</ion-select-option>
+      <ion-select-option [value]="3">3</ion-select-option>
+      <ion-select-option [value]="4">4</ion-select-option>
+      <ion-select-option [value]="5">5</ion-select-option>
+      <ion-select-option [value]="6">6</ion-select-option>
+      <ion-select-option [value]="7">7</ion-select-option>
+      <ion-select-option [value]="8">8</ion-select-option>
+      <ion-select-option [value]="9">9</ion-select-option>
+      <ion-select-option [value]="10">10</ion-select-option>
+      <ion-select-option [value]="11">11</ion-select-option>
+      <ion-select-option [value]="12">12</ion-select-option>
+    </ion-select>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-item> 
+            <ion-label position="floating" style="margin-bottom: 12px;">Category</ion-label>
+            <ion-select placeholder="Select category" name="category" [(ngModel)]="categ">
+              <ion-select-option *ngFor="let category of expense_categories" [value]="category" [disabled]="checkIfSelected(category)">
+                {{ category }}
+              </ion-select-option>
+              
+            </ion-select>
+          </ion-item>
+        </ion-col>
+  
+        <ion-col size="6">
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 12px;">Amount</ion-label>
+            <ion-input type="number" placeholder="Enter amount" [(ngModel)]="amount"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+  
+      <!-- Use *ngFor to display rows dynamically -->
+      <ion-row *ngFor="let row of rows">
+        <ion-col size="6">
+          <ion-label>{{ row.categ }}</ion-label>
+        </ion-col>
+        <ion-col size="6">
+          <ion-label>{{ row.amount }}</ion-label>
+        </ion-col>
+      </ion-row>
+  
+      <ion-button expand="block" class="add-button" style="background-color: antiquewhite;" (click)="addRow()">Add row</ion-button>
+    </ion-grid>
+  </div>
+
+  <div *ngIf="selectedData === 'Payment'" class="form-section">
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Amount</ion-label>
+      <ion-input type="number" placeholder="Enter amount" [(ngModel)]="amount" name="amount"></ion-input>
+    </ion-item>
+
+  
+
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Description</ion-label>
+      <ion-textarea placeholder="Enter description" [(ngModel)]="description" name="description"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating" style="margin-bottom: 12px;">Date</ion-label>
+      <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="date" [min]="minDate"></ion-datetime>
+    </ion-item>
+  </div>
+  
+  
+
+  <!-- Submit Button -->
+  <ion-button expand="block" class="submit-button" (click)="add()">Add</ion-button>
+</ion-content>

@@ -1,0 +1,166 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="toolbar-content">
+      <!-- Material Datepicker with visible input -->
+      <mat-form-field appearance="fill" class="date-picker">
+        <mat-label>Select Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          (dateChange)="bindData()"
+          [value]="selectedDate"
+          [(ngModel)]="selectedDate"
+          [min]="minDate"
+          [max]="maxDate"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker">
+          <button mat-icon-button>
+            <mat-icon>calendar_today</mat-icon>
+          </button>
+        </mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <div >
+      <ion-label id="total">Total:
+        <p id="total-amount"  [ngClass]="{'deficit': (totalAmount$ |async)! < 0, 'surplus': (totalAmount$ | async)! > 0}"> {{totalAmount$ | async | currency}}</p>
+      </ion-label>
+    </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+
+
+
+  <!-- Render sections based on selectedData -->
+  <!-- <div *ngIf="selectedData === 'All' && !loading" class="main-page">
+    <ng-container *ngIf="(combinedData$ | async) as combinedData">
+      <div *ngIf="combinedData.length > 0; else noData">
+        <ion-list>
+          <ion-item *ngFor="let item of combinedData" 
+                    [ngClass]="{
+                      'expense-item': item.type === 'expense', 
+                      'income-item': item.type === 'income'
+                    }">
+            <ion-label class="amount" [ngClass]="{
+              'expense-amount': item.type === 'expense', 
+              'income-amount': item.type === 'income'
+            }">{{ item.Amount }}$</ion-label>
+            <ion-label class="description">{{ item.Description }}</ion-label>
+            <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(item)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ng-container>
+  </div> -->
+  @if(selectedData === 'All' && !loading){
+    @if ((combinedData$ | async) ; as combinedData){
+      @if (combinedData.length > 0){
+        <ion-list>
+          <ion-item *ngFor="let item of combinedData" 
+                    [ngClass]="{
+                      'expense-item': item.type === 'expense', 
+                      'income-item': item.type === 'income'
+                    }"lines="none">
+            <ion-label class="amount" [ngClass]="{
+              'expense-amount': item.type === 'expense', 
+              'income-amount': item.type === 'income'
+            }">{{ item.Amount }}$</ion-label>
+            <ion-label class="description">{{ item.Description }}</ion-label>
+            <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(item)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ion-item>
+        </ion-list>
+      } @else {
+        <p id="noData">No data available.</p>
+      }
+    }
+  }
+
+  <!-- <div *ngIf="selectedData === 'Expenses' && !loading" class="main-page">
+    <ng-container *ngIf="(expenses$ | async) as expenses">
+      <div *ngIf="expenses.length > 0; else noData">
+        <ion-list>
+          <ion-item *ngFor="let expense of expenses" class="expense-item">
+            <ion-label class="expense-amount">{{ expense.Amount }}$</ion-label>
+            <ion-label class="description">{{ expense.Description }}</ion-label>
+            <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(expense)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ng-container>
+  </div> -->
+  @if(selectedData === 'Expenses' && !loading){
+    @if ((expenses$ | async) ; as expenses){
+      @if (expenses.length > 0){
+        <ion-list>
+          <ion-item *ngFor="let expense of expenses" class="expense-item" lines="none">
+            <ion-label class="expense-amount">{{ expense.Amount }}$</ion-label>
+            <ion-label class="description">{{ expense.Description }}</ion-label>
+            <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(expense)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ion-item>
+        </ion-list>
+      } @else {
+        <p id="noData">No data available.</p>
+      }
+     
+    }
+  }
+
+  <!-- <div *ngIf="selectedData === 'Incomes' && !loading" class="main-page">
+    <ng-container *ngIf="(incomes$ | async) as incomes">
+      <div *ngIf="incomes.length > 0; else noData">
+        <ion-list>
+          <ion-item *ngFor="let income of incomes" class="income-item">
+            <ion-label class="income-amount">{{ income.Amount }}$</ion-label>
+            <ion-label class="description">{{ income.Description }}</ion-label>
+            <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(income)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ng-container>
+  </div> -->
+@if (selectedData === 'Incomes' && !loading) {
+  @if ((incomes$ | async) ; as incomes  ) {
+    @if (incomes.length > 0 ) {
+      <ion-list lines="none">
+        <ion-item *ngFor="let income of incomes" class="income-item" lines="none">
+          <ion-label class="income-amount">{{ income.Amount }}$</ion-label>
+          <ion-label class="description">{{ income.Description }}</ion-label>
+          <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(income)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </ion-item>
+      </ion-list>
+    } @else {
+      <p id="noData">No data available.</p>
+    }
+  } @else {
+    <p>Loading incomes...</p>
+  }
+}
+
+
+ 
+
+  <div *ngIf="loading">
+    <ion-spinner name="crescent" id="spinner"></ion-spinner>
+  </div>
+
+  <ion-fab id="add-button" vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button routerLink="/add">
+      <ion-icon [src]="'../assets/add.svg'"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

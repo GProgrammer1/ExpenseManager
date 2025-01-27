@@ -1,0 +1,634 @@
+// /* Style the toolbar content */
+// :root {
+//   --item-height: 50px;
+// }
+// .toolbar-content {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     width: 100%;
+//   }
+  
+//   .select {
+//     width: 20%;
+//     border: 2px solid #d1d5db; /* Light gray border */
+//     border-radius: 8px; /* Softly rounded corners */
+//     padding: 6px; /* Inner padding for spacing */
+//     background-color: #f9fafb; /* Light neutral background */
+//     color: #374151; /* Dark gray text for readability */
+//     font-weight: 500; /* Slightly bold text for emphasis */
+//     transition: border-color 0.3s ease; /* Smooth hover effect */
+//   }
+  
+//   .select:focus {
+//     border-color: #9ca3af; /* Medium gray on focus */
+//     outline: none; /* Remove default outline */
+//   }
+  
+//   mat-form-field {
+//    position: relative;
+//    top: 10px;
+//   }
+
+//   ion-toolbar {
+//     display: flex;
+//     align-items: center;
+//   }
+  
+  
+//   /* General styling for list items */
+  
+//   #bottom-divs {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 10px;
+//   }
+  
+//   ion-tab-button.selected {
+//     background-color: #f0f0f0;
+//   }
+  
+//   ion-tabs {
+//     position: fixed;
+//     top: -3px;
+   
+//   }
+  
+//   /* Define styles for the expenses items */
+  
+  
+//   /* For amount labels */
+  
+
+//   /* Responsive design */
+
+//   @media (max-width: 600px) {
+//     .toolbar-content {
+//       display: flex;
+//       // flex-direction: column;
+//       align-items: flex-start;
+//     }
+  
+  
+  
+//     ion-label {
+//       font-size: 14px;
+//     }
+  
+    
+//     ion-content {
+//       padding: 0;
+//       margin: 0;
+//     }
+//     ion-list {
+//       max-height: fit-content;
+//       border: none;
+//       margin: 0;
+//       --padding-top: 0 !important;
+//   --padding-bottom: 0 !important;
+//   --inner-padding: 0 !important;
+//   padding: 0 !important;
+      
+//     }
+    
+//   .description {
+//     font-size: small;
+//     color: #666;
+//   }
+//   }
+//   /* General styles for income and expense items */
+//   .amount {
+//     font-size: 16px;
+//     color: #333;
+//   }
+  
+//   .expense-amount {
+//     color: red;
+//   }
+   
+//   .expense-type {
+//     color: red;
+//     font-weight: bold;
+//   }
+  
+//   /* For Incomes */
+//   .income-amount {
+//     color: green;
+//   }
+  
+//   .income-type {
+//     color: green;
+//     font-weight: bold;
+//   }
+  
+//   /* Styles for the navigation links */
+  
+//   /* Responsive design */
+//   @media (max-width: 600px) {
+//     .toolbar-content {
+//       align-items: center;
+//       // flex-direction: column;
+//       justify-content: space-around;
+
+//       #amounts {
+//         width: 20%;
+//         font-size: smaller;
+//       }
+
+//       #expenses, #incomes, #total {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//       }
+
+//       .select {
+//         width: 20%;
+//       }
+
+//       .date-picker {
+//         position: relative;
+//         width: 50%;
+//         align-self: flex-start;
+//       }
+      
+//       .date-input {
+//         width: 100%;
+//         padding: 10px 12px;
+//         font-size: 16px;
+//         border: 2px solid #d1d5db; /* Light gray border */
+//         border-radius: 8px; /* Rounded corners */
+//         background-color: #f9fafb; /* Neutral background */
+//         color: #374151; /* Dark gray text */
+//         appearance: none; /* Remove default date picker styling */
+//         outline: none;
+//         transition: border-color 0.3s ease, background-color 0.3s ease;
+//       }
+      
+//       .date-input:focus {
+//         border-color: #6366f1; /* Focus color */
+//         background-color: #ffffff; /* White background */
+//       }
+      
+//       .placeholder {
+//         position: absolute;
+//         top: 50%;
+//         left: 12px;
+//         transform: translateY(-50%);
+//         font-size: 16px;
+//         color: #9ca3af; /* Medium gray */
+//         pointer-events: none;
+//         transition: opacity 0.3s ease, transform 0.3s ease;
+//       }
+      
+//       .placeholder.hidden {
+//         opacity: 0;
+//         transform: translateY(-30%);
+//       }
+      
+//       .date-picker:hover .date-input {
+//         border-color: #9ca3af; /* Hover effect */
+//       }
+      
+  
+//     }
+  
+    
+//     ion-label {
+//       font-size: 14px;
+//     }
+  
+//     ion-item {
+//       padding: 8px;
+//       border-bottom: 1px solid #f0f0f0;
+//     }
+  
+//   }
+//   ion-content {
+//     --padding-bottom: 70px;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//   }
+//   ion-tab-bar {
+//     position: fixed;
+//     top: 20px;
+//     width: 100%;
+//     background-color: var(--ion-color-light); /* Optional: Ensure background matches design */
+//     border-bottom: 1px solid var(--ion-border-color, #dcdcdc); /* Match ion-item's border color */
+//   }
+
+//   #title {
+//     display: flex;
+//     margin-top: 30px;
+//   }
+  
+//   #title mat-icon {
+//     color: green;
+//   }
+  
+//   .main-page {
+//     position: relative;
+//     top: 70px;
+//     padding: 0;
+//     margin: 0;
+//     border: 1px solid #f0f0f0;
+//   }
+  
+//   ion-title {
+//     text-align: center;
+//   }
+
+//   ::ng-deep #filter {
+//     position: fixed;
+//     top: 13%;
+//     padding: 0;
+//   }
+
+//   ion-content {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     background-color: gray;
+//   }
+  
+//   ion-tab-button.active-tab {
+//     background-color: #f0f0f0;
+//   }
+
+//   mat-datepicker-toggle {
+//     position: relative;
+//     width: 50%;
+//     align-self: flex-start;
+//   }
+  
+//   #spinner {
+//     position: fixed;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     size: 900px;
+//   }
+  
+//   a {
+//     color: white;
+//     text-decoration: none;
+//   }
+  
+  
+  
+//   #noData {
+//     text-align: center;
+//     color: #888;
+//     font-size: 16px;
+//     padding: 20px;
+//     display: flex;
+//     position: fixed;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     margin: 0 auto;
+//   }
+  
+//   ::ng-deep ng-template {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+  
+//   #amounts {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 10px;
+//     gap: 10px;
+//   }
+//   #add-button {
+//     position: absolute;
+//     bottom: 5%;
+    
+//   }
+
+//   #expenses .amounts-value{ 
+//     color: red;
+//   }
+//   ion-icon {
+//     color: white;
+//   }
+
+//   #incomes .amounts-value {
+//     color: green;
+//   }
+//   /* Apply the gray background to the entire body */
+// /* Ensure the ion-header is transparent */
+// /* Ensure the ion-header is transparent */
+// /* Ensure the ion-header is transparent */
+// ion-header {
+//   background-color: transparent; /* Keep header transparent */
+//   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for the header */
+// }
+
+// /* Ensure ion-content has a lighter gray background */
+// ion-content {
+//   --background: rgb(235, 235, 235); /* Lighter gray background */
+//   // --padding-bottom: 70px;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// #total-amount.deficit {
+//   color: red;
+// }
+// #total-amount.surplus {
+//   color: green;
+// }
+
+// #total * {
+//   font-size: 1rem;
+// }
+// #total {
+//   font-size: 1rem;
+//   font-weight: bold;
+// }
+
+// .alterable-icon {
+//   color: orange; /* Change the stroke color */
+//   width: 48px; /* Change the size */
+//   height: 48px; /* Change the size */
+//   --stroke-width: 4px; /* Adjust stroke width */
+// }
+
+// /* Main content area with border and shadows matching ion-item's border */
+// .main-page {
+//   background-color: white; /* White background */
+//   position: relative;
+//   top: -3px;
+//   height: fit-content;
+//   border: 1px solid var(--ion-border-color, #dcdcdc); /* Match ion-item's border color */
+//   border-radius: 8px; /* Rounded corners for a softer look */
+//   padding: 15px;
+//   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+// }
+
+// /* Adjust the ion-content padding for better layout */
+
+// ion-list {
+//   --padding-top: 0 !important;
+//   --padding-bottom: 0 !important;
+//   --inner-padding: 0 !important;
+//   padding: 0 !important;
+
+//   /* Add a box shadow */
+//   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 
+//               0 1px 3px rgba(0, 0, 0, 0.06);
+
+//   /* Optional styling for a more refined appearance */
+//   border-radius: 8px; /* Rounds the corners */
+//   background-color: #ffffff; /* Ensures the background is white */
+// }
+
+
+
+// /* Optionally, add some margin to create spacing around the main content */
+// body {
+//   margin: 0;
+//   padding: 0;
+//   font-family: Arial, sans-serif;
+// }
+
+
+// ion-tab-bar {
+//   display: flex;
+//   justify-content: space-around;
+//   background-color: #f8f9fa;
+//   border-top: 2px solid #e0e0e0;
+//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+//   padding: 15px 0;
+//   margin-bottom: 300px;
+//   position: absolute;
+//   top: 30px;
+// }
+
+// ion-tabs {
+//   position: fixed;
+//   top: -12px;
+//   width: 100%;
+//   margin-bottom: 100px; 
+// }
+
+// ion-tab-button {
+//   flex-grow: 1;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 10px;
+//   border-radius: 5px;
+//   transition: background-color 0.3s, box-shadow 0.3s;
+//   color: #6c757d;
+//   font-size: 0.95rem;
+// }
+
+// ion-tab-button:hover {
+//   background-color: #e0e0e0;
+// }
+
+// ion-tab-button.active-tab {
+//   background-color: #ffffff;
+//   color: var(--ion-color-primary);
+//   font-weight: bold;
+//   box-shadow: 0 2px 6px rgba(0, 0, 255, 0.2);
+// }
+:root {
+  --item-height: 50px;
+}
+
+/* Toolbar Content */
+.toolbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.select {
+  width: 20%;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px;
+  background-color: #f9fafb;
+  color: #374151;
+  font-weight: 500;
+  transition: border-color 0.3s ease;
+}
+
+.select:focus {
+  border-color: #9ca3af;
+  outline: none;
+}
+
+/* Form Fields */
+mat-form-field {
+  position: relative;
+  top: 10px;
+}
+
+/* Toolbar */
+ion-toolbar {
+  display: flex;
+  align-items: center;
+}
+
+/* Bottom Divs */
+#bottom-divs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Tab Button */
+ion-tab-button.selected {
+  background-color: #f0f0f0;
+}
+
+/* Tabs */
+ion-tabs {
+  position: fixed;
+  top: -3px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .toolbar-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+  }
+
+  .select {
+    width: 20%;
+  }
+
+  ion-label {
+    font-size: 14px;
+  }
+
+  ion-item {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  ion-content {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Amount Styles */
+.amount {
+  font-size: 16px;
+  color: #333;
+}
+
+.expense-amount {
+  color: red;
+}
+
+.expense-type {
+  color: red;
+  font-weight: bold;
+}
+
+.income-amount {
+  color: green;
+}
+
+.income-type {
+  color: green;
+  font-weight: bold;
+}
+
+/* Total Amount */
+#total-amount.deficit {
+  color: red;
+}
+
+#total-amount.surplus {
+  color: green;
+}
+
+/* General Styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.main-page {
+  background-color: white;
+  position: relative;
+  top: -3px;
+  height: fit-content;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header and Content Background */
+ion-header {
+  background-color: transparent;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+ion-content {
+  --background: rgb(235, 235, 235);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tab Bar */
+ion-tab-bar {
+  display: flex;
+  justify-content: space-around;
+  background-color: #f8f9fa;
+  border-top: 2px solid #e0e0e0;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px 0;
+  position: absolute;
+  top: 30px;
+}
+
+ion-tab-button {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+ion-tab-button:hover {
+  background-color: #e0e0e0;
+}
+
+ion-tab-button.active-tab {
+  background-color: #ffffff;
+  color: var(--ion-color-primary);
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+

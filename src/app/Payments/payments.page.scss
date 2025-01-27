@@ -1,0 +1,156 @@
+/* Toolbar Content */
+.toolbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Ion List Styling */
+ion-list {
+  padding: 15px;
+  // background-color: #f9f9f9;
+  border-radius: 10px;
+  z-index: 10;
+  margin-bottom: 20px;
+}
+
+ion-content {
+    background-color: #f9f9f9;
+  z-index: 1;
+}
+
+.payment-item {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  padding: 15px;
+  display: flex !important;
+  justify-content: space-between;
+}
+
+.payment-item ion-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Payment Date Section */
+.payment-date-section {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+#payment-date {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px; /* Added more space between the date and payments */
+}
+
+#payment-desc {
+  width: 9%;
+}
+
+#warning-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  gap: 0.4rem
+}
+
+#warning, #warning-sign {
+  color: #d9534f;
+}
+
+/* Buttons and Icon Styles */
+ion-button {
+  font-size: 16px;
+  color: #007aff;
+  text-transform: capitalize;
+}
+
+ion-button[fill="clear"] {
+  color: #d9534f;
+}
+
+ion-icon {
+  font-size: 22px;
+}
+
+/* No Data Message */
+#noData {
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+  padding: 40px 20px;
+  background-color: #f0f0f0; /* Gray background when no data */
+  border-radius: 10px;
+}
+
+/* Loading Spinner */
+#spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Add Button */
+#add-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+ion-fab-button {
+  background-color: #007aff;
+  border-radius: 50%;
+}
+
+ion-fab-button:hover {
+  background-color: #005fa3;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  ion-list {
+    padding: 10px;
+  }
+
+  ion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .payment-item {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .payment-date-section {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  ion-label {
+    font-size: 14px;
+  }
+
+  ion-item ion-label {
+    font-size: 11px;
+  }
+
+  
+  ion-button {
+    font-size: 0.4rem;
+  }
+}

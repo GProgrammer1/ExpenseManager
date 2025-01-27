@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Register</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="register-container">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Account Information</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form>
+          <!-- First Name -->
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 15px;">First Name</ion-label>
+            <ion-input [(ngModel)]="name" type="text" name="name" required></ion-input>
+          </ion-item>
+
+          <!-- Email -->
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 15px;">Email</ion-label>
+            <ion-input [(ngModel)]="email" type="email" name="email" required></ion-input>
+          </ion-item>
+
+          <!-- Password -->
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 15px;">Password</ion-label>
+            <ion-input [(ngModel)]="password" type="password" name="password" required></ion-input>
+          </ion-item>
+
+          <!-- Confirm Password -->
+          <ion-item>
+            <ion-label position="floating" style="margin-bottom: 15px;">Confirm Password</ion-label>
+            <ion-input [(ngModel)]="confirmPassword" type="password" name="confirmPassword" required></ion-input>
+          </ion-item>
+
+          <!-- Register Button -->
+          <ion-button expand="block" class="ion-margin-top" (click)="register()">Register</ion-button>
+
+          <!-- Login Link -->
+          <div class="ion-text-center ion-margin-top">
+            <p>
+              Already have an account? 
+              <ion-router-link routerLink="/login">Login here</ion-router-link>
+            </p>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
