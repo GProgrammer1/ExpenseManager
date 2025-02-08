@@ -88,6 +88,8 @@ async function checkPaymentsApproachingDeadline() {
 
 // Set up cron job to run once a day at midnight
 function sendNotification(title, body, fcmToken) {
+  console.log('Sending notification...');
+  
   const message = {
     notification: {
       title: title,

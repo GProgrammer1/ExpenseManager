@@ -7,11 +7,11 @@ const {sendNotification} = require('./admin')
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(cors());
-app.listen(3000,'10.169.39.40', () => {
+app.listen(3000,'10.169.39.9', () => {
     console.log('Server is running on port 3000');
 });
 // minutes hours dayofthemonth month dayoftheweek
-cron.schedule('0 0 * * *', () => {
+cron.schedule('8 16 * * *', () => {
     console.log('Checking for payments nearing the deadline...');
     checkPaymentsApproachingDeadline();
     deleteExpiredPayments();
