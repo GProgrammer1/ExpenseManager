@@ -8,6 +8,7 @@ import { User } from '../models';
 import { RouterLink } from '@angular/router';
 
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
+import { FcmService } from '../fcm.service';
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
@@ -23,7 +24,9 @@ export class RegisterPage implements OnInit {
   password: string = '';
   confirmPassword: string = '';
 
-  constructor(private authService: AuthService, private firestoreService: FirestoreService) { }
+  constructor(private authService: AuthService, private firestoreService: FirestoreService,
+    private fcmService: FcmService
+  ) { }
 
   ngOnInit() {
   }
@@ -37,19 +40,14 @@ export class RegisterPage implements OnInit {
     try {
       const authUser =  await this.authService.signup(this.email, this.password);
       const uid = authUser.uid;
-     const {value} = await  SecureStoragePlugin.get({key: 'device_id'});
-      console.log(value);
-
-    
-      const fcmToken = await this.firestoreService.getFcmToken(value!);
-      console.log(fcmToken);
+     const fcmToken  = await this.fcmService.getToken();
       
       const user : User = {
         uid,
         Email: this.email,
         Password: this.password,
         Budgets: [],Expenses: [], Incomes: [], Payments: [],
-        Name: this.name, fcmToken
+        Name: this.name, fcmToken: fcmToken!
         
       }
       await this.firestoreService.addUser(user);
