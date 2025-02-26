@@ -1,0 +1,216 @@
+/* Toolbar Content */
+.toolbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+ion-header, ion-toolbar {
+  --background: #007aff;
+  --color: white;
+  font-weight: bold;
+ 
+}
+
+ion-toolbar {
+  display: flex !important;
+  flex-direction: row;
+  justify-content: space-between !important;
+
+  ion-title {
+    position: relative;
+    top: 20px;
+    margin-bottom: 40px;
+  }
+}
+
+#add-subscription {
+  display: flex;
+  align-items: center;
+  justify-self: flex-end;
+  align-self: flex-start;
+  --color: white !important;
+  position: relative;
+  bottom: 55px;
+}
+
+#view-sub-btn {
+  color: #007aff;;
+  --background: white;
+  border: none !important;
+}
+
+#subscription-list {
+  z-index: 100000;
+}
+
+#view-subscriptions {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  z-index: 100000;
+}
+/* Ion List Styling */
+ion-list {
+  padding: 15px;
+  // background-color: #f9f9f9;
+  border-radius: 10px;
+  z-index: 10;
+  margin-bottom: 20px;
+}
+
+ion-content {
+    background-color: #f9f9f9;
+  z-index: 1;
+}
+
+.payment-item {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  padding: 15px;
+  display: flex !important;
+  justify-content: space-between;
+}
+
+.payment-item ion-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Payment Date Section */
+.payment-date-section {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+#payment-date {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px; /* Added more space between the date and payments */
+}
+
+#payment-desc {
+  width: 9%;
+}
+
+#warning-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  gap: 0.4rem
+}
+
+#add-sub-btn {
+  --color: white;
+}
+
+#warning, #warning-sign {
+  color: #d9534f;
+}
+
+/* Buttons and Icon Styles */
+
+
+ion-button[fill="clear"] {
+  color: #d9534f;
+}
+
+ion-icon {
+  font-size: 22px;
+}
+
+/* No Data Message */
+#noData {
+  
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+    padding: 20px;
+    position: fixed; /* Keeps it within the flow */
+    top: 50%; /* Centers it vertically */
+    left: 50%; /* Centers it horizontally */
+    transform: translate(-50%, -50%); /* Centers it perfectly */
+    margin-top: 30px;
+  
+}
+
+/* Loading Spinner */
+#spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Add Button */
+#add-button {
+  position: fixed;
+  // bottom: 20px;
+  // right: 20px;
+  z-index: 10;
+}
+
+ion-fab-button {
+  background-color: #007aff;
+  border-radius: 50%;
+}
+
+ion-fab-button:hover {
+  background-color: #005fa3;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  ion-list {
+    padding: 10px;
+  }
+
+  ion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .payment-item {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .payment-date-section {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  ion-label {
+    font-size: 14px;
+  }
+
+  ion-item ion-label {
+    font-size: 11px;
+  }
+
+  
+  // ion-button {
+  //   font-size: 0.4rem;
+  // }
+}
+.dropdown-menu {
+  border: 1px solid black; /* Black border to distinguish */
+  max-height: 300px; /* Small height to avoid covering the whole screen */
+  overflow-y: auto; /* Enables scrolling if content overflows */
+  background: white; /* Ensures visibility */
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds slight shadow for better distinction */
+  border-radius: 20px;
+}
+

@@ -1,0 +1,104 @@
+<div id="view-subscriptions">
+  <ion-button fill="clear" (click)="toggleDropdown()" id="view-sub-btn">
+    View Subscriptions
+    <ion-icon name="chevron-down" *ngIf="!dropdownOpen"></ion-icon>
+    <ion-icon name="chevron-up" *ngIf="dropdownOpen"></ion-icon>
+  </ion-button>
+
+  <div *ngIf="dropdownOpen" class="dropdown-menu">
+    <ion-list id="subscription-list">
+      @if ((subscriptions$ |async) ; as subscriptions){
+        @if (subscriptions.length > 0) {
+      <ion-item *ngFor="let sub of subscriptions">
+        <ion-label>
+          <h3>{{ sub.name }}</h3>
+          <p>Amount: ${{ sub.amount }}</p>
+          <p>Due: {{ sub.dayOfTheMonth }} of each month</p>
+        </ion-label>
+        <ion-button fill="clear" color="danger" (click)="presentDeleteSubscriptionDialog(sub)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-button>
+      </ion-item>
+    } @else {
+      <ion-item>
+        <ion-label>
+          <h3>No subscriptions</h3>
+        </ion-label>
+      </ion-item>}
+    }
+    @else {
+      <ion-item>
+        <ion-label>
+          <h3>No subscriptions</h3>
+        </ion-label>
+      </ion-item>
+    }
+    </ion-list>
+  </div>
+</div>
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Payments</ion-title>
+    
+    <div id="add-subscription">
+      <ion-icon name="add" id="add-icon"></ion-icon>
+      <ion-button fill="clear" id="add-sub-btn" (click)="presentAddSubscriptionDialog()">
+        Add subscription
+      </ion-button>
+    </div>
+
+    
+
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true">
+  <div *ngIf="!loading; else Loading">
+    <ng-container *ngIf="(dueDates$ | async) as dueDates">
+      <div *ngIf="dueDates.length > 0; else noData">
+        <ion-list>
+          <div *ngFor="let dueDate of sortDates(dueDates)">
+            <ng-container *ngIf="(payments$ | async) && hasPaymentsForDate(dueDate, (payments$ | async)!)">
+              <div class="payment-date-section">
+                @if (isNearPayment(dueDate)){
+                  <div id="warning-div">
+                    <ion-icon name="warning-outline" id="warning-sign"></ion-icon>
+                    <ion-label id="warning">Payments are due in {{timeUntil(dueDate)}}</ion-label>
+                  </div> 
+              }
+                <ion-title id="payment-date">{{ formatDate(dueDate) }}</ion-title>
+                <div *ngFor="let payment of (payments$ | async)">
+                  <ng-container *ngIf="compareDates(dueDate, payment.dueDate.toDate())">
+                    <ion-item class="payment-item">
+                      <ion-label id="payment-desc">{{ payment.description }}</ion-label>
+                      <ion-label>{{ payment.amount | currency }}</ion-label>
+                      <ion-button fill="clear" color="danger" (click)="presentDeleteDialog(payment)">
+                        <ion-icon slot="icon-only" name="trash"></ion-icon>
+                      </ion-button>
+                    </ion-item>
+                  </ng-container>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </ion-list>
+      </div>
+    </ng-container>
+  </div>
+
+  <ng-template #noData>
+    <p id="noData">No data available</p>
+  </ng-template>
+
+  <ng-template #Loading>
+    <ion-spinner name="crescent" id="spinner"></ion-spinner>
+  </ng-template>
+
+  <ion-fab id="add-button" vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button routerLink="/add-payment" routerDirection="forward">
+      <ion-icon [src]="'../assets/add.svg'"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

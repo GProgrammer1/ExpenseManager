@@ -1,0 +1,31 @@
+<ion-content [fullscreen]="true">
+  <div class="login-container">
+    <ion-card class="login-card">
+      <ion-card-header>
+        <ion-card-title>Expense Manager</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Email Input -->
+        <ion-item>
+          <ion-label position="floating">Email</ion-label>
+          <ion-input [(ngModel)]="email" type="email" required></ion-input>
+        </ion-item>
+
+        <!-- Password Input -->
+        <ion-item>
+          <ion-label position="floating">Password</ion-label>
+          <ion-input [(ngModel)]="password" type="password" required></ion-input>
+        </ion-item>
+
+        <!-- Login Button -->
+        <ion-button expand="block" (click)="login()">Login</ion-button>
+
+        <!-- Registration Link -->
+        <div class="register-link">
+          Don't have an account? <a routerLink="/register">Register Here</a>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

@@ -1,0 +1,72 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Add Budget</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid class="grid-wrapper">
+    <!-- Month Selector -->
+    <ion-item>
+      <ion-label position="floating">Select Month</ion-label>
+      <ion-select [(ngModel)]="selectedMonth" placeholder="Select month">
+        <ion-select-option [value]="1">January</ion-select-option>
+        <ion-select-option [value]="2">February</ion-select-option>
+        <ion-select-option [value]="3">March</ion-select-option>
+        <ion-select-option [value]="4">April</ion-select-option>
+        <ion-select-option [value]="5">May</ion-select-option>
+        <ion-select-option [value]="6">June</ion-select-option>
+        <ion-select-option [value]="7">July</ion-select-option>
+        <ion-select-option [value]="8">August</ion-select-option>
+        <ion-select-option [value]="9">September</ion-select-option>
+        <ion-select-option [value]="10">October</ion-select-option>
+        <ion-select-option [value]="11">November</ion-select-option>
+        <ion-select-option [value]="12">December</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-button expand="block" class="add-button" (click)="addRow()">Add Row</ion-button>
+
+    <!-- Category and Amount Input -->
+    <ion-row>
+      <ion-col size="6">
+        <ion-item>
+          <ion-label position="floating">Category</ion-label>
+          <ion-select placeholder="Select category" name="category" [(ngModel)]="categ">
+            <ion-select-option *ngFor="let category of expense_categories" [value]="category" [disabled]="checkIfSelected(category)">
+              {{ category }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-item>
+          <ion-label position="floating">Amount</ion-label>
+          <ion-input type="number" placeholder="Enter amount" [(ngModel)]="amount"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <!-- Displaying Dynamic Rows -->
+    <ion-row *ngFor="let row of rows" class="row-item">
+      <ion-col size="4" class="row-category">
+        <ion-label>{{ row.category }}</ion-label>
+      </ion-col>
+      <ion-col size="4" class="row-amount">
+        <ion-label>{{ row.amount | currency}}</ion-label>
+      </ion-col>
+      <ion-col size="4" class="row-actions">
+        <ion-button fill="clear" color="danger" (click)="removeRow(row)">Remove</ion-button>
+      </ion-col>
+    </ion-row>
+
+
+    <!-- Submit Button -->
+    <ion-button expand="block" class="submit-button" (click)="add()">Submit</ion-button>
+    <ion-button expand="block"
+   class="cancel-button"
+  routerLink="/tabs/budget"
+  color="danger" >Cancel</ion-button>
+  </ion-grid>
+</ion-content>

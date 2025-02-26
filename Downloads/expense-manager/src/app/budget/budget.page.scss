@@ -1,0 +1,107 @@
+/* Header Styling */
+.month-toggler-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+#budget-title {
+  font-family: 'Poppins', sans-serif; /* Modern, clean font */
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+/* Table Design */
+.table {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin: 20px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+
+.deficit {
+  color: green;
+}
+
+.surplus {
+  color: red;
+}
+
+.header-row {
+  background-color: #007aff;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+.data-row {
+  border-bottom: 1px solid #ccc;
+  transition: background-color 0.3s;
+}
+
+.data-row:hover {
+  background-color: #f9f9f9;
+}
+
+.total-row {
+  font-weight: bold;
+  background-color: #f4f4f4;
+}
+
+.data-cell {
+  padding: 12px;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+
+
+/* Spinner Centering */
+#spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+
+/* FAB Styling */
+ion-fab{
+  position: fixed;
+  // bottom: 5%;
+}
+
+ion-content {
+  background-color: red;
+}
+
+#gray {
+  z-index: -1000;
+}
+#toggler {
+  display: flex;
+  align-items: first-baseline;
+  gap: 8px;
+  
+  ion-label {
+    font-family: 'Poppins', sans-serif; /* Modern, clean font */
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+}
+.deficit-total {
+  --background: green;
+}
+
+.surplus-total {
+  --background: red;
+}

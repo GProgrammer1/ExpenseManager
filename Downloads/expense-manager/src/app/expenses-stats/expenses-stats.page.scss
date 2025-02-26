@@ -1,0 +1,161 @@
+// $font-stack: 'Arial', sans-serif;
+
+/* Container for chart and percentages */
+ .percentages-container {
+  margin: 20px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  // font-family: $font-stack;
+}
+
+.percentages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  padding-bottom: 120px;
+  background: #fefefe;
+  border-radius: 8px;
+  overflow-y: auto;
+}
+
+#spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: larger;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: #333;
+}
+
+.percentages-container {
+  margin-top: 20px;
+}
+
+
+.percentage-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.category {
+  font-weight: bold;
+  color: #00796b; /* Accent color */
+}
+
+.percentage-value {
+  color: #333;
+}
+
+/* Loading state for the canvas */
+.loading {
+  background-size: 50px;
+  min-height: 400px;
+  height: 400px;
+}
+
+#expense-chart {
+  margin: 30px;
+  padding: 30px;
+  padding-bottom: 0px;
+  height: 100%; /* Adjust for responsive behavior */
+  background-color: #ffffff; /* Ensure the background is white */
+  border-radius: 8px;
+  border-bottom: 2px solid #ccc;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+canvas {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#chart {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* Adjust the chart to take full available space */
+  box-sizing: border-box;
+}
+
+.not-loading {
+  min-height: 400px;
+  height: 400px;
+}
+ion-header, ion-toolbar {
+  --background: #007aff;
+  color: white;
+}
+
+ion-content {
+  padding: 20px !important;
+  position: absolute;
+  top: 50px;
+  overflow: auto;
+  height: 100%;
+  z-index: 5000;
+}
+
+.no-data {
+  text-align: center;
+  color: #888;
+  font-size: 16px;
+  padding: 20px;
+  position: fixed; /* Keeps it within the flow */
+  top: 50%; /* Centers it vertically */
+  left: 50%; /* Centers it horizontally */
+  transform: translate(-50%, -50%); /* Centers it perfectly */
+  margin-top: 30px;
+}
+
+.percentage-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background: #fefefe;
+  border-radius: 8px;
+}
+
+.percentage {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 5px 10px;
+  background: #f1f3f5;
+  border-radius: 6px;
+}
+
+.chart-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.percentages-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background: #fefefe;
+  border-radius: 8px;
+  overflow-y: auto;
+}
+#category {
+  font-weight: bold;
+}

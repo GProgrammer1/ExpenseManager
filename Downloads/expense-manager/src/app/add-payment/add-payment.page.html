@@ -1,0 +1,32 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Add Payment</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Amount Input -->
+  <ion-item>
+    <ion-label position="floating" class="form-label">Amount</ion-label>
+    <ion-input type="number" placeholder="Enter amount" [(ngModel)]="amount" name="amount"></ion-input>
+  </ion-item>
+
+  <!-- Description Input -->
+  <ion-item>
+    <ion-label position="floating" class="form-label">Description</ion-label>
+    <ion-textarea placeholder="Enter description" [(ngModel)]="description" name="description"></ion-textarea>
+  </ion-item>
+
+  <!-- Date Input -->
+  <ion-item>
+    <ion-label position="floating" class="form-label">Date</ion-label>
+    <ion-datetime displayFormat="YYYY/MM/DD" [(ngModel)]="selectedDate" [min]="tomorrow" ></ion-datetime>
+  </ion-item> 
+
+  <!-- Add Button -->
+  <ion-button expand="block" class="submit-button" (click)="add()">Add</ion-button>
+  <ion-button expand="block"
+   class="cancel-button"
+  routerLink="/tabs/payments"
+  color="danger" >Cancel</ion-button>
+</ion-content>

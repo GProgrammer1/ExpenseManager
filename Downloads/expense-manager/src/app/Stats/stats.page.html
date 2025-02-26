@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="month-toggler-container">
+      <ion-buttons slot="start">
+        <ion-button (click)="toggleMonth('back')" color="white">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>{{ currentMonth.display }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleMonth('forward')" color="white">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+
+  <!-- Tabs Section -->
+  
+  </ion-toolbar>
+</ion-header>
+<ion-tabs>
+<ion-tab-bar slot="top" id="filter">
+  <ion-tab-button 
+    [routerLink]="['/tabs/stats/expenses', currentMonth.value]"
+    [ngClass]="{ 'active-tab': selectedData === 'Expenses' }" 
+      (click)="selectedData = 'Expenses'"
+  >
+    <ion-label>Expenses</ion-label>
+  </ion-tab-button>
+  <ion-tab-button
+    [routerLink]="['/tabs/stats/incomes', currentMonth.value]"
+    [ngClass]="{ 'active-tab': selectedData === 'Incomes' }"
+      (click)="selectedData = 'Incomes'"
+  >
+    <ion-label>Incomes</ion-label>
+  </ion-tab-button>
+  <ion-router-outlet></ion-router-outlet>
+</ion-tab-bar>
+</ion-tabs>
+<ion-content [fullscreen]="true" class="chart-data-content">
+  
+  
+
+  <!-- Loading Spinner
+  
+
+  <div id="canvas" *ngIf="!noData">
+    <div
+      style="position: relative; height: 400px;"
+      id="expense-chart"
+      *ngIf="!noData && selectedData === 'Expenses'"
+    >
+      <div id="chart">
+        <ion-title class="chart-title">Expenses:</ion-title>
+        <canvas id="myChart1" [ngClass]="{'loading': loading, 'not-loading': !loading}"></canvas>
+      </div>
+    </div>
+    
+
+    <div
+      style="position: relative; height: 400px;"
+      id="income-chart"
+      *ngIf="!noData && selectedData === 'Incomes' "
+    >
+    <div id="chart">
+      <ion-title class="chart-title">Incomes:</ion-title>
+      <canvas id="myChart2" [ngClass]="{'loading': loading, 'not-loading': !loading}"></canvas>
+    </div>
+    </div>
+    
+  </div>
+
+  <div class="percentages" *ngIf="!noData">
+    <ion-title class="chart-title">Percentages:</ion-title>
+    <div class="percentage-container">
+      <div *ngFor="let pair of (selectedData ==='Expenses' ? expensePercentages: incomePercentages); let i = index" class="percentage">
+        <ion-label id="category">{{pair['category']}}:</ion-label>
+        <ion-label>{{pair['percentage'] | percent}}</ion-label>
+      </div>
+    </div>
+  </div>
+    
+  <div *ngIf="noData" id="no-data">
+    <div class="no-data">
+      <ion-title>No data available</ion-title>
+    </div>
+  </div>
+</ion-content> -->

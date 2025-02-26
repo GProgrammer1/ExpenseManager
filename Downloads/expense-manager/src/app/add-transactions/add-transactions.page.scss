@@ -1,0 +1,31 @@
+ion-tabs {
+    z-index: 10; /* Lower z-index to not overlap everything else */
+  }
+  
+  ion-tab-bar {
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+    z-index: 100; /* Ensure it is above other content */
+  }
+  
+  ion-tab-button {
+    z-index: 101; /* Ensure buttons are above the tab bar */
+  }
+  ion-item {
+    z-index: 1; /* Ensure it's not interfering with tabs */
+  }
+  ion-router-outlet {
+    position: relative;
+    z-index: 10; /* Ensure the content is above other elements */
+  }
+  ion-tab-button.selected {
+    background-color: #ffffff;
+    color: var(--ion-color-primary); /* Active tab color */
+    font-weight: bold;
+    border-bottom: 2px solid var(--ion-color-primary); /* Highlight active tab with border */
+    box-shadow: 0 2px 6px rgba(0, 0, 255, 0.2); /* Subtle shadow on active tab */
+  }
+  ion-tab-button:focus {
+    background-color: #e0e0e0;
+    --color: var(--ion-color-primary);
+  }

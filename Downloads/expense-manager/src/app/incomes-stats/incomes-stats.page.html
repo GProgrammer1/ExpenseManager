@@ -1,0 +1,31 @@
+<ion-content [fullscreen]="true">
+
+  @if (!loading) {
+  <div style="position: relative; height: 100%;" id="income-chart" *ngIf="!noData">
+    <div id="chart">
+      <ion-title class="chart-title">Incomes:</ion-title>
+      <canvas id="myChart2" style="height: 100%; width: 100%;"></canvas>
+    </div>
+  </div>
+} @else {
+    <ion-spinner name="crescent" id="spinner" style="--width: 500px; --height: 500px;"></ion-spinner>
+}
+  @if (!loading) {
+  <div class="percentages" *ngIf="!noData">
+    <ion-title class="chart-title">Percentages:</ion-title>
+    <div class="percentages-container">
+      <div *ngFor="let pair of incomePercentages; let i = index" class="percentage">
+        <ion-label id="category">{{pair['category']}}:</ion-label>
+        <ion-label>{{pair['percentage'] | percent}}</ion-label>
+      </div>
+    </div>
+  </div>
+}
+  
+
+  <div *ngIf="noData" id="no-data">
+    <div class="no-data">
+      <ion-title>No data available</ion-title>
+    </div>
+  </div>
+</ion-content>

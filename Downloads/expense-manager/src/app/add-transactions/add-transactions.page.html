@@ -1,0 +1,15 @@
+
+ <ion-tabs>
+<ion-router-outlet></ion-router-outlet>
+  <ion-tab-bar slot="top" id="filter">
+    <ion-tab-button [ngClass]="{'selected': selectedTab === 'expense'}" (click)="navigate('expense')" tab="expense" >
+      Expense
+    </ion-tab-button>
+    <ion-tab-button  (click)="navigate('income')" [ngClass]="{'selected': selectedTab === 'income'}" tab="income">
+      Income
+   </ion-tab-button>
+   
+  </ion-tab-bar>
+
+</ion-tabs>
+ 

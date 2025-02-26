@@ -1,0 +1,66 @@
+/* Full-screen Centering */
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #00b4d8, #0077b6);
+}
+
+/* Card Styling */
+.register-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background: white;
+  text-align: center;
+}
+
+ion-card-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #0077b6;
+}
+
+/* Input Fields */
+ion-item {
+  --background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+ion-input {
+  padding-left: 10px;
+}
+
+/* Button Styling */
+ion-button {
+  --border-radius: 8px;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  --background: #0077b6;
+  --color: white;
+  margin-top: 10px;
+}
+
+ion-label{
+  margin-bottom: 7px !important;
+}
+/* Login Link */
+.login-link {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: #333;
+
+  a {
+    color: #0077b6;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

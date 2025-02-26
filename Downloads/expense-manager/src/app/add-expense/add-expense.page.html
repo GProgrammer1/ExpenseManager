@@ -1,0 +1,45 @@
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <ion-item>
+      <ion-label position="floating">Amount</ion-label>
+      <ion-input
+        type="number"
+        placeholder="Enter amount"
+        [(ngModel)]="amount"
+        name="amount"
+        class="input-field"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Category</ion-label>
+      <ion-select
+        placeholder="Select category"
+        name="category"
+        [(ngModel)]="categ"
+        class="input-field"
+      >
+        <ion-select-option *ngFor="let category of expense_categories" [value]="category">{{ category }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Description</ion-label>
+      <ion-textarea
+        placeholder="Enter description"
+        [(ngModel)]="description"
+        name="description"
+        class="input-field"
+      ></ion-textarea>
+    </ion-item>
+
+    <ion-button
+      expand="block"
+      class="submit-button"
+      (click)="add()"
+    >
+      Add Expense
+    </ion-button>
+    <ion-button expand="block" color="danger" routerLink="/tabs/transactions">Cancel</ion-button>
+  </div>
+</ion-content>

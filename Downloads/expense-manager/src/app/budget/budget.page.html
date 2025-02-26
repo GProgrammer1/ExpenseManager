@@ -1,0 +1,204 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="month-toggler-container">
+      <ion-buttons slot="start">
+        <ion-button (click)="toggleMonth('back')" color="white">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title id="wrapped-title">{{ currentMonth.display }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleMonth('forward')" color="white">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+ 
+  <div class="content-wrapper">
+    
+    
+    
+    @if (!loading) {
+    @if ((budget$ | async) ; as budgetInfo) {
+    <h2 id="budget-title">Monthly Budget: month {{budgetInfo.month}} of year {{selectedDate.getFullYear()}}</h2>
+    <ion-grid class="table">
+      <ion-row class="header-row">
+        <ion-col class="header-cell">Category</ion-col>
+        <ion-col class="header-cell">Amount</ion-col>
+      </ion-row>
+      <ion-row *ngFor="let spending of (budgetInfo.budget.spendings | keyvalue)" class="data-row">
+        <ion-col class="data-cell">{{ spending.key }}</ion-col>
+        <ion-col class="data-cell">{{ spending.value | currency : 'USD' : 'symbol' : '1.2-2' : 'en' }}</ion-col>
+      </ion-row>
+      <ion-row class="total-row">
+        <ion-col class="data-cell"><strong>Total</strong></ion-col>
+        <ion-col class="data-cell"><strong>{{ budgetInfo.budget.totalBudget| currency }}</strong></ion-col>
+      </ion-row>
+    </ion-grid>
+    } @else {
+    <p class="no-data">No budget data available</p>
+    }
+    }@else {
+    <ion-spinner name="crescent" id="spinner"></ion-spinner>
+    }
+  </div>
+  
+  
+  <ion-item-divider class="budget-divider">
+    <ion-label>Current Budget</ion-label>
+    <div id="toggler">
+      <ion-toggle id="toggle" [(ngModel)]="showCurrent" (ionChange)="toggleAction()"></ion-toggle>
+      <ion-label id="show-budget"><strong>Show</strong></ion-label>
+    </div>
+  </ion-item-divider>
+  
+  <!-- @if (showCurrent) { -->
+    @if ((currentBudget$ | async) ; as currentBudget) {
+      <ion-grid class="table">
+        <!-- Table Header -->
+        <ion-row class="header-row">
+          <ion-col class="header-cell"><strong>Category</strong></ion-col>
+          <ion-col class="header-cell"><strong>Amount</strong></ion-col>
+        </ion-row>
+    
+        <!-- Table Data -->
+        <ion-row *ngFor="let spending of (currentBudget.spendings | keyvalue)" class="data-row">
+          <ion-col class="data-cell" [ngClass]="
+          {'deficit': spending.value < setBudget.spendings[spending.key],
+          'surplus': spending.value > setBudget.spendings[spending.key]}">
+          {{ spending.key }}
+        </ion-col>
+          <ion-col class="data-cell"
+          [ngClass]="
+          {'deficit': spending.value < setBudget.spendings[spending.key],
+          'surplus': spending.value > setBudget.spendings[spending.key]}">{{ spending.value | currency: 'USD' : 'symbol' : '1.2-2' : 'en'  }}</ion-col>
+        </ion-row>
+        <ion-row class="total-row"
+        [ngClass]="
+        {'deficit-total': currentBudget.totalBudget < setBudget.totalBudget,
+        'surplus-total': currentBudget.totalBudget > setBudget.totalBudget}">
+          <ion-col class="data-cell"><strong>Total</strong></ion-col>
+          <ion-col class="data-cell"><strong>{{ currentBudget.totalBudget| currency }}</strong></ion-col>
+        </ion-row>
+      </ion-grid>
+      } @else {
+      <p class="no-data">No data available</p>
+      }
+    <!-- } -->
+  <div id="fab-container">
+    <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+      <ion-fab-button routerLink="/add-budget" routerDirection="forward">
+        <ion-icon [src]="'../../assets/add.svg'"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+</ion-content>
+
+
+<style>
+  ion-header, ion-toolbar {
+    --background: #007aff;
+    color: white;
+  }
+  .budget-divider {
+  --background: #007aff;
+  --color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  display: flex;
+  gap: 30px;
+  justify-content: space-around !important;
+  margin-top: 15px;
+}
+
+#toggler {
+  justify-self: flex-end !important;
+  margin-left: auto;
+}
+
+  .month-toggler-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+
+  #wrapped-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  ion-content {
+    --background: #f8f9fa;
+    padding-bottom: 70px;
+  }
+
+  .content-wrapper {
+    padding: 16px;
+  }
+
+  #budget-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .table {
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+
+  .header-row {
+    background: #007aff;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .data-row {
+    transition: background-color 0.3s;
+  }
+
+  .data-row:hover {
+    background: #f1f1f1;
+  }
+
+  .total-row {
+    background: #e1e1e1;
+    font-weight: bold;
+  }
+
+  .data-cell {
+    padding: 12px;
+    text-align: center;
+  }
+
+  .no-data {
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+    padding: 20px;
+  }
+
+  #spinner {
+    display: block;
+    margin: 30px auto;
+  }
+
+  #fab-container {
+    position: fixed;
+    bottom: 10px;
+    /* right: 20px; */
+  }
+</style>

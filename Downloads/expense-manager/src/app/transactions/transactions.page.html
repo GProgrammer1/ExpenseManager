@@ -1,0 +1,154 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="toolbar-content">
+      <mat-form-field appearance="fill" class="date-picker">
+        <mat-label>Select Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          (dateChange)="bindData()"
+          [(ngModel)]="selectedDate"
+          [min]="minDate"      
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker">
+          <button mat-icon-button>
+            <mat-icon>calendar_today</mat-icon>
+          </button>
+        </mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <ion-label id="total">Total:
+        <p id="total-amount"  [ngClass]="{'deficit': (totalAmount$ |async)! < 0, 'surplus': (totalAmount$ | async)! > 0}"> {{totalAmount$ | async | currency}}</p>
+      </ion-label>
+    </div>
+
+    <ion-button color="primary" (click)="presentSignoutDialog()" class="logout-btn ">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Logout
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (!loading) {
+    @if ((combinedData$ | async) ; as combinedData){
+      @if (combinedData.length > 0){
+        <ion-list>
+          <ion-item *ngFor="let item of combinedData" 
+                    [ngClass]="{
+                      'expense-item': item.type === 'expense', 
+                      'income-item': item.type === 'income'
+                    }"lines="none">
+            <ion-label class="amount" [ngClass]="{
+              'expense-amount': item.type === 'expense', 
+              'income-amount': item.type === 'income'
+            }">{{ item.Amount }}$</ion-label>
+
+             <ion-icon id="category-icon" [src]="'assets/' + item.Category.toLowerCase() + '.svg'"
+             color="primary"></ion-icon>
+           
+            <ion-label class="description"> {{ item.Description }}</ion-label>
+             
+            <button mat-icon-button id="delete-btn" aria-label="Delete" (click)="presentDeleteDialog(item)">
+              <mat-icon>delete</mat-icon>
+            </button>
+
+          </ion-item>
+        </ion-list>
+      } @else {
+        <p id="noData">No data available</p>
+      }
+    }
+  }
+    @else {
+      <ion-spinner name="crescent" id="spinner"></ion-spinner>
+    }
+    <div id="gray">
+      <ion-fab id="add-button" vertical="bottom" horizontal="center" slot="fixed">
+        <ion-fab-button [routerLink]="['/add-transactions']" routerDirection="forward">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+  </ion-content>
+  
+
+ 
+  
+   <!-- <ion-header [translucent]="true">
+    <ion-toolbar>
+      <div class="toolbar-content">
+        <mat-form-field appearance="outline" class="date-picker">
+          <input
+            matInput
+            [matDatepicker]="picker"
+            (dateChange)="bindData()"
+            [(ngModel)]="selectedDate"
+            [min]="minDate"
+          />
+          <mat-datepicker-toggle matSuffix [for]="picker">
+            <button mat-icon-button aria-label="Select Date">
+              <mat-icon>calendar_today</mat-icon>
+            </button>
+          </mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+  
+        <ion-label id="total">
+          Total:
+          <p
+            id="total-amount"
+            [ngClass]="{
+              deficit: (totalAmount$ | async)! < 0,
+              surplus: (totalAmount$ | async)! > 0,
+              balance: (totalAmount$ | async) === 0
+            }"
+          >
+            {{ totalAmount$ | async | currency }}
+          </p>
+        </ion-label>
+  
+        <ion-button color="primary" (click)="presentSignoutDialog()" class="logout-btn">
+          <ion-icon name="log-out-outline"></ion-icon>
+          Logout
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content [fullscreen]="true">
+    <ng-container *ngIf="loading">
+      <ion-spinner name="crescent" id="spinner"></ion-spinner>
+    </ng-container>
+  
+    <ng-container *ngIf="!loading">
+      <ng-container *ngIf="(combinedData$ | async) as combinedData">
+        <ng-container *ngIf="combinedData.length > 0">
+          <ion-list>
+            <ion-item
+              *ngFor="let item of combinedData"
+              [ngClass]="{
+                'expense-item': item.type === 'expense',
+                'income-item': item.type === 'income'
+              }"
+              lines="none"
+            >
+              <ion-label class="amount" [ngClass]="{
+                'expense-amount': item.type === 'expense',
+                'income-amount': item.type === 'income'
+              }">{{ item.Amount | currency }}</ion-label>
+              <ion-label class="description">{{ item.Description }}</ion-label>
+              <button mat-icon-button aria-label="Delete" (click)="presentDeleteDialog(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+        <ng-container *ngIf="combinedData.length === 0">
+          <p id="noData">No data available</p>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  
+    
+  </ion-content> -->

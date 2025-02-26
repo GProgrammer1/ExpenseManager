@@ -1,0 +1,104 @@
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  ion-item {
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-top: 4px;
+    --inner-padding-bottom: 4px;
+  }
+  
+  ion-label {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ion-color-dark);
+  }
+  
+  .input-field {
+    --background: transparent;
+    --border-radius: 10px;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --color: var(--ion-color-dark);
+    --placeholder-color: #bbb;
+    --box-shadow: none;
+    --border-width: 1px;
+    --border-color: #ddd;
+    transition: all 0.3s ease;
+  }
+  
+  input,
+  ion-textarea {
+    font-size: 16px;
+  }
+  
+  // ion-button.submit-button {
+  //   --background: var(--ion-color-primary);
+  //   --border-radius: 20px;
+  //   --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  //   font-weight: 600;
+  //   font-size: 17px;
+  //   padding: 14px;
+  //   transition: background 0.3s ease-in-out, transform 0.2s ease;
+  // }
+  
+  // ion-button.submit-button:hover {
+  //   background: var(--ion-color-primary-shade);
+  //   transform: scale(1.05);
+  // }
+  
+  ion-select,
+  ion-input,
+  ion-textarea {
+    font-size: 16px;
+    background: transparent;
+  }
+  
+  ion-select-option {
+    font-size: 14px;
+  }
+  
+  ion-item ion-label {
+    font-size: 16px;
+  }
+  
+  ion-input,
+  ion-textarea {
+    --padding: 14px;
+    --border-radius: 10px;
+    --background: transparent;
+  }
+  
+  ion-select {
+    --background: transparent;
+    --border-width: 1px;
+    --border-color: #ddd;
+  }
+  
+  ion-select .select-text {
+    font-size: 16px;
+  }
+  
+  ion-select .select-icon {
+    color: var(--ion-color-dark);
+  }
+  
+  // ion-button.submit-button {
+  //   padding: 12px;
+  //   text-transform: uppercase;
+  //   font-size: 16px;
+  // }
+  
+  // ion-button.submit-button:hover {
+  //   background: var(--ion-color-primary-shade);
+  // }
+  
+  ion-label {
+    margin-bottom: 20px !important;
+  }
