@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import {app} from '../../firebase.config';
+import {app, firestore} from '../../firebase.config';
+import { collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
 @Injectable({
   providedIn: 'root'
 })
@@ -47,6 +48,28 @@ export class AuthService {
       throw error;
     }
   }
+
+  async updateUserData(uid: string, data: any): Promise<void> {
+
+    try {
+      const usersCollection = collection(firestore, 'users');
+      const userQuery = query(usersCollection, where('uid', '==', uid));
+      const userSnapshot = await getDocs(userQuery);
+
+      const batch = writeBatch(firestore);
+      for(const doc of userSnapshot.docs) {
+        let userData : import('./models').User = doc.data() as import('./models').User 
+        userData = {...userData, ...data};
+        batch.update(doc.ref, {...userData});
+      }
+
+      await batch.commit();
+    } catch (ex: any) {
+      console.log("Error adding data to user:", ex.message);
+      Promise.reject(ex);
+    }
+  }
+
 
   // Get current user
   getCurrentUser(): any {

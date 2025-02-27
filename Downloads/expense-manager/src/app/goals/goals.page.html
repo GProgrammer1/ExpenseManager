@@ -1,0 +1,85 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="toolbar-content">
+      <ion-title>Goals</ion-title>
+      <ion-text>Manage your finances wisely</ion-text>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+    @if (goals$ | async; as goals) {
+      @if (goals.length === 0) {
+        <ion-text color="medium" class="no-goals-text">No goals set yet</ion-text>
+      }
+      @else {
+        <ion-list>
+          <ion-item  *ngFor="let goal of goals">
+            <div class="custom-item">
+            <div id="top-layer">
+              <div id="goal-title">
+              <ion-icon name="trophy" class="goal-icon"></ion-icon>
+              <ion-label class="goal-name">{{ goal.name }}</ion-label></div>
+               <ion-icon name="trash" class="delete-icon" (click)="presentDeleteGoalDialog(goal)" color="danger"></ion-icon>
+              
+            </div>
+
+            <!-- Description (Always at the bottom) -->
+            <div id="description" #desc
+             [contentEditable]="allowEdit"
+             (blur)="editDescription($event, goal)"
+             [ngClass]="{'active-div': allowEdit && focusedGoal?.name === goal.name}">   
+              <ion-text color="medium" class="goal-category">{{ goal.description }}</ion-text>
+              <ion-icon name="pencil-outline" class="edit-icon" 
+                (click)="allowEdit = !allowEdit; focusedGoal=goal; focusOnDiv() "
+                [ngClass]="{'active': allowEdit && focusedGoal?.name === goal.name}"></ion-icon>
+            </div>
+
+            <div id="ai-btns">
+              <ion-button fill="outline" color="primary" (click)="goalAdvise(goal)" [disabled]="generating">
+                @if (generating && selectedGoal?.name === goal.name) {
+                  <ion-icon name="bulb" slot="start"></ion-icon>
+                  Generating content...
+                } @else {
+                  <ion-icon name="bulb" slot="start"></ion-icon>
+                  Advise
+                } 
+              </ion-button>
+      
+              @if (generated && selectedGoal?.name === goal.name) {
+                <ion-button (click)="showPopup = true">Open Report</ion-button>
+              }
+              
+            </div>
+          </div>
+          </ion-item>
+        </ion-list>
+      }
+    } 
+    @else {
+      <ion-spinner name="crescent" class="spinner"></ion-spinner>
+    }
+  </div>
+
+  <!-- Popup (Report Style) -->
+  <div class="custom-popup" *ngIf="showPopup">
+    <div class="popup-content">
+      <div class="popup-header">
+        <ion-icon name="close" class="close-icon" (click)="showPopup = false; generated=false; selectedGoal=null"></ion-icon>
+        Goal Report</div>
+
+      <div class="popup-section">
+        <h4>Advice</h4>
+        <ion-text class="response">{{ response }}</ion-text>
+      </div>
+
+    </div>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button routerLink="/add-goal">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -23,11 +23,22 @@ export class RegisterPage implements OnInit {
   password: string = '';
   confirmPassword: string = '';
 
+  passwordType: string = 'password';
+  confirmPasswordType: string = 'password';
+
+  togglePasswordVisibility() {
+    this.passwordType = this.passwordType === 'password' ? 'text' : 'password';
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.confirmPasswordType = this.confirmPasswordType === 'password' ? 'text' : 'password';
+  }
   constructor(private authService: AuthService, private firestoreService: FirestoreService,
     private fcmService: FcmService, private router: Router
   ) { }
 
   ngOnInit() {
+    
   }
 
   async register() {
@@ -45,18 +56,21 @@ export class RegisterPage implements OnInit {
         uid,
         Email: this.email,
         Password: this.password,
-        Budgets: [],Expenses: [], Incomes: [], Payments: [],
-        Name: this.name, fcmTokens: [fcmToken!]
+        Budgets: [],Expenses: [], Incomes: [], Payments: [], Goals: [],
+        Name: this.name, fcmTokens: [fcmToken!],
+        variableExpenses: [], fixedExpenses: [], hasDebt: false,
+        savingsGoal: null,ageRange: '', country: ''
         
       }
       await this.firestoreService.addUser(user);
-      alert('User signed up successfully');
-      this.router.navigate(['/tabs']);
+      this.router.navigate(['/personalinfo']);
       
     }
     catch (error: any) {
       alert('Error signing up: ' + error.message);
     }
   }
+
+  
 
 }

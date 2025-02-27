@@ -1,18 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <div class="month-toggler-container">
-      <ion-buttons slot="start">
-        <ion-button (click)="toggleMonth('back')" color="white">
-          <ion-icon name="chevron-back-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-title id="wrapped-title">{{ currentMonth.display }}</ion-title>
-      <ion-buttons slot="end">
-        <ion-button (click)="toggleMonth('forward')" color="white">
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </div>
+    <div class="toolbar-container">
+      <div class="month-toggler-container">
+        <ion-buttons slot="start">
+          <ion-button (click)="toggleMonth('back')" color="white">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-text id="wrapped-title">{{ currentMonth.display }}</ion-text>
+        <ion-buttons slot="end">
+          <ion-button (click)="toggleMonth('forward')" color="white">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </div>
+      
+      <ion-button color="white" id="personalized-budget">
+        <ion-icon name="bulb" id="bulb-icon"></ion-icon>
+        Get Personalized budget</ion-button>
+
+  </div>
   </ion-toolbar>
 </ion-header>
 
@@ -52,7 +59,7 @@
     <ion-label>Current Budget</ion-label>
     <div id="toggler">
       <ion-toggle id="toggle" [(ngModel)]="showCurrent" (ionChange)="toggleAction()"></ion-toggle>
-      <ion-label id="show-budget"><strong>Show</strong></ion-label>
+      <ion-label id="show-budget"><strong>Show Current Budget</strong></ion-label>
     </div>
   </ion-item-divider>
   

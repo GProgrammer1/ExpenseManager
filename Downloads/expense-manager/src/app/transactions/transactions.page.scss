@@ -77,6 +77,10 @@ ion-list {
   background-color: #ffffff; /* Ensures the background is white */
 }
 
+.logout-btn{ 
+  justify-self: flex-end;
+  align-self: flex-end;
+}
 .description {
   display: flex;
   justify-content: first baseline;
@@ -88,7 +92,27 @@ ion-list {
   --item-height: 50px;
 }
 
+#filter {
+  display: flex;
+  flex-direction: column;
+}
 
+#control-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-bottom: 6px;
+  width: 100%;
+
+}
+
+#filter {
+  border: 1px solid #d1d5db;
+  --background: #f9fafb;
+  border-radius: 8px;
+}
 /* Toolbar Content */
 .toolbar-content  {
   display: flex;
@@ -162,7 +186,6 @@ ion-tabs {
   }
 
   ion-item {
-    padding: 8px;
     border-bottom: 1px solid #f0f0f0;
   }
 

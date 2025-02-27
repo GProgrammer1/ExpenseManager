@@ -2,10 +2,20 @@
 .month-toggler-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
+  justify-content: flex-start;
+  padding-left: 0 !important;
 }
 
+#wrapped-title {
+  font-size: large !important;
+}
+
+#show-budget {
+  font-size: xx-small !important;
+}
+#bulb-icon {
+  font-size: xx-large !important;
+}
 #budget-title {
   font-family: 'Poppins', sans-serif; /* Modern, clean font */
     font-size: 1.5rem;
@@ -13,7 +23,35 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+/* Change the toggle color */
+ion-toggle {
+  --background: #ccc !important; /* Background color when off */
+  --background-checked: #4caf50 !important; /* Background color when on */
+  --handle-background: #fff !important; /* Handle color */
+  --handle-background-checked: #fff !important; /* Handle color when on */
+}
+ion-toolbar {
+  display: flex;
+}
 
+.toolbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.toolbar-container > * 
+{
+  width: 33%;
+}
+
+#personalized-budget {
+background-color: white;
+  color: var(--ion-color-primary);
+  font-size: x-small !important;
+  margin : 0.4rem;
+  outline: none !important;
+  font-weight: bold;
+}
 
 /* Table Design */
 .table {
@@ -92,7 +130,7 @@ ion-content {
   
   ion-label {
     font-family: 'Poppins', sans-serif; /* Modern, clean font */
-    font-size: 0.7rem;
+    font-size: xx-small;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;

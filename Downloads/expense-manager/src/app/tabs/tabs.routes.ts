@@ -34,6 +34,12 @@ export const tabsRoutes: Routes = [
           import('../Payments/payments.page').then((m) => m.PaymentPage),
       },
       {
+        path: 'goals',
+        loadComponent: () =>
+          import('../goals/goals.page').then((m) => m.GoalsPage),
+
+      },
+      {
         path: 'budget',
         loadComponent: () =>
           import('../budget/budget.page').then((m) => m.BudgetPage),

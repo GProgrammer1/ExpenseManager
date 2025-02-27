@@ -9,7 +9,15 @@ export interface User {
     Incomes: Income[];
     Budgets: Budget[];
     Payments: Payment[];
+    Goals: Goal[];
     fcmTokens: string[];
+    fixedExpenses: {category: string, amount: number}[];
+    variableExpenses: {category: string, amount: number}[];
+    savingsGoal: number | null;
+    country:string;
+    ageRange: string;
+    hasDebt: boolean;
+
 }
 
 export interface Expense {
@@ -55,4 +63,19 @@ export interface Payment {
     dueDate: Timestamp;
     description: string;
     userId: string;
+}
+
+export interface Goal {
+    type: 'Expense' | 'Income';
+    userId: string;
+    description: string;
+    name: string;
+    // deadline? : Timestamp;
+    // advices?: string[];
+}
+
+export interface GoalAdvice {
+    advice: string,
+    goal: Goal,
+    userId: string
 }

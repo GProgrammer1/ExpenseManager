@@ -1,0 +1,215 @@
+<ion-content [fullscreen]="true">
+  <div class="register-container">
+    <ion-card class="register-card">
+      <!-- Progress Meter -->
+      <div class="progress-container">
+        <p>Step {{ currentStep }} of 4</p>
+        <ion-progress-bar class="progress" [value]="(4- currentStep) / 3"></ion-progress-bar>
+      </div>
+
+      <ion-card-header>
+        <ion-card-title>Enter additional financial information for better advice personalization later when using this app</ion-card-title>
+      </ion-card-header>
+
+      <!-- Step 1: Fixed Expenses -->
+      <ion-card-content *ngIf="currentStep === 1">
+        <ion-item lines="none">
+          <ion-label>Fixed Expenses</ion-label>
+          <ion-icon name="add-circle-outline" class="add-icon" (click)="addFixedExpense()"></ion-icon>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6"><strong>Category</strong></ion-col>
+            <ion-col size="6"><strong>Amount ($)</strong></ion-col>
+          </ion-row>
+          <ion-row *ngFor="let expense of fixedExpenses; let i = index">
+            <ion-col size="6">
+              <ion-input [(ngModel)]="fixedExpenses[i].category" placeholder="Enter Category"></ion-input>
+            </ion-col>
+            <ion-col size="6">
+              <ion-input [(ngModel)]="fixedExpenses[i].amount" type="number" placeholder="Enter Amount"></ion-input>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <ion-button expand="block" (click)="nextStep()">Continue</ion-button>
+        <ion-button expand="block" routerLink="/tabs" id="skip-btn">Skip and go to home page</ion-button>
+      </ion-card-content>
+
+      <!-- Step 2: Variable Expenses -->
+      <ion-card-content *ngIf="currentStep === 2">
+        <ion-item lines="none">
+          <ion-label>Variable Expenses</ion-label>
+          <ion-icon name="add-circle-outline" class="add-icon" (click)="addVariableExpense()"></ion-icon>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6"><strong>Category</strong></ion-col>
+            <ion-col size="6"><strong>Amount ($)</strong></ion-col>
+          </ion-row>
+          <ion-row *ngFor="let expense of variableExpenses; let j = index">
+            <ion-col size="6">
+              <ion-input [(ngModel)]="variableExpenses[j].category" placeholder="Enter Category"></ion-input>
+            </ion-col>
+            <ion-col size="6">
+              <ion-input [(ngModel)]="variableExpenses[j].amount" type="number" placeholder="Enter Amount"></ion-input>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <ion-button expand="block" (click)="nextStep()">Continue</ion-button>
+        <ion-button expand="block" (click)="prevStep()">Back</ion-button>
+      </ion-card-content>
+
+      <!-- Step 3: Income, Savings, Debt -->
+      <ion-card-content *ngIf="currentStep === 3">
+        <ion-item>
+          <ion-label position="floating">Monthly Income ($)</ion-label>
+          <ion-input [(ngModel)]="monthlyIncome" type="number" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Savings Goal ($)</ion-label>
+          <ion-input [(ngModel)]="savingsGoal" type="number" required></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" (click)="nextStep()">Continue</ion-button>
+        <ion-button expand="block" (click)="prevStep()">Back</ion-button>
+      </ion-card-content>
+
+      <!-- Step 4: Country, Age, Debt -->
+      <ion-card-content *ngIf="currentStep === 4">
+        <ion-item>
+          <ion-searchbar  (ionInput)="filterCountries($event)" placeholder="Search for a country"></ion-searchbar>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Country</ion-label>
+          <ion-select [(ngModel)]="country" interface="alert" >
+            @if (filteredCountries.length === 0) {
+              <ion-select-option disabled="true">No countries found</ion-select-option>
+            }
+            @else {
+              @for (country of filteredCountries; track $index) {
+                <ion-select-option value="{{ country }}">{{ country }}</ion-select-option>
+              }
+            }
+            
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Age Range</ion-label>
+          <ion-select [(ngModel)]="ageRange" interface="popover">
+            <ion-select-option value="18-24">18-24</ion-select-option>
+            <ion-select-option value="25-34">25-34</ion-select-option>
+            <ion-select-option value="35-44">35-44</ion-select-option>
+            <ion-select-option value="45-54">45-54</ion-select-option>
+            <ion-select-option value="55+">55+</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Do you have outstanding debt?</ion-label>
+          <ion-toggle [(ngModel)]="hasDebt"></ion-toggle>
+          @if (hasDebt) {
+            
+              <ion-label position="floating">Debt Amount ($)</ion-label>
+              <ion-input [(ngModel)]="debtAmount" type="number" required></ion-input>
+
+          }
+        </ion-item>
+        <ion-button expand="block" (click)="submitFinancialInfo()">Submit</ion-button>
+        <ion-button expand="block" (click)="prevStep()">Back</ion-button>
+
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
+
+<style>
+  .register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #00b4d8, #0077b6);
+  }
+  ion-searchbar {
+  width: 600px;
+  margin: 0 auto 12px auto; /* Center it and add spacing */
+  display: block; /* Ensure full width behavior */
+  --border-radius: 8px; /* Match other elements */
+  --background: #f9f9f9;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+  .progress {
+    transform: scaleX(-1); /* Ensures the fill moves in reverse */
+
+  }
+
+  #skip-btn {
+    --background: #0077b6;
+  }
+
+  .register-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background: white;
+    text-align: center;
+  }
+
+  ion-card-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #0077b6;
+  }
+
+  ion-item {
+    --background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  ion-grid {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  ion-row {
+    border-bottom: 1px solid #ddd;
+    padding: 5px 0;
+  }
+
+  ion-row:last-child {
+    border-bottom: none;
+  }
+
+  .add-icon {
+    font-size: 1.5rem;
+    color: #0077b6;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .add-icon:hover {
+    color: #00b4d8;
+  }
+
+  .progress-container {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  ion-progress-bar {
+    --progress-background: #e0e0e0;
+    --progress-bar-color: #0077b6;
+    height: 8px;
+    border-radius: 4px;
+  }
+</style>

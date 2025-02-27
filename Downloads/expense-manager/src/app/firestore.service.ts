@@ -6,6 +6,7 @@ import { app, firestore } from '../../firebase.config';
 import { Expense, Income, Subscription } from './models';
 import { Auth, browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, User } from 'firebase/auth';
 import { LogarithmicScale } from 'chart.js';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class FirestoreService {
@@ -111,7 +112,7 @@ let updatedIncomesData = [] as Income[];
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor() {
+  constructor(private http: HttpClient) {
     
 
     setPersistence(this.auth, browserLocalPersistence)
@@ -270,6 +271,7 @@ let updatedIncomesData = [] as Income[];
     }
   }
 
+ 
   
 
 
@@ -524,6 +526,5 @@ let updatedIncomesData = [] as Income[];
     }
   }
 
- 
 
 }

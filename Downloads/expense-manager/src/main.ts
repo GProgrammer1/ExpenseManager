@@ -16,18 +16,20 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { provideHttpClient } from '@angular/common/http';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { initializeApp } from 'firebase/app';
 
+const firebaseApp = initializeApp(firebaseConfig);
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     importProvidersFrom(BrowserAnimationsModule),
-    provideFirebaseApp(() => app), // Firebase App
+    provideFirebaseApp(() => firebaseApp), // Firebase App
     provideAuth(() => getAuth()), // Auth Service
     provideFirestore(() => getFirestore()), // Firestore
     importProvidersFrom(AngularFireModule),
-    importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
+    // importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
     importProvidersFrom(AngularFireMessagingModule),
     importProvidersFrom(IonicModule.forRoot()),
     provideHttpClient()

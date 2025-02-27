@@ -1,0 +1,370 @@
+.page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+  }
+  
+  .no-goals-text {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  ion-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  // ion-item {
+  //   display: flex;
+  //   flex-direction: column;
+  //   align-items: flex-start;
+  //   padding: 12px;
+  //   border-radius: 12px;
+  //   background: var(--ion-color-light);
+  //   margin-bottom: 10px;
+  // }
+  
+  .goal-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .goal-category {
+    max-width: 70%;
+    text-wrap: normal;
+    color: #666;
+  }
+  .goal-icon {
+    font-size: 1.5rem;
+    color: var(--ion-color-primary);
+    cursor: pointer;
+    // position: relative;
+    // bottom: 18px;
+    // right: 8px;
+  }
+  
+  .goal-description {
+    margin-top: 4px;
+    font-size: 0.9rem;
+  }
+  
+  ion-button {
+    margin-top: 10px;
+    align-self: flex-start;
+  }
+
+  .custom-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    backdrop-filter: blur(8px); /* Blurs background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  
+  .popup-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 75vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    font-family: "Arial", sans-serif;
+  }
+  
+  .popup-header {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+  }
+  
+  .popup-section {
+    margin-bottom: 15px;
+  }
+  
+  .popup-section h4 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .popup-section p {
+    font-size: 0.95rem;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  .popup-footer {
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  ion-button {
+    --background: #007bff;
+    --color: white;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 6px;
+  }
+
+  ion-header, ion-toolbar{ 
+    --background: #007aff;
+    color: white;
+  }
+  
+  ion-button:hover {
+    --background: #0056b3;
+  }
+
+  .toolbar-content {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    padding-left: 0.7rem;
+    ion-title {
+      padding-left: 0 !important;
+    }
+  }
+
+@media screen and (max-width: 700px) {
+  #ai-btns {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  #top-layer {
+    display: flex;
+  }
+
+  #description {
+    // width: 100%;
+    display: flex;
+    margin-top: 8px;
+    align-items:center;
+    gap: 4px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    justify-content: space-between;
+    padding: 8px;
+    margin-top: 20px;
+    
+    ion-icon { 
+      justify-self: flex-end !important;
+      color: var(--ion-color-primary);
+    }
+
+    &:focus {
+      border: none !important;
+      outline: none !important; /* Removes the default orange focus border */
+      -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
+    }
+
+  }
+  
+  
+}
+
+@media screen and (min-width: 700px) {
+ 
+ .custom-item > *{
+  width: 33%;
+ }
+#top-layer {
+  display: flex;
+  align-items: center;
+  // width: 100%;
+  gap:6px;
+  font-size: 1.6rem;
+}
+
+#description {
+  width: 100%;
+  display: flex;
+  margin-top: 8px;
+  align-items:center;
+  gap: 4px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  justify-content: space-between;
+  padding: 8px;
+  margin-top: 20px;
+  
+  ion-icon { 
+    justify-self: flex-end !important;
+    color: var(--ion-color-primary);
+  }
+
+}
+#ai-btns {
+  display: flex;
+  align-items: flex-start ;
+  justify-content: flex-end;
+  width: 100%;
+}
+}
+.response {
+  line-height: 1.5;
+}
+.response {
+  white-space: pre-wrap;
+}
+.delete-icon ion-icon {
+  font-size: 1.8rem;
+  color: var(--ion-color-danger);
+  cursor: pointer;
+}
+
+.edit-icon{
+  font-size: 1.6rem;
+&.active {
+  border-radius: 50%;
+  padding: 3px;
+  background: var(--ion-color-primary);
+  color: white !important;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.6); /* Darker and more intense shadow */
+}
+}
+
+.active-div {
+  background-color: var(--ion-color-light); /* Slightly different background */
+  border: 2px solid var(--ion-color-primary); /* Highlight the border */
+  border-radius: 8px; /* Smooth rounded corners */
+  padding: 10px; /* Add some spacing */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.5); /* Stronger shadow effect */
+  transition: all 0.2s ease-in-out; /* Smooth animation */
+}
+/* Mobile styles */
+
+/* Desktop styles */
+@media screen and (min-width: 700px) {
+  .custom-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--ion-color-light);
+    margin-bottom: 10px;
+    width: 100%;
+    
+    /* Soft border with shadow */
+    border: 1px solid rgba(0, 0, 0, 0.08); /* Light gray, almost invisible */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow like `.payment-item` */
+  }
+  
+
+  .custom-item > * {
+    width: 33%;
+  }
+}
+
+.custom-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  width: 100%;
+  
+  /* Soft border with shadow */
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Light gray, almost invisible */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow like `.payment-item` */
+}
+
+
+#top-layer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-icon {
+  font-size: 18px; /* Reduce icon size */
+}
+
+.goal-name {
+  font-size: 14px; /* Smaller font for better fit */
+  font-weight: 600;
+}
+
+#description {
+  font-size: 12px; /* Reduce text size */
+}
+
+
+
+ion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+
+  ion-item {
+    width: 100% !important;
+  }
+}
+
+ion-button {
+  font-size: 12px; /* Smaller button text */
+  padding: 4px 8px; /* Reduce button size */
+}
+
+
+
+.close-icon {
+  position: absolute;
+  top: 95px;
+  right: 40px;
+  color: red;
+}
+
+.delete-icon {
+ font-size: x-large;
+}
+
+#goal-title {
+  display: flex;
+  gap: 0.4rem;
+}
+
+#top-layer {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  justify-content: space-between; /* Space out items */
+  gap: 6px; /* Add gap between items */
+}
+.custom-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Light gray, almost invisible */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* More subtle shadow */
+}
+
+
+

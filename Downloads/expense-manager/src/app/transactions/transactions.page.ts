@@ -23,7 +23,6 @@ import { addIcons } from 'ionicons';
 import { add, card, cash, wallet } from 'ionicons/icons';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FcmService } from '../fcm.service';
-import { FeedbackService } from '../feedback.service';
 
 
 @Component({
@@ -67,11 +66,14 @@ showPlaceholder = false;
   dueDates$! : Observable<Date[]>;
   selectedData : 'All' | 'Expenses' | 'Incomes'| 'Budgets' | 'Payments' = 'All';
   combinedData$!: Observable<Expense[] | Income[]>;
-
+  response = '';
   budget$!: Observable<Budget | null>;
   totalAmount$!: Observable<number>;
   loading = true;
+  selectedFilter = 'All';
+  filterCriteria$ = new BehaviorSubject<string>('All'); // Default: show all
 
+filteredData$!: Observable<(Expense | Income)[]>;
   private auth: Auth;
   userEmail! :string;
   userId!: string;
@@ -80,7 +82,6 @@ showPlaceholder = false;
   constructor(
      private firestoreService: FirestoreService, private authService: AuthService,
     private router: Router, private budgetService : BudgetService, private alertController : AlertController,
-    private fcmService: FcmService, private feedbackService: FeedbackService
     ) {
       addIcons({ add, wallet });
       this.auth = getAuth();
@@ -105,6 +106,19 @@ showPlaceholder = false;
           return data.reduce((total, item) => {
             return total + (item.type === 'income' ? item.Amount : -item.Amount);
           }, 0);
+        })
+      );
+
+      this.filteredData$ = combineLatest([
+        this.combinedData$,
+        this.filterCriteria$
+      ]).pipe(
+        map(([data, criteria]) => {
+          if (criteria === 'All') {
+            return data;
+          } else {
+            return data.filter(item => item.type === criteria.toLowerCase());
+          }
         })
       );
       console.log("Selected data:", this.selectedData);
@@ -136,6 +150,12 @@ showPlaceholder = false;
       
     }
 
+    setFilter(criteria: string) {
+      console.log("Filter criteria:", criteria);
+      
+      this.filterCriteria$.next(criteria);
+    }
+    
 
 getCategoryName(category: string) {
 
@@ -270,16 +290,7 @@ async presentSignoutDialog() {
     await alert.present();
   }
 
-  async getAiFeedback() {
-    try {
-    const feedback = await this.feedbackService.getExpenseFeedback(this.userId);
-    console.log("Feedback:", feedback);
-    alert(feedback);
-    } catch (error) {
-      console.error("Error getting feedback:", error);
-    }
-  }
-
+ 
   // async presentSignoutDialog() {
 
   //   const alert = await this.alertController.create({

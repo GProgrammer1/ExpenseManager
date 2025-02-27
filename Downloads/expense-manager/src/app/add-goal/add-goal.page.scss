@@ -1,0 +1,53 @@
+ion-header, ion-toolbar {
+    --background: #007aff;
+    color: white;
+  }
+  
+  ion-content {
+    --background: #f8f9fa;
+    padding-bottom: 70px;
+  }
+  
+  ion-item {
+    margin-bottom: 16px;
+  }
+  
+  ion-label {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  .form-label {
+    margin-bottom: 12px;
+  }
+  
+  ion-input, ion-textarea, ion-datetime {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
+  
+  .submit-button {
+    margin-top: 20px;
+    background-color: #007aff;
+    color: white;
+    border-radius: 8px;
+  }
+  
+  .submit-button:hover {
+    background-color: #005bb5;
+  }
+  
+  .cancel-button {
+    margin-top: 10px;
+  }
+  
+  ion-textarea {
+    --min-height: 100px;
+  }
+  
+  ion-toolbar {
+    padding-top: 8px;
+  }
+  

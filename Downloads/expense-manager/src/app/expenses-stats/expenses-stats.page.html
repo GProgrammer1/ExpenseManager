@@ -12,7 +12,7 @@
  @else {
     <ion-spinner name="crescent" id="spinner" style="--width: 500px; --height: 500px;"></ion-spinner>
 
-  }
+ }
 
   @if (!loading){
   <div class="percentages" *ngIf="!noData">
@@ -25,6 +25,7 @@
       </div>
     </div>
   </div>
+  
 }
 
   <div *ngIf="noData" id="no-data">
@@ -33,3 +34,4 @@
     </div>
   </div>
 </ion-content>
+ 

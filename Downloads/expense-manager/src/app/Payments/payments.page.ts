@@ -57,14 +57,14 @@ compareDates(paymentDate: Date, dueDate: Date) {
   totalAmount$!: Observable<number>;
   loading = true;
 
-  private auth: Auth;
+  auth: Auth;
   userEmail! :string;
   userId!: string;
 payments$!: Observable<Payment[]>;
 
-  constructor(private afAuth: AngularFireAuth, private paymentService: PaymentService,
-     private firestoreService: FirestoreService, private authService: AuthService,
-    private router: Router, private budgetService : BudgetService, private alertController : AlertController
+  constructor( private paymentService: PaymentService,
+     private firestoreService: FirestoreService,
+    private router: Router, private alertController : AlertController
     ) {
 
       this.auth = getAuth();

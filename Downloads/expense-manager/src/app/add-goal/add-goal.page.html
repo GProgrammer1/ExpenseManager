@@ -1,0 +1,44 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Add Goal</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Goal Name -->
+  <ion-item>
+    <ion-label position="floating" class="form-label">Goal Name</ion-label>
+    <ion-input type="text" placeholder="Enter goal name" [(ngModel)]="name"></ion-input>
+  </ion-item>
+
+  <!-- Description -->
+  <ion-item>
+    <ion-label position="floating" class="form-label">Description</ion-label>
+    <ion-textarea placeholder="Enter goal description" [(ngModel)]="description"></ion-textarea>
+  </ion-item>
+
+  <!-- Goal Type (Radio Buttons) -->
+  <ion-item>
+    <ion-label class="form-label">Goal Type</ion-label>
+  </ion-item>
+  <ion-list>
+    <ion-item>
+      <ion-radio-group [(ngModel)]="type">
+        <ion-item>
+          <ion-label>Expense</ion-label>
+          <ion-radio slot="start" value="Expense"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>Income</ion-label>
+          <ion-radio slot="start" value="Income"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-item>
+  </ion-list>
+
+  
+
+  <!-- Add & Cancel Buttons -->
+  <ion-button expand="block" class="submit-button" (click)="addGoal()">Add Goal</ion-button>
+  <ion-button expand="block" class="cancel-button" routerLink="/tabs/goals" color="danger">Cancel</ion-button>
+</ion-content>

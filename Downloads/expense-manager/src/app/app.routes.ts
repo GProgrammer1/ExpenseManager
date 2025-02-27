@@ -34,6 +34,22 @@ export const routes: Routes = [
     path: 'add-budget',
     loadComponent: () => import('./add-budget/add-budget.page').then( m => m.AddBudgetPage)
   },
+  {
+    path: 'add-goal',
+    loadComponent: () => import('./add-goal/add-goal.page').then( m => m.AddGoalPage)
+  },
+  {
+    path: 'goals',
+    loadComponent: () => import('./goals/goals.page').then( m => m.GoalsPage)
+  },
+  {
+    path: 'add-goal',
+    loadComponent: () => import('./add-goal/add-goal.page').then( m => m.AddGoalPage)
+  },
+  {
+    path: 'personalinfo',
+    loadComponent: () => import('./personalinfo/personalinfo.page').then( m => m.PersonalinfoPage)
+  },
   
 
  

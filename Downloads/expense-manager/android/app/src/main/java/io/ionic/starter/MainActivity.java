@@ -45,10 +45,6 @@ import com.google.android.gms.tasks.Task;
 public class MainActivity extends BridgeActivity {
 
   private static final String TAG = "MainActivity";
-  private FirebaseAuth.AuthStateListener authStateListener;
-  private static final int PERMISSION_REQUEST_CODE = 123;  // You can use any number
-
-  private static final String BOOLEAN = "Can navigate back";
 
   // Declare the launcher at the top of your Activity/Fragment:
   private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -79,11 +75,12 @@ public class MainActivity extends BridgeActivity {
   @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    FirebaseApp.initializeApp(this);
+
     super.onCreate(savedInstanceState);  // ✅ FIX 1: Move this to the top
 
 //    setContentView(R.layout.activity_main);
     Log.d(TAG, "asking permission for notifications");
-FirebaseApp.initializeApp(this);
     askNotificationPermission();  // ✅ FIX 2: Only call this, don't launch manually
 
     fetchFCMToken();

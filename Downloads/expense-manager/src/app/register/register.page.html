@@ -21,13 +21,23 @@
         <!-- Password Input -->
         <ion-item>
           <ion-label position="floating">Password</ion-label>
-          <ion-input [(ngModel)]="password" type="password" required></ion-input>
+          <ion-input [(ngModel)]="password" [type]="passwordType" required></ion-input>
+          <ion-icon
+            slot="end"
+            [name]="passwordType === 'password' ? 'eye-off' : 'eye'"
+            (click)="togglePasswordVisibility()"
+          ></ion-icon>
         </ion-item>
 
         <!-- Confirm Password Input -->
         <ion-item>
           <ion-label position="floating">Confirm Password</ion-label>
-          <ion-input [(ngModel)]="confirmPassword" type="password" required></ion-input>
+          <ion-input [(ngModel)]="confirmPassword" [type]="confirmPasswordType" required></ion-input>
+          <ion-icon
+            slot="end"
+            [name]="confirmPasswordType === 'password' ? 'eye-off' : 'eye'"
+            (click)="toggleConfirmPasswordVisibility()"
+          ></ion-icon>
         </ion-item>
 
         <!-- Register Button -->
