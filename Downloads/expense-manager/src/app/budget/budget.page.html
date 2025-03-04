@@ -3,21 +3,28 @@
     <div class="toolbar-container">
       <div class="month-toggler-container">
         <ion-buttons slot="start">
-          <ion-button (click)="toggleMonth('back')" color="white">
+          <ion-button (click)="toggleMonth('back')" color="white" id="back-btn">
             <ion-icon name="chevron-back-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-text id="wrapped-title">{{ currentMonth.display }}</ion-text>
         <ion-buttons slot="end">
-          <ion-button (click)="toggleMonth('forward')" color="white">
+          <ion-button (click)="toggleMonth('forward')" color="white" id="forward-btn">
             <ion-icon name="chevron-forward-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </div>
       
-      <ion-button color="white" id="personalized-budget">
-        <ion-icon name="bulb" id="bulb-icon"></ion-icon>
-        Get Personalized budget</ion-button>
+      <ion-button color="white" id="personalized-budget" (click)="generatePersonalizedBudget()" [disabled]="!! response">
+        
+        @if (!generating) {
+          <ion-icon name="bulb-outline" id="bulb-icon"></ion-icon>
+        Get Personalized budget
+        }
+        @else {
+          <ion-spinner name="crescent" color="black" class="button-spinner"></ion-spinner>
+          Generating...
+        }</ion-button>
 
   </div>
   </ion-toolbar>
@@ -25,6 +32,34 @@
 
 <ion-content [fullscreen]="true">
  
+  @if (response) {
+  <div class="advice-popup">
+    <div class="popup-content">
+      <ion-icon name="close" id="close-icon" color="danger" (click)="closePopup()"></ion-icon>
+      After analyzing your financial and personal information, this is what your budget should look like: 
+      <ion-grid>
+        <ion-row class="header-row">
+          <ion-col class="header-cell">Category</ion-col>
+          <ion-col class="header-cell">Amount</ion-col>
+        </ion-row>
+        @for (spending of (advisedBudget.spendings | keyvalue); track $index) {
+          <ion-row class="data-row">
+            <ion-col class="data-cell">{{spending.key}}</ion-col>
+            <ion-col class="data-cell">{{spending.value | currency}}</ion-col>
+          </ion-row>
+        }
+        <ion-row class="total-row">
+          <ion-col class="data-cell"><strong>Total</strong></ion-col>
+          <ion-col class="data-cell"><strong>{{ advisedBudget.totalBudget| currency }}</strong></ion-col>
+        </ion-row>
+      </ion-grid>
+      <div id="action-btns">
+        <ion-button (click)="saveAdvisedBudget()">Save</ion-button>
+        <ion-button color="danger" (click)="closePopup()">Discard</ion-button>
+      </div>
+    </div>
+  </div>
+}
   <div class="content-wrapper">
     
     
@@ -47,57 +82,67 @@
       </ion-row>
     </ion-grid>
     } @else {
-    <p class="no-data">No budget data available</p>
+    <div class="no-data">No budget data available</div>
     }
     }@else {
     <ion-spinner name="crescent" id="spinner"></ion-spinner>
     }
   </div>
   
+  @if (!loading) {
+    
   
-  <ion-item-divider class="budget-divider">
-    <ion-label>Current Budget</ion-label>
-    <div id="toggler">
-      <ion-toggle id="toggle" [(ngModel)]="showCurrent" (ionChange)="toggleAction()"></ion-toggle>
-      <ion-label id="show-budget"><strong>Show Current Budget</strong></ion-label>
-    </div>
-  </ion-item-divider>
-  
-  <!-- @if (showCurrent) { -->
-    @if ((currentBudget$ | async) ; as currentBudget) {
+    @if ((currentBudgetSingle$ | async) ; as currentBudget) {
+      @if (currentPair.budget) {
+      <ion-item-divider class="budget-divider">
+        <ion-label id="budget-usage">Budget Usage</ion-label>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div 
+              class="progress-fill" 
+              [ngStyle]="{'background-color': getBudgetColor()}"
+              [style.width.%]= "(setBudget.totalBudget ? (currentPair.budget.totalBudget/ setBudget.totalBudget)* 100 : 0)">
+            </div>
+          </div>
+          
+        </div>
+        <p class="progress-text">
+          <strong [ngStyle]="{'color': getBudgetColor()}">
+            {{ getFormattedPercentage() | percent }}
+          </strong>
+         </p>
+      </ion-item-divider>
       <ion-grid class="table">
-        <!-- Table Header -->
         <ion-row class="header-row">
           <ion-col class="header-cell"><strong>Category</strong></ion-col>
           <ion-col class="header-cell"><strong>Amount</strong></ion-col>
         </ion-row>
     
-        <!-- Table Data -->
-        <ion-row *ngFor="let spending of (currentBudget.spendings | keyvalue)" class="data-row">
-          <ion-col class="data-cell" [ngClass]="
-          {'deficit': spending.value < setBudget.spendings[spending.key],
-          'surplus': spending.value > setBudget.spendings[spending.key]}">
+        <ion-row *ngFor="let spending of (currentPair.budget.spendings| keyvalue)" class="data-row">
+          <ion-col class="data-cell"
+          [ngStyle]="{'color': getSpendingColor(spending.key, spending.value)}">
           {{ spending.key }}
         </ion-col>
           <ion-col class="data-cell"
-          [ngClass]="
-          {'deficit': spending.value < setBudget.spendings[spending.key],
-          'surplus': spending.value > setBudget.spendings[spending.key]}">{{ spending.value | currency: 'USD' : 'symbol' : '1.2-2' : 'en'  }}</ion-col>
+          >{{ spending.value | currency: 'USD' : 'symbol' : '1.2-2' : 'en'  }}</ion-col>
         </ion-row>
         <ion-row class="total-row"
         [ngClass]="
-        {'deficit-total': currentBudget.totalBudget < setBudget.totalBudget,
-        'surplus-total': currentBudget.totalBudget > setBudget.totalBudget}">
+        {'deficit-total': currentPair.budget.totalBudget < setBudget.totalBudget,
+        'surplus-total': currentPair.budget.totalBudget > setBudget.totalBudget}">
           <ion-col class="data-cell"><strong>Total</strong></ion-col>
-          <ion-col class="data-cell"><strong>{{ currentBudget.totalBudget| currency }}</strong></ion-col>
+          <ion-col class="data-cell"><strong>{{ currentPair.budget.totalBudget| currency }}</strong></ion-col>
         </ion-row>
       </ion-grid>
-      } @else {
-      <p class="no-data">No data available</p>
+    }@else {
+      <div class="no-data">No current data available</div>
       }
-    <!-- } -->
+      } 
+    } @else {
+    <ion-spinner name="crescent" id="spinner"></ion-spinner>
+    }
   <div id="fab-container">
-    <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
       <ion-fab-button routerLink="/add-budget" routerDirection="forward">
         <ion-icon [src]="'../../assets/add.svg'"></ion-icon>
       </ion-fab-button>
@@ -206,6 +251,5 @@
   #fab-container {
     position: fixed;
     bottom: 10px;
-    /* right: 20px; */
   }
 </style>

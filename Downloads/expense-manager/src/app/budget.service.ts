@@ -1,32 +1,45 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Budget, Expense, Income } from './models';
-import { addDoc, collection, DocumentReference, getDoc, getDocs, updateDoc, where } from 'firebase/firestore';
+import { BehaviorSubject } from 'rxjs';
+import { Budget, Expense, Income, User } from './models';
+import { addDoc, collection, doc, getDocs, updateDoc, writeBatch, query, where, getDoc, DocumentReference, arrayUnion } from 'firebase/firestore';
 import { firestore } from 'firebase.config';
-import { query } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BudgetService {
 
-  budgetSubject = new BehaviorSubject<{month: number, budget: Budget} | null>(null);
+  budgetSubject = new BehaviorSubject<{ month: number, budget: Budget } | null>(null);
   budget$ = this.budgetSubject.asObservable();
-  
+
   totalAmountSubject = new BehaviorSubject<number>(0);
   totalAmount$ = this.totalAmountSubject.asObservable();
 
-
+  initialValues = [
+    {month: 1, budget: null}, 
+    {month: 2, budget: null},
+    {month: 3, budget: null},
+    {month: 4, budget: null},
+    {month: 5, budget: null},
+    {month: 6, budget: null},
+    {month: 7, budget: null},
+    {month: 8, budget: null},
+    {month: 9, budget: null},
+    {month: 10, budget: null},
+    {month: 11, budget: null},
+    {month: 12, budget: null}
+    ]
   changedBudgetSubject = new BehaviorSubject<'Expense' | 'Income' | null>(null);
   changedBudget$ = this.changedBudgetSubject.asObservable();
 
-  cachedBudgetSubject = new BehaviorSubject<{month: number, budget: Budget }[]>([]);
+  cachedBudgetSubject = new BehaviorSubject<{ month: number, budget: Budget }[]>([]);
 
-  currentBudgetSubject = new BehaviorSubject<Budget | null>(null);
+  currentBudgetSubject = new BehaviorSubject<{month: number, budget: Budget| null}[]>(
+    this.initialValues
+  );
   currentBudget$ = this.currentBudgetSubject.asObservable();
-  constructor() { 
 
-  }
+  constructor() {}
 
   signalChange(type: 'Expense' | 'Income') {
     this.changedBudgetSubject.next(type);
@@ -34,176 +47,140 @@ export class BudgetService {
 
   async getCurrentSpendings(month: number, uid: string): Promise<Budget | null> {
     try {
-      const expenses = collection(firestore, 'expenses');
-      const q = query(expenses, where('userId','==',uid));
-      const querySnapshot = await getDocs(q);
-      let budget: Budget = {
-        totalBudget: 0,
-        spendings: {},
-        month,
-        userId: uid
-      };
+      const expensesCollection = collection(firestore, 'expenses');
+      const expensesQuery = query(expensesCollection, where('userId', '==', uid));
+      const expensesSnapshot = await getDocs(expensesQuery);
 
-      for (const doc of querySnapshot.docs) {
+      const cachedBudget = this.currentBudgetSubject.value.find(b => b.month === month);
+      
+      
+      console.log("Cached budget: ", cachedBudget);
+      
+      if (cachedBudget?.budget) {
+        this.currentBudgetSubject.next( [...this.currentBudgetSubject.value]);
+        return cachedBudget.budget;
+      }
+
+      let budget: Budget = { month, totalBudget: 0, spendings: {}, userId: uid, id: '' };
+      let totalExpenses = 0;
+      expensesSnapshot.docs.forEach(doc => {
         const expenseData = doc.data() as Expense;
-        console.log("Expense data: ", expenseData);
+        console.log("Expense month: ", expenseData.Date.toDate().getMonth());
+        console.log("Argument month: ", month);
         
-        console.log("Month of expense: ", expenseData.Date.toDate().getMonth());
         
         if (expenseData.Date.toDate().getMonth() + 1 === month) {
+          totalExpenses += expenseData.Amount;
           if (budget.spendings[expenseData.Category]) {
             budget.spendings[expenseData.Category] += expenseData.Amount;
           } else {
             budget.spendings[expenseData.Category] = expenseData.Amount;
           }
-          budget.totalBudget += expenseData.Amount;
         }
       }
+
+      );
+     
+
+      budget.totalBudget =  totalExpenses;
       console.log("Current budget: ", budget);
-      if (budget.totalBudget === 0) {
-        this.currentBudgetSubject.next(null);
+      
+      if (Object.keys(budget.spendings).length === 0) {
+        this.currentBudgetSubject.next([...this.currentBudgetSubject.value]);
         return null;
-      };
-      this.currentBudgetSubject.next(budget);
+      }
+
+      const updatedBudgets = this.currentBudgetSubject.value.map(entry => 
+        entry.month === month ? { ...entry, budget } : entry
+      );
+      this.currentBudgetSubject.next(updatedBudgets);
+      console.log("Current budget subejct: ", this.currentBudgetSubject.value);
+      
       return budget;
     } catch (err) {
-      console.log("Error fetching spendings: ", err);
+      console.error("Error fetching current spendings: ", err);
       return Promise.reject(err);
     }
   }
- 
 
- async getUserBudgetByMonth(uid: string, month: number) : Promise<Budget | null> {
-  console.log("Month of the function:" , month);
-  console.log("Cached budget: ", this.cachedBudgetSubject.value);
-  
-  if (this.cachedBudgetSubject.value.some(budget => budget.month === month)) {
-    console.log("Budget already cached");
-    
-    const cachedBudget = this.cachedBudgetSubject.value.find(budget => budget.month === month);
-    this.budgetSubject.next(cachedBudget!);
-    this.cachedBudgetSubject.next(this.cachedBudgetSubject.value);
-    return cachedBudget!.budget;
-  }
-  
+  async getUserBudgetByMonth(uid: string, month: number): Promise<Budget | null> {
     try {
-      const budgetsCollection = collection(firestore, 'budgets');
-      const q = query(budgetsCollection, where('userId','==',uid), where('month','==',month));
-      const querySnapshot = await getDocs(q);
-
-      for (const doc of querySnapshot.docs) {
-        const budgetData = doc.data() as Budget;
-        console.log("Budget data: ", budgetData);
-        this.budgetSubject.next({month, budget: budgetData});
-        this.cachedBudgetSubject.next([...this.cachedBudgetSubject.value, {month, budget: budgetData}]);
-        return budgetData;
-      }
-      console.log("No budget found");
+      const budgetRef = doc(collection(firestore, 'budgets'), `${uid}_${month}`);
+      const budgetDoc = await getDoc(budgetRef);
+      const cachedBudget = this.cachedBudgetSubject.value.find(b => b.month === month);
+      console.log("Cached budget: ", cachedBudget);
       
-      this.budgetSubject.next(null);
-      this.cachedBudgetSubject.next(this.cachedBudgetSubject.value);
+
+      if (cachedBudget) {
+        this.cachedBudgetSubject.next([...this.cachedBudgetSubject.value]);
+        return cachedBudget.budget;
+      }
+      if (budgetDoc.exists()) {
+        this.cachedBudgetSubject.next([...this.cachedBudgetSubject.value, { month, budget: budgetDoc.data() as Budget }]);
+        return budgetDoc.data() as Budget;
+      }
+
+      this.cachedBudgetSubject.next([...this.cachedBudgetSubject.value]);
       return null;
-
-    }catch(err) {
-      console.log("Error fetching budget: ", err);
+    } catch (err) {
+      console.error("Error fetching user budget: ", err);
       return Promise.reject(err);
     }
   }
 
-   async getTotalBudget(uid: string, month: number): Promise<{type: string, amount: number}[]> {
-      console.log("Month in budget function: ", month);
-      
-      try {
-        const incomesCollection = collection(firestore, 'incomes'); 
-        const qI = query(incomesCollection, where('userId','==',uid));
-        const incomesSnapshot = await getDocs(qI);
-        
-        let totalIncome = 0;
-        for (const doc of incomesSnapshot.docs ) {
-          const incomeData = doc.data() as Income;
-          if (incomeData.Date.toDate().getMonth() === month) {
-            console.log("Income data: ", incomeData);
-            totalIncome += incomeData.Amount;
-            console.log("Total income: ", totalIncome);
-            
-          }
-        }
-
-        const expensesCollection = collection(firestore, 'expenses');
-        const qE = query(expensesCollection, where('userId','==',uid));
-        const expensesSnapshot = await getDocs(qE);
-
-        let totalExpense = 0;
-        for (const doc of expensesSnapshot.docs) {
-          const expenseData = doc.data() as Expense;
-          console.log("Expense data date: ", expenseData.Date.toDate().getMonth());
-          console.log("Month in function: ", month);
-          
-          
-          if (expenseData.Date.toDate().getMonth() === month) {
-            console.log("Expense data: ", expenseData);
-            totalExpense += expenseData.Amount;
-            console.log("Total expense: ", totalExpense);
-            
-          }
-        }
-
-        const totalBudget = totalIncome - totalExpense;
-        console.log("Total budget: ", totalBudget);
-        
-        this.totalAmountSubject.next(totalBudget);
-       
-        
-        return [{type: 'Expense', amount: totalExpense}, {type: 'Income', amount: totalIncome}];
-      } catch (err) {
-        console.log("Error fetching total budget: ", err);
-        return Promise.reject(err);
-      }
-       
-    }
-
-
-  async addBudget(uid: string, budget: Budget) : Promise<void>{
-    console.error("Budget in addBudget argument: ", budget);
-    
+  async getTotalBudget(uid: string, month: number): Promise<{ type: string, amount: number }[]> {
     try {
-      const budgetsCollection = collection(firestore, 'budgets');
-      const qB = query(budgetsCollection, where('userId','==',uid), where('month','==',budget.month));
-      const querySnapshotB = await getDocs(qB);
-      if (querySnapshotB.size !== 0) {
-      for (const doc of querySnapshotB.docs) {
-        await updateDoc(doc.ref, {spendings: budget.spendings, totalBudget: budget.totalBudget});
-        console.log("Budget updated successfully");
-        this.budgetSubject.next({month: budget.month, budget});
-        this.cachedBudgetSubject.next(this.cachedBudgetSubject.value.map(b => b.month === budget.month ? {month: budget.month, budget} : b));
-        return;
-      }
-    } else {
-      const budgetRef = await addDoc(budgetsCollection, budget);
-      console.log("Budget added successfully");
+      const incomeQuery = query(collection(firestore, 'incomes'), where('userId', '==', uid));
+      const expensesQuery = query(collection(firestore, 'expenses'), where('userId', '==', uid));
+      const [incomesSnapshot, expensesSnapshot] = await Promise.all([getDocs(incomeQuery), getDocs(expensesQuery)]);
 
-      const usersCollection = collection(firestore, 'users');
-      const q = query(usersCollection, where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
+      let totalIncome = incomesSnapshot.docs.reduce((sum, doc) => {
+        const incomeData = doc.data() as Income;
+        return incomeData.Date.toDate().getMonth() === month ? sum + incomeData.Amount : sum;
+      }, 0);
 
-      for (const doc of querySnapshot.docs) {
-        const userData = doc.data();
-        const userBudgets = userData['Budgets'] as DocumentReference[];
-        userBudgets.push(budgetRef);
-        await updateDoc(doc.ref, {Budgets: userBudgets});
-        console.log("Budget added successfully");
-        this.budgetSubject.next({month: budget.month, budget});
-        this.cachedBudgetSubject.next([...this.cachedBudgetSubject.value, {month: budget.month, budget}]);
-        return;
-      }
-    }
-    
-    } catch(err) {
-      console.log("Error adding budget: ", err);
-      
+      let totalExpense = expensesSnapshot.docs.reduce((sum, doc) => {
+        const expenseData = doc.data() as Expense;
+        return expenseData.Date.toDate().getMonth() === month ? sum + expenseData.Amount : sum;
+      }, 0);
+
+      this.totalAmountSubject.next(totalIncome - totalExpense);
+      return [{ type: 'Expense', amount: totalExpense }, { type: 'Income', amount: totalIncome }];
+    } catch (err) {
+      console.error("Error fetching total budget: ", err);
+      return Promise.reject(err);
     }
   }
-    
+
+  async addBudget(uid: string, budget: Budget): Promise<void> {
+    try {
+      const batch = writeBatch(firestore);
+      const userDocRef = doc(firestore, 'users', uid);
+      const monthBudgetExists = this.cachedBudgetSubject.value.find(b => b.month === budget.month);
+      if (monthBudgetExists) {
+        const budgetRef = doc(collection(firestore, 'budgets'), `${uid}_${budget.month}`);
+        budget.id = budgetRef.id;
+
+        batch.update(budgetRef, { spendings: budget.spendings, totalBudget: budget.totalBudget });
+        await batch.commit();
+        const updatedBudgets = this.cachedBudgetSubject.value.map(entry =>
+          entry.month === budget.month ? { month: budget.month, budget } : entry
+        );
+        this.cachedBudgetSubject.next(updatedBudgets);
+        
+        return;
+      } else {
+        const newBudgetRef = doc(collection(firestore, 'budgets'), `${uid}_${budget.month}`);
+        budget.id = newBudgetRef.id;
+        batch.set(newBudgetRef, budget);
+        batch.update(userDocRef, { Budgets: arrayUnion(budget) });
+        await batch.commit();
+        this.budgetSubject.next({ month: budget.month, budget });
+        this.cachedBudgetSubject.next([...this.cachedBudgetSubject.value, { month: budget.month, budget }]);
+      }
+
+    } catch (err) {
+      console.error("Error adding budget: ", err);
+    }
+  }
 }
-
-

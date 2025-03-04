@@ -18,6 +18,7 @@ export class AddGoalPage implements OnInit {
 
   name = '';
   description = '';
+  targetAmount: number | null= null;
   // deadline = new Date().toISOString();
   type: 'Expense' | 'Income'= 'Income';
   constructor(private goalService: GoalsService, private router: Router) { }
@@ -31,6 +32,9 @@ export class AddGoalPage implements OnInit {
     
     if (this.name && this.description) {
       const goal : Goal = {
+        targetAmount: this.targetAmount!,
+        progress: 0,
+        id: '',
         name: this.name,
         description: this.description,
         // deadline: Timestamp.fromDate(new Date(this.deadline)),

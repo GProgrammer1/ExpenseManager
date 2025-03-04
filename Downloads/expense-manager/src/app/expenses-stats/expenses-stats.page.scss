@@ -29,8 +29,10 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  // transform: translate(-50%, -50%);
 }
+
+
 
 .chart-title {
   font-size: 1.2rem;
@@ -50,9 +52,17 @@
   margin: 5px 0;
 }
 
-.category {
+#category {
   font-weight: bold;
-  color: #00796b; /* Accent color */
+
+  //blue color: #
+  color: #007aff;
+}
+
+.category {
+  display: flex;
+  align-items: center;
+  gap: 9px;
 }
 
 .percentage-value {
@@ -78,6 +88,11 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   height: 20px;
+}
+
+.icon {
+  font-size: xx-large;
+  font-weight: bold;
 }
 
 canvas {
@@ -111,15 +126,20 @@ ion-content {
 }
 
 .no-data {
-  text-align: center;
-  color: #888;
-  font-size: 16px;
+  background-color: white; /* Light whitish background */
+  color: #959494; /* Slightly dark text for contrast */
   padding: 20px;
-  position: fixed; /* Keeps it within the flow */
-  top: 50%; /* Centers it vertically */
-  left: 50%; /* Centers it horizontally */
-  transform: translate(-50%, -50%); /* Centers it perfectly */
-  margin-top: 30px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  width: 60%;
+  max-width: 400px; /* Adjust width as needed */
+  margin: auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .percentage-container {
@@ -134,6 +154,7 @@ ion-content {
 .percentage {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   padding: 5px 10px;
   background: #f1f3f5;
@@ -163,5 +184,5 @@ ion-content {
 canvas {
   width: 100%;
   max-width: 400px;
-  max-height: 250px; /* Reduce height */
+  max-height: 350px; /* Reduce height */
 }

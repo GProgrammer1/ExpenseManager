@@ -45,6 +45,7 @@ export class AddPaymentPage implements OnInit {
     console.log('Adding payment:', this.description, this.amount, this.selectedDate);
     const userId = localStorage.getItem('userId');
     const payment: Payment = {
+      id: '',
       description: this.description,
       amount: this.amount!,
       dueDate: Timestamp.fromDate(new Date(this.selectedDate)),

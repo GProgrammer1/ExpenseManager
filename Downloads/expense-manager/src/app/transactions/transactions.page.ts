@@ -59,7 +59,6 @@ showPlaceholder = false;
   user$: Observable<User | null> = this.firestoreService.user$;
   minDate = new Date(new Date().getFullYear(), 0, 1);  maxDate = new Date();
   selectedDate: Date = new Date();
-  selectedDateString = this.selectedDate.toISOString().split('T')[0];
 
   expenses$! : Observable<Expense[]>;
   incomes$! : Observable<Income[]>;
@@ -78,12 +77,15 @@ filteredData$!: Observable<(Expense | Income)[]>;
   userEmail! :string;
   userId!: string;
   payments$!: Observable<Payment[]>;
-
+  selectedDate$ = new BehaviorSubject<string>(this.formatDate(this.selectedDate));
   constructor(
      private firestoreService: FirestoreService, private authService: AuthService,
     private router: Router, private budgetService : BudgetService, private alertController : AlertController,
     ) {
       addIcons({ add, wallet });
+      console.log("Selected date:", this.selectedDate);
+      console.log("SELECETDE DATE SUBJECT VALUE:", this.selectedDate$.value);
+      
       this.auth = getAuth();
       this.expenses$ = firestoreService.expenses$;
       this.incomes$ = firestoreService.incomes$;
@@ -101,24 +103,41 @@ filteredData$!: Observable<(Expense | Income)[]>;
         }
       ));
   
-      this.totalAmount$ = this.combinedData$.pipe(
+      
+
+      this.filteredData$ = combineLatest([
+        this.combinedData$,
+        this.filterCriteria$,
+        this.selectedDate$
+      ]).pipe(
+        map(([data, criteria, selectedDate]) => {
+          if (criteria === 'All') {
+            console.log("Selected date:", selectedDate);
+            
+            console.log("Data:", data.filter(item => {
+              const date = item.Date.toDate();
+              console.log("Item date:", date.toISOString().split('T')[0], "selected date:", selectedDate);
+              
+              return date.toISOString().split('T')[0] === selectedDate;
+            }
+            ));
+            
+            return data.filter(item => {
+              const date = item.Date.toDate();
+              return date.toISOString().split('T')[0] === selectedDate;
+            }
+            );
+          } else {
+            return data.filter(item => item.type === criteria.toLowerCase() && item.Date.toDate().toISOString().split('T')[0] === selectedDate);
+          }
+        })
+      );
+
+      this.totalAmount$ = this.filteredData$.pipe(
         map((data) => {
           return data.reduce((total, item) => {
             return total + (item.type === 'income' ? item.Amount : -item.Amount);
           }, 0);
-        })
-      );
-
-      this.filteredData$ = combineLatest([
-        this.combinedData$,
-        this.filterCriteria$
-      ]).pipe(
-        map(([data, criteria]) => {
-          if (criteria === 'All') {
-            return data;
-          } else {
-            return data.filter(item => item.type === criteria.toLowerCase());
-          }
         })
       );
       console.log("Selected data:", this.selectedData);
@@ -150,72 +169,85 @@ filteredData$!: Observable<(Expense | Income)[]>;
       
     }
 
+    formatDate(date: Date): string {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two-digit format
+      const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit format
+      return `${year}-${month}-${day}`;
+    }
+    
+
+    onDateChange() {
+      this.selectedDate$.next(this.formatDate(this.selectedDate));
+    }
+
     setFilter(criteria: string) {
       console.log("Filter criteria:", criteria);
       
       this.filterCriteria$.next(criteria);
     }
     
+    isDatePickerVisible: boolean = false;
 
-getCategoryName(category: string) {
+    toggleDatePicker() {
+      this.isDatePickerVisible = !this.isDatePickerVisible;
+    }
 
-  const categoryObj : Category = JSON.parse(category);
-  return categoryObj.name;
-}
+    getCategoryName(category: string) {
+
+      const categoryObj : Category = JSON.parse(category);
+      return categoryObj.Name;
+    }
   
-deleteData(item: Expense | Income) {
-  if (item.type === 'expense') {
-   
-      this.firestoreService.deleteExpense(this.userId, item as Expense);
-      this.budgetService.signalChange('Expense');
+    deleteData(item: Expense | Income) {
+      if (item.type === 'expense') {
+      
+          this.firestoreService.deleteExpense(this.userId, item as Expense);
+          this.budgetService.signalChange('Expense');
+        
+      } else if (item.type === 'income') {
+        this.firestoreService.deleteIncome(this.userId, item as Income);
+        this.budgetService.signalChange('Income');
+      }
+
+    }
+
+    async bindData() {
+      this.loading = true;
+      console.log("Selected date:", this.selectedDate);
     
-  } else if (item.type === 'income') {
-    this.firestoreService.deleteIncome(this.userId, item as Income);
-    this.budgetService.signalChange('Income');
-  }
-
-}
-
-  async bindData() {
-    this.loading = true;
-    console.log("Selected date:", this.selectedDate);
-  console.log("Selected iso date:", this.selectedDate.toISOString());
-  ;
-  
-    console.log("Selected month:", this.selectedDate.getMonth() + 1);
-    console.log("User id: ", this.userId);
+      console.log("User id: ", this.userId);
+      
+      const timestamp = Timestamp.fromDate(new Date(this.selectedDate));
+      console.log("Timestamp: ", timestamp.toDate());
+        await this.firestoreService.getAllTransactions(this.userId);
+        this.loading = false;
     
-    const timestamp = Timestamp.fromDate(this.selectedDate);
-    console.log("Timestamp: ", timestamp.toDate());
-      await this.firestoreService.getUserExpensesByDate(this.userId!, timestamp); //expenses emitted a value
-      await this.firestoreService.getUserIncomesByDate(this.userId!, timestamp); //inomes emitted  a value
-      this.loading = false;
-  
-  }
+    }
 
-  formatTimestamp(timestamp: Timestamp): string {
-    const date = timestamp.toDate();  // Convert Firestore Timestamp to JS Date
-  
-    // Get the time zone offset in minutes (UTC+2 is 120 minutes ahead of UTC)
-    const timezoneOffset = -date.getTimezoneOffset() / 60;  // in hours
-  
-    // Format the date to your desired format
-    const formattedDate = date.toLocaleString('en-US', {
-      weekday: 'long',   // e.g. "Monday"
-      year: 'numeric',   // e.g. "2025"
-      month: 'long',     // e.g. "January"
-      hour: '2-digit',   // e.g. "02"
-      minute: '2-digit', // e.g. "00"
-      second: '2-digit', // e.g. "00"
-      hour12: true,      // Use 12-hour format with AM/PM
-      timeZone: 'UTC'    // Set the time zone to UTC to calculate from UTC time
-    });
-  
-    // Construct the final string with the timezone info
-    const timezoneString = `UTC${timezoneOffset >= 0 ? '+' : '-'}${Math.abs(timezoneOffset)}`;
-  
-    return `${formattedDate} ${timezoneString}`;
-  }
+    formatTimestamp(timestamp: Timestamp): string {
+      const date = timestamp.toDate();  // Convert Firestore Timestamp to JS Date
+    
+      // Get the time zone offset in minutes (UTC+2 is 120 minutes ahead of UTC)
+      const timezoneOffset = -date.getTimezoneOffset() / 60;  // in hours
+    
+      // Format the date to your desired format
+      const formattedDate = date.toLocaleString('en-US', {
+        weekday: 'long',   // e.g. "Monday"
+        year: 'numeric',   // e.g. "2025"
+        month: 'long',     // e.g. "January"
+        hour: '2-digit',   // e.g. "02"
+        minute: '2-digit', // e.g. "00"
+        second: '2-digit', // e.g. "00"
+        hour12: true,      // Use 12-hour format with AM/PM
+        timeZone: 'UTC'    // Set the time zone to UTC to calculate from UTC time
+      });
+    
+      // Construct the final string with the timezone info
+      const timezoneString = `UTC${timezoneOffset >= 0 ? '+' : '-'}${Math.abs(timezoneOffset)}`;
+    
+      return `${formattedDate} ${timezoneString}`;
+    }
 
 
 
@@ -228,7 +260,7 @@ deleteData(item: Expense | Income) {
   }
 
 
-  formatDate(dateObj: Date) {
+  formatLocaleDate(dateObj: Date) {
     const day = dateObj.toLocaleString('en-US', { weekday: 'short' });
     const month = dateObj.toLocaleString('en-US', { month: 'short' });
     const dayOfMonth = dateObj.getDate();

@@ -52,6 +52,10 @@ export class AuthService {
   async updateUserData(uid: string, data: any): Promise<void> {
 
     try {
+      console.log('Updating user data:', data);
+      console.log('User ID:', uid);
+      
+      
       const usersCollection = collection(firestore, 'users');
       const userQuery = query(usersCollection, where('uid', '==', uid));
       const userSnapshot = await getDocs(userQuery);
@@ -60,6 +64,8 @@ export class AuthService {
       for(const doc of userSnapshot.docs) {
         let userData : import('./models').User = doc.data() as import('./models').User 
         userData = {...userData, ...data};
+        console.log('Updating user data:', userData);
+        
         batch.update(doc.ref, {...userData});
       }
 
@@ -75,4 +81,6 @@ export class AuthService {
   getCurrentUser(): any {
     return this.auth.currentUser;
   }
+
+  
 }

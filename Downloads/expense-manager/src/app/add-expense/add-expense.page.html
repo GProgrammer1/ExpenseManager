@@ -19,7 +19,9 @@
         [(ngModel)]="categ"
         class="input-field"
       >
-        <ion-select-option *ngFor="let category of expense_categories" [value]="category">{{ category }}</ion-select-option>
+        <ion-select-option *ngFor="let category of expense_categories" [value]="category">
+          {{ category }}
+        </ion-select-option>
       </ion-select>
     </ion-item>
 
@@ -33,13 +35,16 @@
       ></ion-textarea>
     </ion-item>
 
-    <ion-button
-      expand="block"
-      class="submit-button"
-      (click)="add()"
-    >
-      Add Expense
-    </ion-button>
+    <ion-item>
+      <ion-label position="floating">Date</ion-label>
+      <ion-datetime 
+        display-format="YYYY-MM-DD"
+        [(ngModel)]="selectedDate"
+        name="selectedDate"
+      ></ion-datetime>
+    </ion-item>
+
+    <ion-button expand="block" class="submit-button" (click)="add()">Add Expense</ion-button>
     <ion-button expand="block" color="danger" routerLink="/tabs/transactions">Cancel</ion-button>
   </div>
 </ion-content>

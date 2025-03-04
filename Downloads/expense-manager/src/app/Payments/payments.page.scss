@@ -31,24 +31,32 @@ ion-toolbar {
   justify-self: flex-end;
   align-self: flex-start;
   --color: white !important;
-  position: relative;
-  bottom: 55px;
+  // position: relative;
+  // bottom: 55px;
 }
 
 #view-sub-btn {
   color: #007aff;;
   --background: white;
   border: none !important;
+  font-size: small;
+  width: 150px;
+  margin-top: 7px;
+  
 }
 
 #subscription-list {
   z-index: 100000;
 }
 
+.toolbar-container {
+  display: flex;
+}
+
 #view-subscriptions {
   position: absolute;
-  top: 50px;
-  left: 10px;
+  
+  right: 5px;
   z-index: 100000;
 }
 /* Ion List Styling */
@@ -105,12 +113,14 @@ ion-content {
   padding: 20px;
   background-color: #f0f0f0;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   gap: 0.4rem
 }
 
 #add-sub-btn {
   --color: white;
+  width: 150px;
+  
 }
 
 #warning, #warning-sign {
@@ -205,12 +215,30 @@ ion-fab-button:hover {
   // }
 }
 .dropdown-menu {
-  border: 1px solid black; /* Black border to distinguish */
-  max-height: 300px; /* Small height to avoid covering the whole screen */
-  overflow-y: auto; /* Enables scrolling if content overflows */
-  background: white; /* Ensures visibility */
-  padding: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds slight shadow for better distinction */
-  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.15); /* Softer border */
+  max-height: 300px; /* Prevents covering too much screen */
+  overflow-y: auto; /* Enables scrolling if needed */
+  background: white;
+  transition: max-height 0.3s ease-in-out;
+  // padding: 12px;
+  border-radius: 12px;
+  
+  /* Subtle 3D shadow effect */
+  box-shadow: 
+    0px 2px 4px rgba(0, 0, 0, 0.08), 
+    0px 6px 12px rgba(0, 0, 0, 0.12); 
+}
+
+#noData {
+  background-color: white; /* Light whitish background */
+  color: #959494; /* Slightly dark text for contrast */
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  width: 50%;
+  max-width: 400px; /* Adjust width as needed */
+  margin: auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 

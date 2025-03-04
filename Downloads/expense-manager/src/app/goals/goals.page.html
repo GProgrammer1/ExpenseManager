@@ -9,77 +9,160 @@
 
 <ion-content [fullscreen]="true">
   <div class="page-container">
+    @if (!loading) {
     @if (goals$ | async; as goals) {
       @if (goals.length === 0) {
         <ion-text color="medium" class="no-goals-text">No goals set yet</ion-text>
       }
       @else {
         <ion-list>
-          <ion-item  *ngFor="let goal of goals">
-            <div class="custom-item">
-            <div id="top-layer">
-              <div id="goal-title">
-              <ion-icon name="trophy" class="goal-icon"></ion-icon>
-              <ion-label class="goal-name">{{ goal.name }}</ion-label></div>
-               <ion-icon name="trash" class="delete-icon" (click)="presentDeleteGoalDialog(goal)" color="danger"></ion-icon>
-              
-            </div>
+          <ion-card *ngFor="let goal of goals" class="goal-card">
+            <ion-card-header>
+              <ion-item lines="none">
+                <ion-icon src="assets/goal.svg" class="goal-icon"></ion-icon>
+                <ion-label class="goal-name">{{ goal.name }}</ion-label>
+                <ion-icon name="trash" class="delete-icon" (click)="presentDeleteGoalDialog(goal)" color="danger"></ion-icon>
 
-            <!-- Description (Always at the bottom) -->
-            <div id="description" #desc
-             [contentEditable]="allowEdit"
-             (blur)="editDescription($event, goal)"
-             [ngClass]="{'active-div': allowEdit && focusedGoal?.name === goal.name}">   
-              <ion-text color="medium" class="goal-category">{{ goal.description }}</ion-text>
-              <ion-icon name="pencil-outline" class="edit-icon" 
-                (click)="allowEdit = !allowEdit; focusedGoal=goal; focusOnDiv() "
-                [ngClass]="{'active': allowEdit && focusedGoal?.name === goal.name}"></ion-icon>
-            </div>
-
-            <div id="ai-btns">
-              <ion-button fill="outline" color="primary" (click)="goalAdvise(goal)" [disabled]="generating">
-                @if (generating && selectedGoal?.name === goal.name) {
-                  <ion-icon name="bulb" slot="start"></ion-icon>
-                  Generating content...
-                } @else {
-                  <ion-icon name="bulb" slot="start"></ion-icon>
-                  Advise
-                } 
-              </ion-button>
-      
-              @if (generated && selectedGoal?.name === goal.name) {
-                <ion-button (click)="showPopup = true">Open Report</ion-button>
-              }
+              </ion-item>
+            </ion-card-header>
+            
+            <ion-card-content>
+              <div id="description" #desc
+                [contentEditable]="allowEdit"
+                (blur)="editDescription($event, goal)"
+                [ngClass]="{'active-div': allowEdit && focusedGoal?.name === goal.name}">
+                <ion-text color="medium" class="goal-category">{{ goal.description }}</ion-text>
+                <ion-icon name="pencil-outline" class="edit-icon" 
+                  (click)="allowEdit = !allowEdit; focusedGoal=goal; focusOnDiv() "
+                  [ngClass]="{'active': allowEdit && focusedGoal?.name === goal.name}"></ion-icon>
+              </div>
               
-            </div>
-          </div>
-          </ion-item>
+              <div id="ai-btns">
+                <ion-button  (click)="goalAdvise(goal)" [disabled]="generating">
+                  @if (generating && selectedGoal?.name === goal.name) {
+                    <ion-icon name="bulb-outline" slot="start"></ion-icon>
+                    Generating content...
+                  } @else {
+                    <ion-icon name="bulb-outline" slot="start"></ion-icon>
+                    Advise
+                  }
+                </ion-button>
+                
+                <ion-button (click)="checkGoalProgress(goal)">
+                  <ion-icon name="sync" class="progress-icon" ></ion-icon>
+                  @if (checkingProgress) {Checking...}
+                  @else {Check progress}
+                </ion-button>
+
+              </div>
+              <div id="progress-container">
+                <ion-label>Progress: </ion-label>
+                <span>{{goal.progress | percent}}</span>
+                <ion-progress-bar
+                [value]="goal.progress / 100"
+                [color]="getColor(goal.progress)">
+              </ion-progress-bar>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-list>
       }
     } 
     @else {
       <ion-spinner name="crescent" class="spinner"></ion-spinner>
     }
-  </div>
+  }
+  @else {
+    <ion-spinner name="crescent" class="spinner"></ion-spinner>
+  }
+</div>
 
-  <!-- Popup (Report Style) -->
+
   <div class="custom-popup" *ngIf="showPopup">
     <div class="popup-content">
       <div class="popup-header">
         <ion-icon name="close" class="close-icon" (click)="showPopup = false; generated=false; selectedGoal=null"></ion-icon>
         Goal Report</div>
-
       <div class="popup-section">
         <h4>Advice</h4>
         <ion-text class="response">{{ response }}</ion-text>
       </div>
-
     </div>
   </div>
 
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button routerLink="/add-goal">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 </ion-content>
+
+<style>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+
+.goal-card {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.no-goals-text {
+  font-size: 1rem;
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.goal-icon {
+  font-size: 1.9rem;
+  color: var(--ion-color-primary);
+  margin-right: 0.5rem;
+}
+
+.goal-category {
+  max-width: 70%;
+  line-height: 1.5;
+  color: #666;
+}
+
+.delete-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+ion-header, ion-toolbar { 
+  --background: #007aff;
+  color: white;
+}
+
+.toolbar-content {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0.7rem;
+}
+
+@media screen and (max-width: 700px) {
+  #ai-btns {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    top: 10px;
+    width: 100%;
+  }
+  .active-div {
+  border-bottom: 2px solid var(--ion-color-primary);
+  transition: border 0.3s;
+}
+
+}
+
+
+</style>

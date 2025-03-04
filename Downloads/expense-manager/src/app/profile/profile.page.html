@@ -1,0 +1,216 @@
+<ion-content class="ion-padding">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs">Back</ion-back-button>
+      </ion-buttons>
+      <ion-title>Profile</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card *ngIf="user; else loadingTemplate" class="profile-card">
+    <ion-card-header>
+      <ion-card-title>👤 User Profile</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list class="profile-list">
+        <ion-item lines="none">
+          <div class="profile-item">
+          <ion-label>Age Range:</ion-label>
+          <ion-select *ngIf="isEditing"
+          autoGrow="true"
+          class="editable-textarea"
+          [(ngModel)]="editableUser.ageRange"
+          placeholder="Enter age range here..."
+        >
+          <ion-select-option value="18-24">18-24</ion-select-option>
+          <ion-select-option value="25-34">25-34</ion-select-option>
+          <ion-select-option value="35-44">35-44</ion-select-option>
+          <ion-select-option value="45-54">45-54</ion-select-option>
+          <ion-select-option value="55-64">55+</ion-select-option>
+          
+      </ion-select>
+          <ion-note *ngIf="!isEditing">{{ user.ageRange || 'N/A' }}</ion-note>
+        </div>
+        </ion-item>
+
+
+        <ion-item lines="none">
+          <div class="profile-item">
+          <ion-label>Country:</ion-label>
+          <ion-textarea *ngIf="isEditing"
+          autoGrow="true"
+          class="editable-textarea"
+          [(ngModel)]="editableUser.country"
+          placeholder="Enter text here..."
+        ></ion-textarea>
+          <ion-note *ngIf="!isEditing">{{ user.country || 'N/A' }}</ion-note>
+        </div>
+        </ion-item>
+
+        <ion-item lines="none">
+          <div class="profile-item">
+          <ion-label>City:</ion-label>
+          <ion-textarea *ngIf="isEditing"
+          autoGrow="true"
+          class="editable-textarea"
+          [(ngModel)]="editableUser.occupation"
+          placeholder="Enter text here..."
+        ></ion-textarea>
+          <ion-note *ngIf="!isEditing">{{ user.occupation || 'N/A' }}</ion-note>
+        </div>
+
+        </ion-item>
+
+        <ion-item lines="none">
+          <div class="profile-item">
+          <ion-label>Savings Goal:</ion-label>
+          <ion-textarea *ngIf="isEditing"
+          autoGrow="true"
+          class="editable-textarea"
+          [(ngModel)]="editableUser.savingsGoal"
+          placeholder="Enter text here..."
+        ></ion-textarea>
+          <ion-note *ngIf="!isEditing">{{ user.savingsGoal || ( 0 | currency) }}</ion-note>
+        </div>
+
+        </ion-item>
+
+
+        <ion-item lines="none">
+          <div class="profile-item">
+          <ion-label>Monthly Income:</ion-label>
+          <ion-textarea *ngIf="isEditing"
+          autoGrow="true"
+          class="editable-textarea"
+          [(ngModel)]="editableUser.monthlyIncome"
+          placeholder="Enter text here..."
+        ></ion-textarea>
+          <ion-note *ngIf="!isEditing">{{ user.monthlyIncome || ( 0 | currency) }}</ion-note>
+        </div>
+        </ion-item>
+
+        <ion-item lines="none">
+          <div class="profile-item">
+          <ion-label>Savings:</ion-label>
+          <ion-textarea *ngIf="isEditing"
+          autoGrow="true"
+          class="editable-textarea"
+          [(ngModel)]="editableUser.savings"
+          placeholder="Enter text here..."
+        ></ion-textarea>
+          <ion-note *ngIf="!isEditing">{{ user.savings || (0 | currency)  }}</ion-note>
+        </div>
+        </ion-item>
+
+        <!-- Fixed Expenses Grid -->
+        <ion-item lines="none">
+          <ion-label>Fixed Expenses:</ion-label>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6"><strong>Category</strong></ion-col>
+            <ion-col size="4"><strong>Amount</strong></ion-col>
+            <ion-col size="2" *ngIf="user.fixedExpenses.length === 0 && isEditing">
+              <ion-icon name="add-circle-outline" (click)="addFixedExpense()"></ion-icon>
+            </ion-col>
+          </ion-row>
+          @for (fixedExpense of user.fixedExpenses; track fixedExpense.category; let idx = $index) {
+          <ion-row>
+            <ion-col size="6">
+              <ion-textarea *ngIf="isEditing"
+              autoGrow="true"
+              class="editable-textarea"
+              [(ngModel)]="editableUser.fixedExpenses[idx].category"
+              placeholder="Enter text here..."
+            ></ion-textarea>              <ion-note *ngIf="!isEditing">{{ fixedExpense.category }}</ion-note>
+            </ion-col>
+            <ion-col size="4">
+              <ion-textarea *ngIf="isEditing"
+              autoGrow="true"
+              class="editable-textarea"
+              [(ngModel)]="editableUser.fixedExpenses[idx].amount"
+              placeholder="Enter text here..."
+            ></ion-textarea>              <ion-note *ngIf="!isEditing">${{ fixedExpense.amount }}</ion-note>
+            </ion-col>
+            <ion-col size="2">
+              <ion-icon *ngIf="isEditing"
+              name="remove-circle-outline"
+              (click)="removeFixedExpense(idx)"
+              class="remove-icon"  ></ion-icon>
+              <ion-icon *ngIf="isEditing && (idx === user.fixedExpenses.length - 1)"
+              name="add-circle-outline"
+              color="primary"
+              (click)="addFixedExpense()"
+              class="add-icon"></ion-icon>
+            </ion-col>
+          </ion-row>
+        }
+        </ion-grid>
+
+        <!-- Variable Expenses Grid -->
+        <ion-item lines="none">
+          <ion-label>Variable Expenses:</ion-label>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6"><strong>Category</strong></ion-col>
+            <ion-col size="4"><strong>Amount</strong></ion-col>
+            <ion-col size="2" *ngIf="user.variableExpenses.length === 0 && isEditing">
+              <ion-icon name="add-circle-outline" (click)="addVariableExpense()"></ion-icon>
+            </ion-col>
+          </ion-row>
+          @for (variableExpense of user.variableExpenses; track variableExpense.category; let idx = $index) {
+          <ion-row>
+            <ion-col size="6">
+              <ion-textarea *ngIf="isEditing"
+              autoGrow="true"
+              class="editable-textarea"
+              [(ngModel)]="editableUser.variableExpenses[idx].category"
+              placeholder="Enter text here..."
+            ></ion-textarea>              <ion-note *ngIf="!isEditing">{{ variableExpense.category }}</ion-note>
+            </ion-col>
+            <ion-col size="4">
+              <ion-textarea *ngIf="isEditing"
+              autoGrow="true"
+              class="editable-textarea"
+              [(ngModel)]="editableUser.variableExpenses[idx].amount"
+              placeholder="Enter text here..."
+            ></ion-textarea>              <ion-note *ngIf="!isEditing">${{ variableExpense.amount }}</ion-note>
+            </ion-col>
+            <ion-col size="2">
+              <ion-icon *ngIf="isEditing"
+              name="remove-circle-outline"
+              (click)="removeVariableExpense(idx)"
+              class="remove-icon"  ></ion-icon>
+              <ion-icon *ngIf="isEditing && (idx === user.variableExpenses.length - 1)"
+              name="add-circle-outline"
+              color="primary"
+              (click)="addVariableExpense()"
+              class="add-icon"></ion-icon>
+            </ion-col>
+          </ion-row>
+        }
+        </ion-grid>
+      </ion-list>
+    </ion-card-content>
+
+    <ion-card-content class="btn-group">
+      <ion-button expand="full" [color]="isEditing? 'danger' : 'primary'" (click)="toggleEditMode()">
+        {{ isEditing ? 'Cancel' : 'Edit Profile' }}
+      </ion-button>
+      <ion-button *ngIf="isEditing" expand="full" color="primary" (click)="saveProfile()" [disabled]="isSaving">
+        <ion-spinner *ngIf="isSaving" name="crescent"></ion-spinner>
+        <span *ngIf="!isSaving">Save</span>
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ng-template #loadingTemplate id="loadingTemplate">
+    <div class="loading-overlay">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading user data...</p>
+    </div>
+  </ng-template>
+</ion-content>

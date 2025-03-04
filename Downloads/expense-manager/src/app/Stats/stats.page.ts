@@ -46,6 +46,7 @@ export class StatsPage implements OnInit {
     this.router.navigate([`/tabs/stats/expenses/${this.currentMonth.value}`]);
   }
 
+
   constructor(private firestoreService: FirestoreService, private authService : AuthService,
     private router: Router
   ) {

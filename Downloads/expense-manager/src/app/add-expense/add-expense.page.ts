@@ -21,7 +21,9 @@ import { Router, RouterLink } from '@angular/router';
 export class AddExpensePage implements OnInit {
 
   amount: number | null = null;
-  expense_categories: string[] = ['Food', 'Transportation', 'Entertainment', 'Health', 'Education', 'Other','Housing'];
+  expense_categories: string[] = ['Food', 'Transportation', 'Entertainment', 'Health', 'Education', 'Other','Housing', 'Utilities',
+    'Clothing', 'Insurance', 'Personal Care'
+  ];
   categ: string = '';
   description: string = '';
   selectedDate: string = new Date().toISOString().split('T')[0];
@@ -52,13 +54,16 @@ export class AddExpensePage implements OnInit {
       return;
     }
     const expense: Expense = {
+      id: '',
 
-      Date: Timestamp.fromDate(new Date()),
+      Date: Timestamp.fromDate(new Date(this.selectedDate)),
       Description: this.description,
       Category: this.categ,
       Amount: this.amount!,
       userId: userId!
     }
+    console.log("Expense date: ", expense.Date.toDate().toISOString());
+    
     
     this.firestoreService.addExpense(userId!, expense);
     this.budgetService.signalChange('Expense');

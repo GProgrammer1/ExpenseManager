@@ -18,10 +18,14 @@ export class AddTransactionsPage implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit() {
+    console.log("Selected tab is: ", this.selectedTab);
+    
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
           console.log('Navigated to:', event.url);
+          this.selectedTab = event.url.includes('income') ? 'income' : 'expense';
         }
+       
       });
    
   }
@@ -29,8 +33,10 @@ export class AddTransactionsPage implements OnInit {
   navigate(route: 'expense' | 'income') {
     console.log('Navigating to:', route);
     
-    this.router.navigate([`/tabs/add-transactions/${route}`]);
+    this.router.navigate([`/add-transactions/${route}`]);
     this.selectedTab = route;
+    console.log('Selected tab is:', this.selectedTab);
+    
 
   }
 

@@ -74,6 +74,8 @@ export class AddBudgetPage implements OnInit {
         
         
         let budget :Budget = {
+          id: '',
+
           spendings,
           month: this.selectedMonth,
           totalBudget,

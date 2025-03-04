@@ -14,7 +14,7 @@ import { FirestoreService } from '../firestore.service';
 import { User } from '../models';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { FcmService } from '../fcm.service';
-
+import { ToastController } from '@ionic/angular';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -30,13 +30,21 @@ export class LoginPage implements OnInit {
   password: string = '';
   auth!: Auth;
 
-  constructor(private authService: AuthService, private router: Router, private fcmService: FcmService) {
+  constructor(private authService: AuthService, private router: Router, private fcmService: FcmService,
+    private toastController: ToastController
+  ) {
     this.auth = getAuth(app);
   }
 
   ngOnInit() {
     // Ensure auth state is always checked on initialization
-    
+    onAuthStateChanged(this.auth, async (user) => {
+      if (user) {
+        // If user is already signed in, navigate to the home page
+        localStorage.setItem('userId', user.uid);
+        this.router.navigate(['/tabs']);
+      }
+    });
   }
 
   async login() {
@@ -83,8 +91,13 @@ export class LoginPage implements OnInit {
       this.router.navigate(['/tabs']);  
     } catch (error: any) {
       console.error('Error signing in:', error);
-      alert('Error signing in: ' + error.message);
-    }
+  
+      const toast = await this.toastController.create({
+        message: 'Invalid credentials. Please try again.',
+        duration: 3000
+      });
+      toast.present();
+      }
   }
 
   async refresh() {

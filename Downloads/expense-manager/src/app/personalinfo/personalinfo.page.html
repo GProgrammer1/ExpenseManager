@@ -71,15 +71,18 @@
           <ion-input [(ngModel)]="savingsGoal" type="number" required></ion-input>
         </ion-item>
 
+        <ion-item>
+          <ion-label position="floating">Current Savings:</ion-label>
+          <ion-input [(ngModel)]="savings" type="number" required></ion-input>
+        </ion-item>
+
         <ion-button expand="block" (click)="nextStep()">Continue</ion-button>
         <ion-button expand="block" (click)="prevStep()">Back</ion-button>
       </ion-card-content>
 
       <!-- Step 4: Country, Age, Debt -->
       <ion-card-content *ngIf="currentStep === 4">
-        <ion-item>
           <ion-searchbar  (ionInput)="filterCountries($event)" placeholder="Search for a country"></ion-searchbar>
-        </ion-item>
         <ion-item>
           <ion-label position="floating">Country</ion-label>
           <ion-select [(ngModel)]="country" interface="alert" >
@@ -95,6 +98,15 @@
           </ion-select>
         </ion-item>
 
+        <ion-item>
+          <ion-label position="floating">City</ion-label>
+          <ion-input [(ngModel)]="city" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Occupation</ion-label>
+          <ion-input [(ngModel)]="occupation" required></ion-input>
+        </ion-item>
         <ion-item>
           <ion-label>Age Range</ion-label>
           <ion-select [(ngModel)]="ageRange" interface="popover">
@@ -116,7 +128,7 @@
 
           }
         </ion-item>
-        <ion-button expand="block" (click)="submitFinancialInfo()">Submit</ion-button>
+        <ion-button expand="block" (click)="saveAndContinue()">Submit</ion-button>
         <ion-button expand="block" (click)="prevStep()">Back</ion-button>
 
       </ion-card-content>

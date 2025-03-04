@@ -26,7 +26,9 @@ export class GoalsPage implements OnInit {
   showPopup = false;
   generated = false;
   allowEdit = false;
+  loading = true;
   focusedGoal: Goal | null = null;
+  checkingProgress = false;
 
   @ViewChild('aiReportModal') aiReportModal!: IonModal;
   @ViewChild('desc') desc!: ElementRef;
@@ -36,11 +38,12 @@ export class GoalsPage implements OnInit {
     this.goals$ = goalsService.goals$;
    }
 
-  ngOnInit() {
+  async ngOnInit() {
     const userId = localStorage.getItem('userId');
     console.log("User id: ", userId);
     
-    this.goalsService.getGoals(userId!);
+    await this.goalsService.getGoals(userId!);
+    this.loading = false;
   }
 
   focusOnDiv() {
@@ -86,6 +89,47 @@ export class GoalsPage implements OnInit {
   deleteGoal(goal: Goal) {
     this.goalsService.deleteGoal(goal);
   }
+
+  getColor(progress: number) {
+    if (progress < 30) {
+      return 'danger';
+    } else if (progress < 70) {
+      return 'warning';
+    } else {
+      return 'success';
+    }  
+  }
+
+  checkGoalProgress(goal: Goal) {
+    this.checkingProgress = true;
+    this.geminiService.estimateGoalProgress(goal).subscribe(
+      {
+        next: (res: any) =>  { 
+          console.log("AI progress feedback succeeded");
+          let percentage = (res?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response');
+          console.log("Percentage: ", percentage);
+            if (isNaN(Number(percentage))) {
+              console.log("Percentage is not a number");
+              this.checkingProgress = false;
+              
+              return;
+            }
+          percentage = Number(percentage.replace(/\s+/g, '')); 
+          console.log(typeof percentage + " Percentage:", percentage);
+
+          goal.progress = percentage;
+          console.log("GOAL PROGRESS:", goal.progress);
+          this.goalsService.updateGoal(goal);
+          this.checkingProgress = false;
+
+        },
+        error:(err) => {
+          console.error("AI response failed: ", err);
+          
+        }
+      }
+    )
+  }
   
   goalAdvise(goal: Goal) {
     console.log("Getting AI advise");
@@ -100,6 +144,7 @@ export class GoalsPage implements OnInit {
   .replace(/\*+/g, '') // Remove all '*' occurrences
 
           this.generated = true;
+          this.showPopup = true;
           console.log("Response: ", this.response);
           
           // this.aiReportModal.present(); // Show the modal

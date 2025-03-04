@@ -1,98 +1,66 @@
-import { Injectable, inject } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { addDoc, collection, deleteDoc, doc, DocumentReference, Firestore, getDoc, getDocs, query, Timestamp, updateDoc, where } from 'firebase/firestore';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { addDoc, arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { BehaviorSubject } from 'rxjs';
 import { app, firestore } from '../../firebase.config';
 import { Expense, Income, Subscription } from './models';
 import { Auth, browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, User } from 'firebase/auth';
-import { LogarithmicScale } from 'chart.js';
 import { HttpClient } from '@angular/common/http';
+import { BudgetService } from './budget.service';
 
 @Injectable({ providedIn: 'root' })
 export class FirestoreService {
 
+ 
+
+  currentTabSubject = new BehaviorSubject<'Expenses' | 'Incomes'>('Expenses');
+  currentTab$ = this.currentTabSubject.asObservable();
+
   async deleteIncome(uid: string, item: Income) {
     try {
-      const incomesCollection = collection(firestore, 'incomes');
-      const q = query(incomesCollection, where('Amount', '==', item.Amount), where('Category', '==', item.Category), where('Description', '==', item.Description), where('Date', '==', item.Date), where('userId', '==', uid));
-      const querySnapshot = await getDocs(q);
+      const userDocRef = doc(firestore, 'users', uid);
+  
+      // Find the exact income document by reference (if stored)
+      const incomeRef = doc(firestore, 'incomes', item.id);
+      const batch = writeBatch(firestore);
+      batch.delete(incomeRef);
 
-      const incomeRefs = querySnapshot.docs.map((doc) => doc.ref);
-
-      for (const incomeRef of incomeRefs) {
-        await deleteDoc(incomeRef);
-      }
-
-      const usersCollection = collection(firestore, 'users');
-      const q2 = query(usersCollection, where('uid', '==', uid)); 
-      const querySnapshotU = await getDocs(q2);
-let updatedIncomesData = [] as Income[];
-      for (const doc of querySnapshotU.docs) {
-        const userData = doc.data();
-        const userIncomeRefs = userData['Incomes'] as DocumentReference[] ?? [];
-        const updatedIncomes = userIncomeRefs.filter((ref) => !incomeRefs.some((incomeRef) => incomeRef.path === ref.path));
-        const updatedIncomesDataPromises = updatedIncomes.map(async (ref) => {
-          const doc = await getDoc(ref);
-          return doc.data() as Income;
-        });
-        updatedIncomesData = await Promise.all(updatedIncomesDataPromises);
-        console.log("Updated incomes: ", updatedIncomes);
-        
-        await updateDoc(doc.ref, { Incomes: updatedIncomes });
-      }
-      this.incomesSubject.next(updatedIncomesData.filter((income) => income.Date.toDate().getDay() === item.Date.toDate().getDay()));
-    } catch (err) {
-      console.log("Error deleting income: ", err);
+     
+        batch.update(userDocRef, {
+        Incomes: arrayRemove(incomeRef)})
       
+
+      this.incomesSubject.next(this.incomesSubject.value.filter((income) => income.id !== item.id));
+      await batch.commit();
+    } catch (err) {
+      console.error("Error deleting income:", err);
     }
   }
-
+  
 
   async deleteExpense(uid: string, item: Expense) {
     try {
-      const expensesCollection = collection(firestore, 'expenses');
-      const q = query(expensesCollection, where('Amount', '==', item.Amount), where('Category', '==', item.Category), where('Date', '==', item.Date), where('Description', '==', item.Description), where('userId', '==', uid));
-      const querySnapshot = await getDocs(q);
+      const userDocRef = doc(firestore, 'users', uid);  
+      const expenseRef = doc(firestore, 'expenses', item.id);
+      const batch = writeBatch(firestore);
+      batch.delete(expenseRef);
 
-      const expenseRefs = querySnapshot.docs.map((doc) => doc.ref);
-      console.log("Expense refs: ", expenseRefs);
-      
-
-      for (const expenseRef of expenseRefs) {
-        await deleteDoc(expenseRef);
-      }
-
-      const usersCollection = collection(firestore, 'users');
-      const q2 = query(usersCollection, where('uid', '==', uid)); 
-      const querySnapshotU = await getDocs(q2);
-      let updatedExpensesData = [] as Expense[];
-      for (const doc of querySnapshotU.docs) {
-        const userData = doc.data();
-        const userExpenseRefs = userData['Expenses'] as DocumentReference[] ?? [];
-        const updatedExpenses = userExpenseRefs.filter((ref) => !expenseRefs.some((expenseRef) => expenseRef.path === ref.path));
-        const updatedExpensesDataPromises = updatedExpenses.map(async (ref) => {
-          const doc = await getDoc(ref);
-          return doc.data() as Expense;
+        batch.update(userDocRef, {
+          Expenses: arrayRemove(expenseRef)
         });
-        
-        console.log("Updated Expenses: ", updatedExpenses);
-        updatedExpensesData = await Promise.all(updatedExpensesDataPromises);
-        await updateDoc(doc.ref, { Expenses: updatedExpenses });
-      }
       
-      console.log("Expenses subject value: ", this.expensesSubject.value);
-      
-      this.expensesSubject.next(updatedExpensesData.filter((expense) => expense.Date.toDate().getDay() === item.Date.toDate().getDay()));
+
+      this.expensesSubject.next(this.expensesSubject.value.filter((expense) => expense.id !== item.id));
+
+      await batch.commit();     
     } catch (err) {
-      console.log("Error deleting expense: ", err);
-      
+      console.error("Error deleting expense:", err);
     }
   }
+  
+  
 
   //observer, observable, subscriber
   //next, error, complete
-  
-
   expensesSubject = new BehaviorSubject<Expense[]>([]);
   expenses$ = this.expensesSubject.asObservable();
 
@@ -112,7 +80,7 @@ let updatedIncomesData = [] as Income[];
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private budgetService: BudgetService) {
     
 
     setPersistence(this.auth, browserLocalPersistence)
@@ -132,6 +100,23 @@ let updatedIncomesData = [] as Income[];
   }
   changeMonth(month: number) {
     this.monthSubject.next(month);
+  }
+
+  async getAllTransactions(uid: string) {
+    try {
+      const expensesCollection = collection(firestore, 'expenses');
+      const incomesCollection = collection(firestore, 'incomes');
+      const q = query(expensesCollection, where('userId', '==', uid));
+      const q2 = query(incomesCollection, where('userId', '==', uid));
+      const [expensesSnapshot, incomesSnapshot] = await Promise.all([getDocs(q), getDocs(q2)]);
+      const expenses = expensesSnapshot.docs.map((doc) => doc.data() as Expense);
+      const incomes = incomesSnapshot.docs.map((doc) => doc.data() as Income);
+      this.expensesSubject.next(expenses);
+      this.incomesSubject.next(incomes);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+
+    }
   }
   
   getFcmToken(deviceId: string): Promise<string> {
@@ -182,7 +167,7 @@ let updatedIncomesData = [] as Income[];
 
   async fetchIncomes(uid: string, month: number): Promise<Income[]> {
     try {
-      const incomesCollection = await collection(firestore, 'incomes');
+      const incomesCollection = collection(firestore, 'incomes');
       const q = query(incomesCollection, where('userId', '==', uid));
 
       const incomesSnapshot = await getDocs(q);
@@ -227,7 +212,7 @@ let updatedIncomesData = [] as Income[];
     const categoryAmount: Record<string, number> = {};
   
     // Categories you want to calculate percentages for
-    const categories = ['Salary', 'Bonus', 'Gig', 'Gift', 'Other'];
+    const categories = ['Salary', 'Bonus', 'Gig', 'Gift', 'Other', 'Investment'];
   
     // Loop over the grouped categories to calculate percentages
     categories.forEach((category) => {
@@ -240,128 +225,61 @@ let updatedIncomesData = [] as Income[];
     return categoryAmount;
   }
   
-  async fetchExpenses(uid: string, month:number): Promise<Expense[]> {
-    console.log("Uid in fetchExpenses: ", uid, 'Month: ', month);
-    
-    try {
-      const expensesCollection = collection(firestore, 'expenses');
-      const q = query(expensesCollection, where('userId', '==', uid));
+  async fetchExpenses(uid: string, month: number): Promise<Expense[]> {
+  console.log(`Fetching expenses for UID: ${uid}, Month: ${month}`);
 
-      const expensesSnapshot = await getDocs(q);
-      const expenses: Expense[] = [];
+  try {
+    const expensesCollection = collection(firestore, 'expenses');
+    const q = query(expensesCollection, where('userId', '==', uid));
+    const expensesSnapshot = await getDocs(q);
 
-      for (const doc of expensesSnapshot.docs) {
-        const expenseData = doc.data() as Expense;
-        console.log("Expense data: ", expenseData);
-        console.log("Expense data month: ", expenseData.Date.toDate().getMonth(), "arg month: ", month);
-        console.log(expenseData.Date.toDate().getMonth() == month);
-        
-        
-        if (expenseData.Date.toDate().getMonth() == month) {
-          expenses.push(expenseData);
-          console.log("Expenses: ", expenses);
-          
-        }
-      }
-      
-      return expenses;
-    } catch (err) {
-      console.log("Error fetching expenses: ", err);
-      return Promise.reject(err);
-    }
+    const batchPromises = expensesSnapshot.docs.map(async (doc) => {
+      const expenseData = doc.data() as Expense;
+      return expenseData.Date.toDate().getMonth() === month ? expenseData : null;
+    });
+
+    const expenses = (await Promise.all(batchPromises)).filter(expense => expense !== null) as Expense[];
+    console.log(`Fetched ${expenses.length} expenses for month ${month}`);
+
+    return expenses;
+  } catch (err) {
+    console.error("Error fetching expenses:", err);
+    return Promise.reject(err);
   }
+}
 
- 
   
 
 
   // Add a user to Firestore with "already exists" check
   async addUser(user: import('./models').User): Promise<any> {
-    const usersCollection = collection(firestore, 'users');
-
     try {
-        console.log("User: ", user);
-        
-        const docRef = await addDoc(usersCollection, user);
-        return docRef;
-    
+      console.log("User: ", user);
+      
+      const userDocRef = doc(firestore, 'users', user.uid); // Set user.uid as the document ID
+      await setDoc(userDocRef, user); // setDoc ensures it uses the specified ID
+      
+      return userDocRef;
     } catch (error) {
-      // Handle any other errors (e.g., network issues)
+      console.error("Error adding user:", error);
       return Promise.reject(error);
     }
   }
+
   getCurrentUser() {
     return this.userSubject.asObservable(); // Returns observable to subscribe to user state
   }
 
 
   // Get a user by uid from Firestore
-  async getUserByuid(uid: string): Promise<import('./models').User[]> {
-    const usersCollection = collection(firestore, 'users');
-    const q = query(usersCollection, where('uid', '==', uid));
-    const querySnapshot = await getDocs(q);
-    const users: any[] = [];
-    querySnapshot.forEach((doc) => {
-      users.push(doc.data());
-    });
-    console.log("Users: ", users);
-
-    return users;
+  async getUserByuid(uid: string): Promise<import('./models').User> {
+    const userDocRef = doc(firestore, 'users', uid);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data() as import('./models').User;
+    console.log("User data: ", userData);
+    return userData;
   }
 
- 
-  async getUserTransactionsByDate(
-    uid: string,
-    timestamp: Timestamp,
-    type: 'Expenses' | 'Incomes'
-  ): Promise<(Expense | Income)[]> {
-    console.log(`Getting ${type.toLowerCase()} for: `, uid);
-  
-    console.log("Timestamp: ", timestamp);
-    
-    
-    try {
-      const transactionsCollection = collection(firestore, type.toLowerCase());
-      const q = query(transactionsCollection, where('userId', '==', uid),);
-      const querySnapshot = await getDocs(q);
-
-      console.log("QuerySnapshot: ", querySnapshot.docs);
-      
-
-      const transactions: (Expense | Income)[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data() as Expense | Income;
-        console.log("Data: ", data.Date);
-
-        console.log("Given timestamp: ", timestamp.toDate().getDay());
-        console.log("Data timestamp: ", data.Date.toDate().getTime());
-        
-        const dataDate = data.Date.toDate();
-        const timestampDate = timestamp.toDate();
-        
-        // Compare the full date (year, month, day)
-        if (dataDate.getFullYear() === timestampDate.getFullYear() && 
-            dataDate.getMonth() === timestampDate.getMonth() && 
-            dataDate.getDate() === timestampDate.getDate()) {
-            transactions.push(data);
-        }
-        
-      });
-      console.log(`${type} for ${uid}: `, transactions);
-      if (type === 'Expenses') {
-        this.expensesSubject.next(transactions as Expense[]);
-      }
-      else {
-        this.incomesSubject.next(transactions as Income[]);
-      }
-      console.log("Transactions: ", transactions);
-      
-      return transactions;
-    } catch (error) {
-      console.log(`Error getting ${type.toLowerCase()}: `, error);
-      return Promise.reject(error);
-    }
-  }
 
   async saveUser(user: import('./models').User) {
 
@@ -384,10 +302,53 @@ let updatedIncomesData = [] as Income[];
   }
   
  
-
+  async getUserTransactionsByDate(
+    uid: string,
+    timestamp: Timestamp,
+    type: 'Expenses' | 'Incomes'
+  ): Promise<(Expense | Income)[]> {
+    console.log(`Fetching ${type.toLowerCase()} for UID:`, uid);
+    console.log('Timestamp:', timestamp.toDate());
+  
+    try {
+      const transactionsCollection = collection(firestore, type.toLowerCase());
+      const q = query(transactionsCollection, where('userId', '==', uid));
+      const querySnapshot = await getDocs(q); // Consider getDocsFromCache(q) for performance
+  
+      console.log(`Fetched ${querySnapshot.size} ${type.toLowerCase()}`);
+  
+      const timestampDate = timestamp.toDate();
+      const transactions = querySnapshot.docs
+        .map((doc) => doc.data() as Expense | Income)
+        .filter((data) => {
+          const dataDate = data.Date.toDate();
+          return (
+            dataDate.getFullYear() === timestampDate.getFullYear() &&
+            dataDate.getMonth() === timestampDate.getMonth() &&
+            dataDate.getDate() === timestampDate.getDate()
+          );
+        });
+  
+      console.log(`${type} for ${uid}:`, transactions);
+  
+      if (type === 'Expenses') {
+        this.expensesSubject.next(transactions as Expense[]);
+      } else {
+        this.incomesSubject.next(transactions as Income[]);
+      }
+  
+      return transactions;
+    } catch (error) {
+      console.error(`Error fetching ${type.toLowerCase()}:`, error);
+      return Promise.reject(error);
+    }
+  }
+  
 
   async getCategories(type: string): Promise<string[]> {
     try {
+      console.log("Type: ", type);
+      
       const categoriesCollection = collection(firestore, type === 'Expense' ? 'expense-categories' : 'income-categories');
       const querySnapshot = await getDocs(categoriesCollection);
       const categories: string[] = [];
@@ -402,129 +363,144 @@ let updatedIncomesData = [] as Income[];
       return Promise.reject(error);
     }
   }
-
   async addExpense(uid: string, expense: Expense) {
     try {
-      const expensesCollection = collection(firestore, 'expenses') ;
-      const docRef = await addDoc(expensesCollection, expense);
-
-      const usersCollection = collection(firestore, 'users');
-      const q = query(usersCollection, where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
-
-      for (const doc of querySnapshot.docs) {
-        const userData = doc.data();
-        const expenseRefs = userData['Expenses'] as DocumentReference[] ?? [];
-        expenseRefs.push(docRef);
-        await updateDoc(doc.ref, { Expenses: expenseRefs });
-      }
+      const userDocRef = doc(firestore, 'users', uid);
+      const expensesCollection = collection(firestore, 'expenses');
+  
+      const batch = writeBatch(firestore);
+      const expenseDocRef = doc(expensesCollection); // Generate a new document reference
+      expense.id = expenseDocRef.id
+      batch.set(expenseDocRef, expense); // Add the expense document
+      batch.update(userDocRef, {
+        Expenses: arrayUnion(expenseDocRef) // Append the new expense reference
+      });
+  
+      await batch.commit();
+      const category = expense.Category;
+      const amount = expense.Amount;
+      
+      const month = expense.Date.toDate().getMonth() + 1;
       this.expensesSubject.next([...this.expensesSubject.value, expense]);
+
+      (async() => {
+        const currentBudget = this.budgetService.currentBudgetSubject.value?.find((budget) => budget.month === month)!.budget;
+
+      if (!currentBudget) {
+        return;
+      }
+      // Get the previous spendings object
+      const previousSpendings = currentBudget?.spendings || {};
+      
+      // Add to the existing amount or initialize it
+      const updatedSpendings = {
+        ...previousSpendings,
+        [category]: (previousSpendings[category] || 0) + amount
+      };
+      
+      currentBudget!.spendings = updatedSpendings;
+      currentBudget!.totalBudget += amount;
+      const updatedBudgets = this.budgetService.currentBudgetSubject.value.map((budget) => 
+      budget.month === month ? {...budget, budget: currentBudget}: {...budget}
+      )
+      // Update the budget state
+      this.budgetService.currentBudgetSubject.next(updatedBudgets);
+    })();
+      
+
     } catch (error) {
-      console.log("Error adding expense: ", error);
+      console.error("Error adding expense: ", error);
       return Promise.reject(error);
     }
   }
+  
 
   async addSubscription(subscription: Subscription) {
     try {
       const uid = subscription.userId;
+      const userDocRef = doc(firestore, 'users', uid);
       const subscriptionsCollection = collection(firestore, 'subscriptions');
-      const docRef = await addDoc(subscriptionsCollection, subscription);
-
-      const usersCollection = collection(firestore, 'users');
-      const q = query(usersCollection, where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
-
-      for (const doc of querySnapshot.docs) {
-        const userData = doc.data();
-        console.log("User data: ", userData);
-        
-        const subscriptionRefs = userData['Subscriptions'] as DocumentReference[] ?? [];
-        subscriptionRefs.push(docRef);
-        await updateDoc(doc.ref, { Subscriptions: subscriptionRefs });
-      }
-      this.subscriptionsSubject.next([...this.subscriptionsSubject.value, subscription
-      ]);
-
+  
+      const batch = writeBatch(firestore);
+      const subscriptionDocRef = doc(subscriptionsCollection); // Create a new doc reference
+      subscription.id = subscriptionDocRef.id;
+      batch.set(subscriptionDocRef, subscription); // Add subscription document
+      batch.update(userDocRef, {
+        Subscriptions: arrayUnion(subscriptionDocRef) // Append new subscription reference
+      });
+  
+      await batch.commit();
+  
+      this.subscriptionsSubject.next([...this.subscriptionsSubject.value, subscription]);
     } catch (error) {
-      console.log("Error adding subscription: ", error);
+      console.error("Error adding subscription: ", error);
       return Promise.reject(error);
     }
   }
+  
 
-  getUserSubscriptions(uid: string): Promise<Subscription[]> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const subscriptionsCollection = collection(firestore, 'subscriptions');
-        const q = query(subscriptionsCollection, where('userId', '==', uid));
-        const querySnapshot = await getDocs(q);
-        const subscriptions: Subscription[] = [];
-        querySnapshot.forEach((doc) => {
-          subscriptions.push(doc.data() as Subscription);
-        });
-        this.subscriptionsSubject.next(subscriptions);
-        resolve(subscriptions);
-      } catch (error) {
-        console.log("Error getting subscriptions: ", error);
-        reject(error);
-      }
+  async getUserSubscriptions(uid: string): Promise<Subscription[]> {
+    try {
+      const subscriptionsCollection = collection(firestore, 'subscriptions');
+      const q = query(subscriptionsCollection, where('userId', '==', uid));
+      const querySnapshot = await getDocs(q);
+  
+      const subscriptions = querySnapshot.docs.map(doc => doc.data() as Subscription);
+  
+      this.subscriptionsSubject.next(subscriptions);
+      return subscriptions;
+    } catch (error) {
+      console.error("Error getting subscriptions: ", error);
+      throw error; // No need for reject; `async` functions naturally reject on errors
     }
-  );
   }
+  
 
   async deleteSubscription(subscription: Subscription) {
     try {
       const uid = subscription.userId;
-      const subscriptionsCollection = collection(firestore, 'subscriptions');
-      const q = query(subscriptionsCollection, where('userId', '==', uid), where('name', '==', subscription.name));
-      const querySnapshot = await getDocs(q);
+      const userDocRef = doc(firestore, 'users', uid);  
+      // Query for the subscription document
+      const subscriptionRef = doc(firestore, 'subscriptions', subscription.id);  
+        const batch = writeBatch(firestore);
+        batch.delete(subscriptionRef);
 
-      const subscriptionRefs = querySnapshot.docs.map((doc) => doc.ref);
+       
+        batch.update(userDocRef, {Subscriptions: arrayRemove(subscriptionRef)});
 
-      for (const subscriptionRef of subscriptionRefs) {
-        await deleteDoc(subscriptionRef);
-      }
-      this.subscriptionsSubject.next(this.subscriptionsSubject.value.filter((sub) => sub.name !== subscription.name));
-      const usersCollection = collection(firestore, 'users');
-      const q2 = query(usersCollection, where('uid', '==', uid));
-      const querySnapshotU = await getDocs(q2);
-
-      for (const doc of querySnapshotU.docs) {
-        const userData = doc.data();
-        const userSubscriptionRefs = userData['Subscriptions'] as DocumentReference[] ?? [];
-        const updatedSubscriptions = userSubscriptionRefs.filter((ref) => !subscriptionRefs.some((subscriptionRef) => subscriptionRef.path === ref.path));
-        await updateDoc(doc.ref, { Subscriptions: updatedSubscriptions });
-      }
-    }
-    catch (error) {
+        await batch.commit();
+        this.subscriptionsSubject.next(this.subscriptionsSubject.value.filter((sub) => sub.id !== subscription.id));
+     
+    } catch (error) {
       console.error("Error deleting subscription: ", error);
     }
   }
+  
 
- 
-  async addIncome(uid: string, income: Income) {
-    console.log("uid in addIncome:", uid);
-    
-    try {
-      const incomesCollection = collection(firestore, 'incomes');
-      const docRef = await addDoc(incomesCollection, income);
+ async addIncome(uid: string, income: Income) {
+  console.log("uid in addIncome:", uid);
 
-      const usersCollection = collection(firestore, 'users');
-      const q = query(usersCollection, where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
+  try {
+    const userDocRef = doc(firestore, 'users', uid);
+    const incomesCollection = collection(firestore, 'incomes');
 
-      for (const doc of querySnapshot.docs) {
-        const userData = doc.data();
-        const incomeRefs = userData['Incomes'] as DocumentReference[] ?? [];
-        incomeRefs.push(docRef);
-        await updateDoc(doc.ref, { Incomes: incomeRefs });
-      }
-      this.incomesSubject.next([...this.incomesSubject.value, income]);
-    } catch (error) {
-      console.log("Error adding income: ", error);
-      return Promise.reject(error);
-    }
+    const batch = writeBatch(firestore);
+    const incomeDocRef = doc(incomesCollection); // Create a new doc reference
+    income.id = incomeDocRef.id;
+    batch.set(incomeDocRef, income); // Add income document
+    batch.update(userDocRef, {
+      Incomes: arrayUnion(incomeDocRef) // Append new income reference
+    });
+
+    await batch.commit();
+    this.incomesSubject.next([...this.incomesSubject.value, income]);
+  } catch (error) {
+    console.log("Error adding income: ", error);
+    return Promise.reject(error);
   }
+}
+
+  
 
 
 }

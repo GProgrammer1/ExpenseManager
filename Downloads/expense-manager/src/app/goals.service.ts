@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Goal, GoalAdvice, User } from './models';
 import { firestore } from 'firebase.config';
-import { addDoc, collection, getDocs, query, updateDoc, where, doc, writeBatch, getDoc } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, updateDoc, where, doc, writeBatch, getDoc, DocumentReference, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -16,22 +16,15 @@ export class GoalsService {
     try {
       const goalsCollection = collection(firestore, 'goals');
 
-      // ✅ Ensure Firestore completes adding before proceeding
-      const docRef = await addDoc(goalsCollection, goal);
-      console.log('Goal added with ID: ', docRef.id);
-
-      // ✅ Use batched writes for efficiency
-      const usersCollection = collection(firestore, 'users');
-      const userQuery = query(usersCollection, where('uid', '==', goal.userId));
-      const userDocs = await getDocs(userQuery);
+      const goalRef = doc(goalsCollection);
+      goal.id = goalRef.id;
 
       const batch = writeBatch(firestore);
-      userDocs.forEach((docSnapshot) => {
-        const userData = docSnapshot.data() as User;
-        const userGoals = userData.Goals || [];
-        batch.update(docSnapshot.ref, { Goals: [...userGoals, goal] });
-      });
+      batch.set(goalRef, goal);
 
+      const usersCollection = collection(firestore, 'users');
+      const userRef = doc(usersCollection, goal.userId);
+      batch.update(userRef, {Goals: arrayUnion(goalRef)})
       await batch.commit(); // ✅ One efficient commit instead of multiple updates
 
       this.goalsSubject.next([...this.goalsSubject.value, goal]);
@@ -63,17 +56,17 @@ export class GoalsService {
 
   async deleteGoal(goal: Goal) {
     try {
+      console.log("Deleting goal:", goal);
+      
       const goalsCollection = collection(firestore, 'goals');
-      const goalQuery = query(goalsCollection, where('name', '==', goal.name));
-      const goalDocs = await getDocs(goalQuery);
+      const goalRef = doc(goalsCollection, goal.id);
 
       const batch = writeBatch(firestore);
-      goalDocs.forEach((docSnapshot) => {
-        batch.delete(docSnapshot.ref);
-      });
-
+      batch.delete(goalRef);
+      const userRef = doc(collection(firestore, 'users'), goal.userId);
+      batch.update(userRef, {Goals: arrayRemove(goalRef)});
       await batch.commit();
-      this.goalsSubject.next(this.goalsSubject.value.filter(g => g.name !== goal.name));
+      this.goalsSubject.next(this.goalsSubject.value.filter(g => g.id !== goal.id));
 
     } catch (ex) {
       console.error("🔥 Error deleting goal:", ex);

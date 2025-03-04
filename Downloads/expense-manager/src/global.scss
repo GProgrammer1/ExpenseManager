@@ -53,7 +53,46 @@
     flex-direction: row;
     justify-content: space-between !important;
   }
+ 
+
+  ion-input {
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+  }
   
+  ion-progress-bar::part(track) {
+    background-color: white !important; /* Sets the unfilled part to white */
+  }
+  
+  ion-progress-bar {
+    --border-radius: 10px; /* Rounded corners */
+    --progress-background: white; /* Unfilled area color */
+    --border: 2px solid #ccc; /* Border color */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    overflow: hidden; /* Ensures rounded corners apply */
+    border-radius: 10px;
+    height: 8px;
+  }
+  
+  ion-progress-bar::part(track) {
+    background-color: white !important; /* White background for the unfilled area */
+    border-radius: 10px; /* Ensures track also has rounded corners */
+  }
+
+  ion-tab-button.tab-selected{
+    color: var(--ion-color-primary);
+
+    ion-icon svg {
+      fill: var(--ion-color-primary) !important;
+    }
+  }
+  
+  ion-spinner {
+    transform: scale(1.5);
+  }
+  ion-progress-bar::part(fill) {
+    border-radius: 20px; /* Rounded corners for the filled part */
+  }
   
   
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */

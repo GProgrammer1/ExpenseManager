@@ -188,6 +188,7 @@ payments$!: Observable<Payment[]>;
       const userId = localStorage.getItem('userId')!;
 
       const subscription: AppSubscription = {
+        id: '',
         userId,
         name,
         amount: Number(amount),
@@ -206,7 +207,7 @@ payments$!: Observable<Payment[]>;
 getCategoryName(category: string) {
 
   const categoryObj : Category = JSON.parse(category);
-  return categoryObj.name;
+  return categoryObj.Name;
 }
   
 deleteData(item: Payment) {
@@ -255,7 +256,7 @@ deleteData(item: Payment) {
     console.log("Selected month:", this.selectedDate.getMonth() + 1);
     console.log("User id: ", this.userId);
     
-      await this.paymentService.getPaymentsByMonth(this.userId ?? localStorage.getItem('userId'), Timestamp.fromDate(this.selectedDate)); //expenses emitted a value
+      await this.paymentService.getPayments(this.userId ?? localStorage.getItem('userId')); //expenses emitted a value
       await this.firestoreService.getUserSubscriptions(this.userId ?? localStorage.getItem('userId')); //inomes emitted  a value
       this.loading = false;
     //expenses emitted a value

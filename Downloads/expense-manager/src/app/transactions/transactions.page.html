@@ -6,7 +6,7 @@
         <input
           matInput
           [matDatepicker]="picker"
-          (dateChange)="bindData()"
+          (dateChange)="onDateChange()"
           [(ngModel)]="selectedDate"
           [min]="minDate"      
         />
@@ -26,6 +26,11 @@
     <ion-button color="primary" (click)="presentSignoutDialog()" class="logout-btn ">
       <ion-icon name="log-out-outline"></ion-icon>
       Logout
+    </ion-button>
+
+    <ion-button routerLink="/profile" color="primary" class="profile-btn">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      Profile
     </ion-button>
 
     <ion-item id="filter" lines="none">
@@ -51,6 +56,7 @@
 <ion-content [fullscreen]="true">
   @if (!loading) {
     @if ((filteredData$ | async) ; as filteredData){
+
       @if (filteredData.length > 0){
         <ion-list lines="none">
           <ion-item *ngFor="let item of filteredData" 
@@ -58,22 +64,25 @@
                       'expense-item': item.type === 'expense', 
                       'income-item': item.type === 'income'
                     }" lines="none">
-            <ion-label class="amount" [ngClass]="{
-              'expense-amount': item.type === 'expense', 
-              'income-amount': item.type === 'income'
-            }">{{ item.Amount }}$</ion-label>
+            <div class="transaction-container">
+              <ion-label class="amount" [ngClass]="{
+                'expense-amount': item.type === 'expense', 
+                'income-amount': item.type === 'income'
+              }">{{ item.Amount }}$</ion-label>
+              <div class="category-container">
+                <ion-icon id="category-icon" [src]="'assets/' + item.Category.toLowerCase() + '.svg'"
+                color="primary"></ion-icon>
+                <ion-label class="category">{{ item.Category }}</ion-label>
+              </div>
 
-            <ion-icon id="category-icon" [src]="'assets/' + item.Category.toLowerCase() + '.svg'"
-                      color="primary"></ion-icon>
+              <ion-label class="description"> {{ item.Description }}</ion-label>
 
-            <ion-label class="description"> {{ item.Description }}</ion-label>
-
-            <button mat-icon-button id="delete-btn" aria-label="Delete" (click)="presentDeleteDialog(item)">
-              <mat-icon>delete</mat-icon>
-            </button>
-
-          </ion-item>
-        </ion-list>
+              <button mat-icon-button id="delete-btn" aria-label="Delete" (click)="presentDeleteDialog(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+          </div>
+        </ion-item>
+      </ion-list>
       } @else {
         <p id="noData">No data available</p>
       }
@@ -84,8 +93,8 @@
   }
   
   <div id="gray">
-    <ion-fab id="add-button" vertical="bottom" horizontal="center" slot="fixed">
-      <ion-fab-button [routerLink]="['/add-transactions']" routerDirection="forward">
+    <ion-fab id="add-button" vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button [routerLink]="['/add-transactions/expense']" routerDirection="forward">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
     </ion-fab>

@@ -27,6 +27,7 @@ export class AddIncomePage implements OnInit {
   categ: string = '';
   amount: number | null = null;
   description: string = '';
+  selectedDate = new Date().toISOString().split('T')[0];
   
   add() {
    console.log("Adding income");
@@ -46,7 +47,8 @@ export class AddIncomePage implements OnInit {
         return;
       }
       const income: Income = {
-        Date: Timestamp.fromDate(new Date()),
+        id: '',
+        Date: Timestamp.fromDate(new Date(this.selectedDate)),
         Description: this.description,
         Category: this.categ,
         Amount: this.amount!,

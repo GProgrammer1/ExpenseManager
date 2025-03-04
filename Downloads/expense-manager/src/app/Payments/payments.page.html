@@ -36,11 +36,9 @@
     </ion-list>
   </div>
 </div>
-
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Payments</ion-title>
-    
+    <div class="toolbar-container">
     <div id="add-subscription">
       <ion-icon name="add" id="add-icon"></ion-icon>
       <ion-button fill="clear" id="add-sub-btn" (click)="presentAddSubscriptionDialog()">
@@ -49,6 +47,7 @@
     </div>
 
     
+  </div>
 
   </ion-toolbar>
 </ion-header>
@@ -96,7 +95,7 @@
     <ion-spinner name="crescent" id="spinner"></ion-spinner>
   </ng-template>
 
-  <ion-fab id="add-button" vertical="bottom" horizontal="center" slot="fixed">
+  <ion-fab id="add-button" vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button routerLink="/add-payment" routerDirection="forward">
       <ion-icon [src]="'../assets/add.svg'"></ion-icon>
     </ion-fab-button>

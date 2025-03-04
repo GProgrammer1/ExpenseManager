@@ -5,6 +5,7 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import {IonicModule} from '@ionic/angular';
 import { AuthService } from '../auth.service';
+import { User } from '../models';
 
 
 @Component({
@@ -15,15 +16,20 @@ import { AuthService } from '../auth.service';
   imports: [RouterModule, IonicModule, CommonModule, FormsModule],
 })
 export class PersonalinfoPage {
-  monthlyIncome: number | null = null;
+  monthlyIncome: number | null = 0;
   fixedExpenses: { category: string, amount: number }[] = [];
   variableExpenses: { category: string, amount: number }[] = [];
-  savingsGoal: number | null = null;
+  savingsGoal: number | null = 0;
+  savings: number | null = 0;
   country: string = '';
   ageRange: string = '';
   hasDebt: boolean = false;
-  debtAmount: number | null = null;
+  debtAmount: number | null = 0;
   currentStep: number = 1;
+  city ='';
+  occupation ='';
+
+
   countries = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
     "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
@@ -63,31 +69,71 @@ export class PersonalinfoPage {
     );
   }
 
-  saveAndContinue() {
-    // Handle saving data and navigate to another page if necessary
-    console.log('Saved data:', {
-      income: this.monthlyIncome,
+  async saveAndContinue() {
+    if (!this.monthlyIncome || this.monthlyIncome < 0) {
+      await this.showToast("Monthly income must be a positive number.");
+      return;
+    }
+    if (this.fixedExpenses.some(exp => (exp.amount < 0 || exp.category === '' || isNaN(exp.amount)))
+       || this.variableExpenses.some(exp => (exp.amount < 0 || exp.category === '' || isNaN(exp.amount)))) {
+      await this.showToast("Expenses must be positive numbers.");
+      return;
+    }
+    if (!this.savingsGoal|| isNaN(this.savingsGoal) || this.savingsGoal < 0) {
+      await this.showToast("Savings goal must be a positive number.");
+      return;
+    }
+    if (!this.country) {
+      await this.showToast("Please select a country.");
+      return;
+    }
+    if (!this.ageRange) {
+      await this.showToast("Please select your age range.");
+      return;
+    }
+    if (this.hasDebt && (!this.debtAmount || isNaN(this.debtAmount) || this.debtAmount < 0)) {
+      await this.showToast("Debt amount must be a positive number.");
+      return;
+    }
+
+  
+  
+    console.log("Saved data:", {
+      income: this.monthlyIncome ? this.monthlyIncome : 0,
       fixedExpenses: this.fixedExpenses,
       variableExpenses: this.variableExpenses,
       savings: this.savingsGoal,
     });
-
-    const userId = localStorage.getItem('userId');
-
+  
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      await this.showToast("User ID not found. Please log in again.");
+      return;
+    }
+  
     const userInfo = {
-      monthlyIncome: this.monthlyIncome,
+      monthlyIncome: this.monthlyIncome ? this.monthlyIncome : 0,
       fixedExpenses: this.fixedExpenses,
       variableExpenses: this.variableExpenses,
-      savings: this.savingsGoal,
+      savings: this.savings ? this.savings : 0,
       hasDebt: this.hasDebt,
       country: this.country,
-      ageRange: this.ageRange
-    
+      ageRange: this.ageRange,
+      debtAmount: this.debtAmount ? this.debtAmount : 0,
+      city: this.city,
+      occupation: this.occupation,
+      savingsGoal: this.savingsGoal,
     };
-
-    this.authService.updateUserData(userId!, userInfo);
-    this.router.navigate(['/tabs']); // Change to the next page
+  
+    try {
+      await this.authService.updateUserData(userId, userInfo);
+      this.router.navigate(["/tabs"]); // Navigate to the next page
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      await this.showToast("Failed to save data. Please try again.");
+    }
   }
+  
 
   addVariableExpense() {
     this.variableExpenses.push({ category: '', amount: 0 });
@@ -104,38 +150,7 @@ export class PersonalinfoPage {
       this.currentStep--;
     }
   }
-  async submitFinancialInfo() {
-    // Validate required fields
-    if (
-      !this.monthlyIncome ||
-      !this.savingsGoal ||
-      !this.country ||
-      !this.ageRange ||
-      this.fixedExpenses.length === 0 ||
-      this.variableExpenses.length === 0 ||
-      this.fixedExpenses.some(exp => !exp.category || exp.amount <= 0) ||
-      this.variableExpenses.some(exp => !exp.category || exp.amount <= 0)
-    ) {
-      this.showToast('Please fill in all required fields and add at least one valid expense for each category.');
-      return;
-    }
-
-    // Prepare user financial data
-    const financialData = {
-      monthlyIncome: this.monthlyIncome,
-      fixedExpenses: this.fixedExpenses,
-      variableExpenses: this.variableExpenses,
-      savingsGoal: this.savingsGoal,
-      country: this.country,
-      ageRange: this.ageRange,
-      hasDebt: this.hasDebt,
-    };
-
-    console.log('User Financial Info:', financialData);
-    
-    // Navigate to the next step (or save to API if needed)
-    this.router.navigate(['/dashboard']); // Adjust the route as needed
-  }
+ 
 
   async showToast(message: string) {
     const toast = await this.toastController.create({
