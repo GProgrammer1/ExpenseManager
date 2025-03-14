@@ -1,200 +1,247 @@
+const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
 
+console.log("Initializing firebase app");
+
 // Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert('./service-account.json'),
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert('./service-account.json'),
+  });
+}
 
 const firestore = admin.firestore();
 
 async function checkPaymentsApproachingDeadline() {
+  console.log("Method triggered");
+
   const now = admin.firestore.Timestamp.now();
-  const twoDaysFromNow = new Date(now.toMillis() + (2 * 24 * 60 * 60 * 1000)); // 2 days from now
+  const twoDaysFromNow = new Date(now.toMillis() + 2 * 24 * 60 * 60 * 1000); // 2 days from now
+
+  let messages = [];
+  let title = "Payment Reminder";
 
   try {
-    const paymentsRef = firestore.collection('payments');
-    console.log("paymentsRef:", paymentsRef);
-    
-    const snapshot = await paymentsRef
-      .where('dueDate', '<=', admin.firestore.Timestamp.fromDate(twoDaysFromNow))
-      .get(); //querysnapshot
+    const usersSnapshot = await admin.firestore().collection("users").get();
 
-    if (snapshot.empty) {
-      console.log('No payments approaching deadline.');
-      return;
-    }
-
-    if (snapshot.size > 1) {
-      console.log(`Found ${snapshot.size} payments nearing the deadline.`);
-    }
-
-    let numOfNotifications = snapshot.size;
-
-    // Use for loop instead of forEach
-    let count = 0;
-    let body = `Your payment for`;
-    for (const doc of snapshot.docs) {
-      const payment = doc.data();
-      console.log("payment:", payment);
-      
-      console.log(`Payment ${payment['description']} is nearing the deadline.`);
-      const userRef = firestore.collection('users').where('uid', '==', payment.userId);
-      const userSnapshot = await userRef.get(); // Get the query snapshot
-
-      console.log("userDoc:", userSnapshot);
-
-      if (userSnapshot.empty) {
-        console.log(`User with ID ${payment.userId} not found.`);
-        continue;  // Use continue to skip this payment and move to next one
-      }
-
-      // Access the first document in the QuerySnapshot
-      const userDoc = userSnapshot.docs[0];
+    for (const userDoc of usersSnapshot.docs) {
       const userData = userDoc.data();
-      console.log('User data:', userData);
 
-      const fcmTokens = userData.fcmTokens;
-      console.log('FCM tokens:', fcmTokens);
-      const title = 'Payment Reminder';
-      if (fcmTokens.length > 0) {
-        // Send the notification
-        
-        
-        if (numOfNotifications === 1) {
-          body = `Your payment for ${payment.description} is nearing the deadline. Please pay as soon as possible`;
-          sendNotification(title, body, fcmTokens[0]);
-          break;  // Stop after sending notification for 1 payment
-        }
-        if (count < 2) {
-          console.log("payment.description:", payment.description);
-          
-          body += ` ${payment.description}, `;
-          
-        } else {
-          body += ` and ${numOfNotifications - count} more payments are nearing the deadline. Please pay as soon as possible`;
-          
-          break;  // Stop after sending notification for 2 payments
-        }
-
-        count++;  // Increment count after processing each payment
-      } else {
-        console.log(`FCM token not found for user ${payment.userId}`);
+      // Check if 'Payments' exists and is an array
+      if (!userData.Payments || !Array.isArray(userData.Payments) || userData.Payments.length === 0) {
+        console.log(`No payments for user ${userDoc.id}`);
+        continue;
       }
-      for (const fcmToken of fcmTokens) {
-        sendNotification(title, body, fcmToken);
+
+      // Fetch payment documents
+      const paymentDocs = await Promise.all(userData.Payments.map((ref) => {
+      
+        return ref.get();
+      }));
+
+      if (paymentDocs.length === 0) {
+        continue;
+      }
+
+      // Get valid payments nearing the deadline
+      const approachingPayments = paymentDocs
+        .map((doc) => doc.data())
+        .filter((payment) => {
+          const dueDate = new Date(payment.dueDate.seconds * 1000); // Convert Firestore Timestamp to JS Date
+          return dueDate <= twoDaysFromNow;
+        });
+
+      if (approachingPayments.length === 0) continue; // No due payments, skip user
+
+      // Generate message body
+      let body = "Your payment for ";
+      if (approachingPayments.length === 1) {
+        body += `${approachingPayments[0].description} is approaching the deadline. Please pay as soon as possible.`;
+      } else {
+        body += approachingPayments
+          .map((payment) => payment.description)
+          .join(", ") + " are approaching the deadline. Please pay as soon as possible.";
+      }
+
+      console.log("User FCM Tokens:", userData.fcmTokens);
+
+      // Ensure fcmTokens exist
+      if (!userData.fcmTokens || !Array.isArray(userData.fcmTokens) || userData.fcmTokens.length === 0) {
+        console.log(`No FCM tokens for user ${userDoc.id}`);
+        continue;
+      }
+
+      // Add notifications for all tokens
+      for (const token of userData.fcmTokens) {
+        messages.push({
+          title,
+          body,
+          token, // Corrected field name
+        });
       }
     }
-    
+
+    if (messages.length > 0) {
+      await sendBatchNotifications(messages);
+      console.log(`Sent ${messages.length} notifications`);
+    } else {
+      console.log("No notifications to send.");
+    }
   } catch (error) {
-    console.error('Error checking payments:', error);
+    console.error("Error fetching payments:", error);
   }
 }
+
+// ✅ Function to send notifications
+async function sendBatchNotifications(messages) {
+  try {
+    const response = await Promise.all(
+      messages.map((msg) =>
+        admin.messaging().send({
+          notification: {
+            title: msg.title,
+            body: msg.body,
+          },
+          token: msg.token,
+        })
+      )
+    );
+    console.log(`Successfully sent ${response.length} notifications.`);
+  } catch (error) {
+    console.error("Error sending notifications:", error);
+  }
+}
+
 
 async function checkUpcomingSubscriptions() {
+  console.log("Method triggered");
+
   const now = admin.firestore.Timestamp.now();
-  const sevenDaysFromNow = new Date(now.toMillis() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+  const sevenDaysFromNow = new Date(now.toMillis() + 7 * 24 * 60 * 60 * 1000);
+
+  let messages = [];
+  let title = "Subscription Renewal Reminder";
 
   try {
-    const subscriptionsRef = firestore.collection('subscriptions');
-    console.log("subscriptionsRef:", subscriptionsRef);
+    const usersSnapshot = await admin.firestore().collection("users").get();
 
-    const snapshot = await subscriptionsRef.get(); // Fetch all subscriptions
+    for (const userDoc of usersSnapshot.docs) {
+      const userData = userDoc.data();
 
-    if (snapshot.empty) {
-      console.log('No subscriptions found.');
-      return;
-    }
-
-    let numOfNotifications = 0;
-    let count = 0;
-    let body = `Your subscription for`;
-
-    // Loop through each subscription
-    for (const doc of snapshot.docs) {
-      const subscription = doc.data();
-      console.log("subscription:", subscription);
-
-      // Calculate the next renewal date based on the day of the month
-      const currentDate = new Date();
-      const nextRenewalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), subscription.dayOfTheMonth);
-
-      // If the next renewal date is in the past, set it for the next month
-      if (nextRenewalDate < currentDate) {
-        nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
+      if (!userData.Subscriptions || !Array.isArray(userData.Subscriptions) || userData.Subscriptions.length === 0) {
+        console.log(`No subscriptions for user ${userDoc.id}`);
+        continue;
       }
 
-      // Check if the subscription is due for renewal within the next 7 days
-      if (nextRenewalDate <= sevenDaysFromNow) {
-        console.log(`Subscription ${subscription.name} is nearing renewal on ${nextRenewalDate.toDateString()}.`);
+      // Fetch subscription documents
+      const subscriptionDocs = await Promise.all(userData.Subscriptions.map((ref) => ref.get()));
 
-        const userRef = firestore.collection('users').where('uid', '==', subscription.userId);
-        const userSnapshot = await userRef.get(); // Get the query snapshot
+      if (subscriptionDocs.length === 0) continue;
 
-        if (userSnapshot.empty) {
-          console.log(`User with ID ${subscription.userId} not found.`);
-          continue;  // Skip this subscription if user not found
-        }
+      // Get valid subscriptions nearing renewal
+      const approachingSubscriptions = subscriptionDocs
+        .map((doc) => doc.data())
+        .filter((subscription) => {
+          const currentDate = new Date();
+          let nextRenewalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), subscription.dayOfTheMonth);
 
-        const userDoc = userSnapshot.docs[0];
-        const userData = userDoc.data();
-        console.log('User data:', userData);
-
-        const fcmTokens = userData.fcmTokens;
-        console.log('FCM tokens:', fcmTokens);
-        const title = 'Subscription Renewal Reminder';
-        
-        if (fcmTokens.length > 0) {
-          numOfNotifications++;
-
-          if (numOfNotifications === 1) {
-            body = `Your subscription for ${subscription.name} has to renewed on ${subscription.dayOfTheMonth} of the current month. Please renew it soon.`;
-            sendNotification(title, body, fcmTokens[0]);
-            break;  // Stop after sending notification for 1 subscription
+          if (nextRenewalDate < currentDate) {
+            nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
           }
 
-          if (count < 2) {
-            body += ` ${subscription.name}, `;
-          } else {
-            body += ` and ${numOfNotifications - count} more subscriptions are nearing renewal. Please renew them on time.`;
-            break;  // Stop after sending notification for 2 subscriptions
-          }
+          return nextRenewalDate <= sevenDaysFromNow;
+        });
 
-          count++;  // Increment count after processing each subscription
-        } else {
-          console.log(`FCM token not found for user ${subscription.userId}`);
-        }
-        
-        for (const fcmToken of fcmTokens) {
-          sendNotification(title, body, fcmToken);
-        }
+      if (approachingSubscriptions.length === 0) continue;
+
+      // Generate message body
+      let body = "Your subscription for ";
+      if (approachingSubscriptions.length === 1) {
+        body += `${approachingSubscriptions[0].name} is due for renewal on ${approachingSubscriptions[0].dayOfTheMonth} of this month. Please renew it soon.`;
+      } else {
+        body += approachingSubscriptions.map((sub) => sub.name).join(", ") + " are nearing renewal. Please renew them on time.";
+      }
+
+      console.log("User FCM Tokens:", userData.fcmTokens);
+
+      if (!userData.fcmTokens || !Array.isArray(userData.fcmTokens) || userData.fcmTokens.length === 0) {
+        console.log(`No FCM tokens for user ${userDoc.id}`);
+        continue;
+      }
+
+      for (const token of userData.fcmTokens) {
+        messages.push({ title, body, token });
       }
     }
-    
+
+    if (messages.length > 0) {
+      await sendBatchNotifications(messages);
+      console.log(`Sent ${messages.length} notifications`);
+    } else {
+      console.log("No notifications to send.");
+    }
   } catch (error) {
-    console.error('Error checking subscriptions:', error);
+    console.error("Error checking subscriptions:", error);
   }
 }
 
-function sendNotification(title, body, fcmToken) {
-  console.log('Sending notification...');
-  console.log("FCM token:", fcmToken);
-  
-  const message = {
-    notification: {
-      title: title,
-      body: body,
-    },
-    token: fcmToken,
-  };
 
-  // Send the notification using Firebase Cloud Messaging (FCM)
-  admin.messaging().send(message)
-    .then((response) => {
-      console.log('Notification sent successfully:', response);
-    })
-    .catch((error) => {
-      console.error('Error sending notification:', error);
+async function warnAboutMoneyShortage() {
+
+  const now = admin.firestore.Timestamp.now().toDate();
+  const endOfTheMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const userSnapshot = await firestore.collection('users').get();
+  let messages = []; 
+  let title = 'Low balance warning'
+  for (const userDoc of userSnapshot.docs ) {
+    const userData = userDoc.data();
+    const id = userData.id;
+    const fcmTokens = userData.fcmTokens;
+    const [expenseSnapshot, incomeSnapshot, paymentSnapshot, subscriptionSnapshot] = await Promise.all([firestore.collection('expenses')
+                                                                .where('userId','==', id)
+                                                                .get(),
+                                                                firestore.collection('incomes')
+                                                                .where('userId','==', id)
+                                                                .get(),
+                                                                firestore.collection('payments')
+                                                                .where('userId','==', id)
+                                                                .get(),
+                                                                firestore.collection('subscriptions')
+                                                                .where('userId','==', id)
+                                                                .get(),
+                                                                ]);
+  const totalExpenses =  expenseSnapshot.docs
+                    .map((doc) => doc.data())
+                    .filter((data) => new Date(data.Date.seconds * 1000).getMonth() === new Date().getMonth())
+                    .reduce((acc, data) => acc + (data.Amount || 0), 0);
+
+  const totalIncomes = incomeSnapshot.docs
+                      .map((doc) => doc.data())
+                      .filter((data) => new Date(data.Date.seconds * 1000).getMonth() === new Date().getMonth())
+                      .reduce((acc, data) => acc + (data.Amount || 0), 0);
+
+  const totalAmount = totalIncomes - totalExpenses;
+  const totalPayments = paymentSnapshot.docs.map((doc) => doc.data())
+  .filter((data)=> new Date(data.dueDate.seconds * 1000) < endOfTheMonth)
+  .reduce((acc, data) => acc + (data.amount || 0) , 0);
+;
+  
+  const totalSubscriptions = subscriptionSnapshot.docs.map((doc) => doc.data())
+  .filter((data)=> data.dayOfTheMonth > now.getDate() )
+  .reduce((acc, data) => acc + (data.amount || 0) , 0);
+
+  const totalDue = totalPayments + totalSubscriptions;
+  if (totalDue > totalAmount || totalAmount - totalDue < 300) {
+    for (const fcmToken of fcmTokens) {
+    messages.push({
+      title,
+      body: `You have ${totalDue}$ in upcoming payments this month and your balance is low.`,
+      token: fcmToken
     });
+  }
+  }
+  }
+  await sendBatchNotifications(messages);
 }
 
 function deleteExpiredPayments() {
@@ -226,7 +273,8 @@ function deleteExpiredPayments() {
 
 module.exports = { 
   checkPaymentsApproachingDeadline, 
-  checkUpcomingSubscriptions, 
-  sendNotification, 
-  deleteExpiredPayments 
+  checkUpcomingSubscriptions,  
+  deleteExpiredPayments,
+  warnAboutMoneyShortage,
+  admin
 };
