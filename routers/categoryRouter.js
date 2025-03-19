@@ -1,11 +1,8 @@
 const express = require('express');
 const categoryRouter = express.Router();
-const {admin} = require('../admin'); // Ensure Firebase Admin SDK is initialized in 'admin.js'
-
+const {admin} = require('../admin'); 
 const firestore = admin.firestore();
-const verifyUser = require('../middlewares/verifyUser');
 
-// GetExpenseCategories
 categoryRouter.get('/expense', async(req, res) => {
     try {
         const categoriesCollection = firestore.collection('expense-categories');
@@ -18,7 +15,7 @@ categoryRouter.get('/expense', async(req, res) => {
     }
 });
 
-//GetIncomeCategories
+
 categoryRouter.get('/income', async(req, res) => {
     try {
         const categoriesCollection = firestore.collection('income-categories');
@@ -30,5 +27,4 @@ categoryRouter.get('/income', async(req, res) => {
         res.status(500).json({ error: "Failed to fetch income categories" });
     }
 });
-// Export the router
 module.exports = categoryRouter;

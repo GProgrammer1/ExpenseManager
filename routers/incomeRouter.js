@@ -1,11 +1,9 @@
 const express = require('express');
 const incomeRouter = express.Router();
-const {admin} = require('../admin'); // Ensure Firebase Admin SDK is initialized
+const {admin} = require('../admin'); 
 
-const firestore = admin.firestore(); // ✅ Correct Firestore initialization
-const verifyUser = require('../middlewares/verifyUser');
-// Add Income
-incomeRouter.post('/addIncome', verifyUser, async (req, res) => {
+const firestore = admin.firestore(); 
+incomeRouter.post('/addIncome',  async (req, res) => {
     try {
         const { userId, ...incomeData } = req.body;
         console.log("Request body: ", req.body);
@@ -15,9 +13,9 @@ incomeRouter.post('/addIncome', verifyUser, async (req, res) => {
         const userDocRef = firestore.doc(`users/${userId}`);
         const incomeDocRef = firestore.collection('incomes').doc();
         const income = { ...incomeData, id: incomeDocRef.id, userId: userId,
-            Date :{
-                seconds: incomeData.Date.seconds,
-                nanoseconds: incomeData.Date.nanoseconds
+            date :{
+                seconds: incomeData.date.seconds,
+                nanoseconds: incomeData.date.nanoseconds
             }
          };
 
@@ -25,7 +23,7 @@ incomeRouter.post('/addIncome', verifyUser, async (req, res) => {
          
         const batch = firestore.batch();
         batch.set(incomeDocRef, income);
-        batch.update(userDocRef, { Incomes: admin.firestore.FieldValue.arrayUnion(incomeDocRef) });
+        batch.update(userDocRef, { incomes: admin.firestore.FieldValue.arrayUnion(incomeDocRef) });
 
         await batch.commit();
         res.status(201).json({ message: 'Income added successfully', income });
@@ -35,8 +33,7 @@ incomeRouter.post('/addIncome', verifyUser, async (req, res) => {
     }
 });
 
-// Delete Income
-incomeRouter.delete('/:incomeId', verifyUser, async (req, res) => {
+incomeRouter.delete('/:incomeId',  async (req, res) => {
     try {
         const { incomeId } = req.params;
         const incomeRef = firestore.doc(`incomes/${incomeId}`);
@@ -51,7 +48,7 @@ incomeRouter.delete('/:incomeId', verifyUser, async (req, res) => {
 
         const batch = firestore.batch();
         batch.delete(incomeRef);
-        batch.update(userRef, { Incomes: admin.firestore.FieldValue.arrayRemove(incomeRef) });
+        batch.update(userRef, { incomes: admin.firestore.FieldValue.arrayRemove(incomeRef) });
 
         await batch.commit();
         res.status(200).json({ message: "Income deleted successfully" });
@@ -61,8 +58,7 @@ incomeRouter.delete('/:incomeId', verifyUser, async (req, res) => {
     }
 });
 
-// Get Income Data (Grouped by Category)
-incomeRouter.get('/incomeData/:uid/:month', verifyUser, async (req, res) => {
+incomeRouter.get('/incomeData/:uid/:month',  async (req, res) => {
     console.log("🔥 Fetching income data...");
     
     try {
@@ -75,7 +71,7 @@ incomeRouter.get('/incomeData/:uid/:month', verifyUser, async (req, res) => {
         const incomes = incomesSnapshot.docs
             .map(doc => doc.data())
             .filter(income =>{ 
-                const timestamp = new Date(income.Date.seconds * 1000);
+                const timestamp = new Date(income.date.seconds * 1000);
                 return timestamp.getMonth()=== monthNum;
             });
             console.log("Incomes: ", incomes);
@@ -90,10 +86,9 @@ incomeRouter.get('/incomeData/:uid/:month', verifyUser, async (req, res) => {
     }
 });
 
-// Get All Incomes for a User in a Given Month
 
 
-incomeRouter.get('/all/:uid', verifyUser, async (req, res) => {
+incomeRouter.get('/all/:uid',  async (req, res) => {
     console.log("🔥 Fetching all incomes...");
     
     try {
@@ -105,10 +100,10 @@ incomeRouter.get('/all/:uid', verifyUser, async (req, res) => {
 
         let incomes = querySnapshot.docs.map(doc => doc.data());
         incomes= incomes.map((income) => {
-            income = {...income, Date: 
+            income = {...income, date: 
                 {
-                    seconds: income.Date.seconds,
-                    nanoseconds: income.Date.nanoseconds
+                    seconds: income.date.seconds,
+                    nanoseconds: income.date.nanoseconds
                 }
             }
             return income;
@@ -124,7 +119,7 @@ incomeRouter.get('/all/:uid', verifyUser, async (req, res) => {
 }
 );
 
-incomeRouter.get('/:uid/:month', verifyUser, async (req, res) => {
+incomeRouter.get('/:uid/:month',  async (req, res) => {
     console.log("🔥 Fetching incomes...");
     try {
         const { uid, month } = req.params;
@@ -135,12 +130,12 @@ incomeRouter.get('/:uid/:month', verifyUser, async (req, res) => {
         const monthNum = parseInt(month);
         let incomes = incomesSnapshot.docs
             .map(doc => doc.data())
-            .filter(income => new admin.firestore.Timestamp(income.Date.seconds, income.Date.nanoseconds).toDate().getMonth()  === monthNum);
+            .filter(income => new admin.firestore.Timestamp(income.date.seconds, income.date.nanoseconds).toDate().getMonth()  === monthNum);
         incomes = incomes.map((income) => {
-            income = {...income, Date: 
+            income = {...income, date: 
                 {
-                    seconds: income.Date.seconds,
-                    nanoseconds: income.Date.nanoseconds
+                    seconds: income.date.seconds,
+                    nanoseconds: income.date.nanoseconds
                 }
             }
             return income;

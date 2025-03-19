@@ -1,43 +1,35 @@
 const express = require('express');
 const budgetRouter = express.Router();
-const {admin} = require('../admin'); // Ensure Firebase Admin SDK is initialized in 'admin.js'
+const {admin} = require('../admin');
 
 const firestore = admin.firestore();
-const verifyUser = require('../middlewares/verifyUser');
-/**
- * GET /budget/current/:uid/:month
- * Calculate current spendings for a given month by aggregating expenses.
- */
-budgetRouter.get('/current/:uid/:month', verifyUser,async (req, res) => {
+
+budgetRouter.get('/current/:uid/:month', async (req, res) => {
   try {
     const { uid, month } = req.params;
     const monthNum = parseInt(month);
     
-    // Query expenses for the given user
     const expensesCollection = firestore.collection('expenses');
     const expensesQuery = expensesCollection.where('userId', '==', uid);
     const expensesSnapshot = await expensesQuery.get();
     
-    // Calculate budget from expenses
     let budget = { month: monthNum, totalBudget: 0, spendings: {}, userId: uid, id: '' };
     let totalExpenses = 0;
     
     expensesSnapshot.docs.forEach(docSnapshot => {
       const expenseData = docSnapshot.data();
-      const date = new Date(expenseData.Date.seconds * 1000);
-      // Firestore Date objects: getMonth() returns 0-indexed; add 1 to compare with monthNum
+      const date = new Date(expenseData.date.seconds * 1000);
       if (date.getMonth() + 1 === monthNum) {
-        totalExpenses += expenseData.Amount;
-        if (budget.spendings[expenseData.Category]) {
-          budget.spendings[expenseData.Category] += expenseData.Amount;
+        totalExpenses += expenseData.amount;
+        if (budget.spendings[expenseData.category]) {
+          budget.spendings[expenseData.category] += expenseData.amount;
         } else {
-          budget.spendings[expenseData.Category] = expenseData.Amount;
+          budget.spendings[expenseData.category] = expenseData.amount;
         }
       }
     });
     
     budget.totalBudget = totalExpenses;
-    // If no spendings, return null
     if (Object.keys(budget.spendings).length === 0) {
       return res.status(200).json(null);
     }
@@ -49,11 +41,7 @@ budgetRouter.get('/current/:uid/:month', verifyUser,async (req, res) => {
   }
 });
 
-/**
- * GET /budget/user/:uid/:month
- * Retrieve the stored budget document for a user for a specific month.
- */
-budgetRouter.get('/user/:uid/:month', verifyUser, async (req, res) => {
+budgetRouter.get('/user/:uid/:month',  async (req, res) => {
   try {
     const { uid, month } = req.params;
     const budgetRef = firestore.doc(`budgets/${uid}_${month}`);
@@ -70,7 +58,7 @@ budgetRouter.get('/user/:uid/:month', verifyUser, async (req, res) => {
   }
 });
 
-budgetRouter.get('/all/:uid',verifyUser,  async (req, res) => {
+budgetRouter.get('/all/:uid',  async (req, res) => {
 
   try {
     const { uid } = req.params;
@@ -86,11 +74,8 @@ budgetRouter.get('/all/:uid',verifyUser,  async (req, res) => {
   }
 });
 
-/**
- * GET /budget/total/:uid/:month
- * Calculate total income and expenses for a given month.
- */
-budgetRouter.get('/total/:uid/:month',verifyUser,  async (req, res) => {
+
+budgetRouter.get('/total/:uid/:month',  async (req, res) => {
   try {
     const { uid, month } = req.params;
     const monthNum = parseInt(month);
@@ -103,12 +88,12 @@ budgetRouter.get('/total/:uid/:month',verifyUser,  async (req, res) => {
     
     let totalIncome = incomesSnapshot.docs.reduce((sum, docSnapshot) => {
       const incomeData = docSnapshot.data();
-      return incomeData.Date.toDate().getMonth() + 1 === monthNum ? sum + incomeData.Amount : sum;
+      return incomeData.date.toDate().getMonth() + 1 === monthNum ? sum + incomeData.amount : sum;
     }, 0);
     
     let totalExpense = expensesSnapshot.docs.reduce((sum, docSnapshot) => {
       const expenseData = docSnapshot.data();
-      return expenseData.Date.toDate().getMonth() + 1 === monthNum ? sum + expenseData.Amount : sum;
+      return expenseData.date.toDate().getMonth() + 1 === monthNum ? sum + expenseData.amount : sum;
     }, 0);
     
     res.status(200).json([ 
@@ -121,28 +106,24 @@ budgetRouter.get('/total/:uid/:month',verifyUser,  async (req, res) => {
   }
 });
 
-/**
- * POST /budget/add/:uid
- * Add or update a budget for a user for a specific month.
- */
-budgetRouter.post('/add/:uid',verifyUser,  async (req, res) => {
+
+budgetRouter.post('/add/:uid',  async (req, res) => {
   try {
     const { uid } = req.params;
-    const budget = req.body; // Expecting a budget object with at least a 'month' property.
+    const budget = req.body; 
     const userDocRef = firestore.doc(`users/${uid}`);
     const budgetRef = firestore.doc(`budgets/${uid}_${budget.month}`);
     const batch = firestore.batch();
     
     console.log("Budget:", budget);
     
-    // Check if budget document already exists
     const budgetDoc = await budgetRef.get();
     budget.id = budgetRef.id;
     if (budgetDoc.exists) {
       batch.update(budgetRef, { spendings: budget.spendings, totalBudget: budget.totalBudget });
     } else {
       batch.set(budgetRef, budget);
-      batch.update(userDocRef, { Budgets: admin.firestore.FieldValue.arrayUnion(budget) });
+      batch.update(userDocRef, { budgets: admin.firestore.FieldValue.arrayUnion(budgetRef) });
     }
     
     await batch.commit();

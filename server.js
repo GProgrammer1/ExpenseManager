@@ -18,16 +18,17 @@ app.use('/users', require('./routers/authRouter'));
 app.use('/budgets', require('./routers/budgetRouter'));
 app.use('/categories', require('./routers/categoryRouter'));
 app.use('/gemini', require('./routers/geminiRouter'));
+app.use('/notes', require('./routers/noteRouter'));
 app.listen(3000,'0.0.0.0', () => {
     console.log('Server is running on port 3000');
 });
 // minutes hours dayofthemonth month dayoftheweek
-cron.schedule('40 19 * * *', () => {
+cron.schedule('26 04 * * *', async() => {
     console.log('Checking for payments nearing the deadline...');
-    checkPaymentsApproachingDeadline();
-    deleteExpiredPayments();
-    checkUpcomingSubscriptions();
-    warnAboutMoneyShortage();
+    await deleteExpiredPayments();
+    await checkPaymentsApproachingDeadline();
+    await checkUpcomingSubscriptions();
+    await warnAboutMoneyShortage();
   });
 
 

@@ -1,11 +1,9 @@
 const express = require('express');
 const paymentRouter = express.Router();
-const { admin } = require('../admin'); // Ensure Firebase Admin SDK is initialized
+const { admin } = require('../admin'); 
 
 const firestore = admin.firestore();
-const verifyUser = require('../middlewares/verifyUser');
-// Add Payment
-paymentRouter.post('/addPayment', verifyUser, async (req, res) => {
+paymentRouter.post('/addPayment',  async (req, res) => {
     try {
         const { userId, ...paymentData } = req.body;
         if (!userId) return res.status(400).json({ error: "User ID is required" });
@@ -23,7 +21,7 @@ paymentRouter.post('/addPayment', verifyUser, async (req, res) => {
         batch.set(paymentRef, payment);
 
         const userRef = firestore.doc(`users/${userId}`);
-        batch.update(userRef, { Payments: admin.firestore.FieldValue.arrayUnion(paymentRef) });
+        batch.update(userRef, { payments: admin.firestore.FieldValue.arrayUnion(paymentRef) });
 
         await batch.commit();
         res.status(201).json({ message: 'Payment added successfully', payment });
@@ -33,8 +31,7 @@ paymentRouter.post('/addPayment', verifyUser, async (req, res) => {
     }
 });
 
-// Get Payments
-paymentRouter.get('/:userId', verifyUser, async (req, res) => {
+paymentRouter.get('/:userId',  async (req, res) => {
     try {
         const { userId } = req.params;
         if (!userId) return res.status(400).json({ error: "User ID is required" });
@@ -61,8 +58,7 @@ paymentRouter.get('/:userId', verifyUser, async (req, res) => {
     }
 });
 
-// Delete Payment
-paymentRouter.delete('/:paymentId',verifyUser,  async (req, res) => {
+paymentRouter.delete('/:paymentId',  async (req, res) => {
     try {
         const { paymentId } = req.params;
         const paymentRef = firestore.doc(`payments/${paymentId}`);
@@ -77,7 +73,7 @@ paymentRouter.delete('/:paymentId',verifyUser,  async (req, res) => {
         batch.delete(paymentRef);
 
         const userRef = firestore.doc(`users/${userId}`);
-        batch.update(userRef, { Payments: admin.firestore.FieldValue.arrayRemove(paymentRef) });
+        batch.update(userRef, { payments: admin.firestore.FieldValue.arrayRemove(paymentRef) });
 
         await batch.commit();
         res.status(200).json({ message: "Payment deleted successfully" });

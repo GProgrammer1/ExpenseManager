@@ -2,10 +2,10 @@ const express = require("express");
 const axios = require("axios");
 const dotenv = require("dotenv");
 
-dotenv.config(); // Load API key from .env
+dotenv.config();
 
 const geminiRouter = express.Router();
-geminiRouter.use(express.json()); // Middleware to parse JSON body
+geminiRouter.use(express.json()); 
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 console.log("GEMINI_API_KEY: ", GEMINI_API_KEY);

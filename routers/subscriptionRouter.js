@@ -1,18 +1,13 @@
 const express = require('express');
 const subscriptionsRouter = express.Router();
-const {admin} = require('../admin'); // Ensure Firebase Admin SDK is initialized in 'admin.js'
+const {admin} = require('../admin'); 
 const firestore = admin.firestore();
-const verifyUser = require('../middlewares/verifyUser');
-/**
- * POST /subscriptions/addSubscription
- * Adds a new subscription and updates the corresponding user document.
- */
-subscriptionsRouter.post('/addSubscription', verifyUser, async (req, res) => {
+
+subscriptionsRouter.post('/addSubscription',  async (req, res) => {
   try {
     const { userId, ...subscriptionData } = req.body;
     if (!userId) return res.status(400).json({ error: "User ID is required" });
 
-    // Create a reference for the new subscription document
     const subscriptionRef = firestore.collection('subscriptions').doc();
     const subscription = { 
       ...subscriptionData, 
@@ -20,24 +15,18 @@ subscriptionsRouter.post('/addSubscription', verifyUser, async (req, res) => {
       userId 
     };
 
-    // Initialize Firestore batch for atomic operations
     const batch = firestore.batch();
 
-    // Set the subscription document
     batch.set(subscriptionRef, subscription);
 
-    // Get the user document reference
     const userRef = firestore.collection('users').doc(userId);
 
-    // Add the subscription reference to the user's Subscriptions array field
     batch.update(userRef, {
-      Subscriptions: admin.firestore.FieldValue.arrayUnion(subscriptionRef) // Use subscriptionRef directly
+      subscriptions: admin.firestore.FieldValue.arrayUnion(subscriptionRef) 
     });
 
-    // Commit the batch operations
     await batch.commit();
 
-    // Send the success response with the subscription data
     res.status(201).json({ message: 'Subscription added successfully', subscription });
   } catch (ex) {
     console.error("🔥 Error adding subscription:", ex);
@@ -45,12 +34,7 @@ subscriptionsRouter.post('/addSubscription', verifyUser, async (req, res) => {
   }
 });
 
-
-/**
- * GET /subscriptions/:userId
- * Retrieves all subscriptions for the given user.
- */
-subscriptionsRouter.get('/:userId', verifyUser, async (req, res) => {
+subscriptionsRouter.get('/:userId',  async (req, res) => {
   try {
     const { userId } = req.params;
     const subscriptionsSnapshot = await firestore.collection('subscriptions').where('userId', '==', userId).get();
@@ -63,11 +47,7 @@ subscriptionsRouter.get('/:userId', verifyUser, async (req, res) => {
   }
 });
 
-/**
- * DELETE /subscriptions/:subscriptionId
- * Deletes a subscription by its ID and updates the corresponding user document.
- */
-subscriptionsRouter.delete('/:subscriptionId', verifyUser, async (req, res) => {
+subscriptionsRouter.delete('/:subscriptionId',  async (req, res) => {
   try {
     const { subscriptionId } = req.params;
     const subscriptionRef = firestore.collection('subscriptions').doc(subscriptionId);
@@ -92,11 +72,8 @@ subscriptionsRouter.delete('/:subscriptionId', verifyUser, async (req, res) => {
   }
 });
 
-/**
- * PUT /subscriptions/:subscriptionId
- * Updates a subscription document with the provided data.
- */
-subscriptionsRouter.put('/:subscriptionId', verifyUser, async (req, res) => {
+
+subscriptionsRouter.put('/:subscriptionId',  async (req, res) => {
   try {
     const { subscriptionId } = req.params;
     const subscriptionRef = firestore.collection('subscriptions').doc(subscriptionId);
