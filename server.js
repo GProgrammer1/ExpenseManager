@@ -22,15 +22,10 @@ app.use('/notes', require('./routers/noteRouter'));
 app.listen(3000,'0.0.0.0', () => {
     console.log('Server is running on port 3000');
 });
-// minutes hours dayofthemonth month dayoftheweek
-cron.schedule('26 04 * * *', async() => {
+cron.schedule('0 0 * * *', async() => {
     console.log('Checking for payments nearing the deadline...');
     await deleteExpiredPayments();
     await checkPaymentsApproachingDeadline();
     await checkUpcomingSubscriptions();
     await warnAboutMoneyShortage();
   });
-
-
-
-//TODO: RESEARCH VIRTUALIZATION

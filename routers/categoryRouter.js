@@ -10,7 +10,7 @@ categoryRouter.get('/expense', async(req, res) => {
         let categories = categoriesSnapshot.docs.map(doc => doc.data());
         res.status(200).json(categories);
     } catch (ex) {
-        console.error("🔥 Error fetching expense categories:", ex);
+        console.error(" Error fetching expense categories:", ex);
         res.status(500).json({ error: "Failed to fetch expense categories" });
     }
 });
@@ -23,7 +23,7 @@ categoryRouter.get('/income', async(req, res) => {
         let categories = categoriesSnapshot.docs.map(doc => doc.data());
         res.status(200).json(categories);
     } catch (ex) {
-        console.error("🔥 Error fetching income categories:", ex);
+        console.error(" Error fetching income categories:", ex);
         res.status(500).json({ error: "Failed to fetch income categories" });
     }
 });

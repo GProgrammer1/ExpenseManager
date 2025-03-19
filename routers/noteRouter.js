@@ -6,9 +6,7 @@ const firestore = admin.firestore();
 
 noteRouter.post('/addNote',  async (req, res) => {
     try {
-        const {  ...noteData } = req.body;
-        console.log("Note data",noteData);
-        
+        const {  ...noteData } = req.body;        
         const {userId} = noteData;
 
         if (!userId) return res.status(400).json({ error: "User ID is required" });
@@ -39,8 +37,6 @@ noteRouter.get('/all/:uid',  async (req, res) => {
 
         const notesSnapshot = await q.get();
         let notes = notesSnapshot.docs.map(doc => doc.data());
-        console.log(notes);
-
         res.status(200).json(notes);
     } catch (ex) {
         console.error("Error fetching notes:", ex);

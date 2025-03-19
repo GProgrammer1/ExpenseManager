@@ -3,7 +3,7 @@ const authRouter = express.Router();
 const {admin} = require('../admin');
 const firestore = admin.firestore();
 const axios = require('axios');
-
+const bcrypt = require('bcryptjs');
 console.log("Proccess env firebase eky: ", process.env.FIREBASE_API_KEY);
 const User = require('../models/User');
 
@@ -14,7 +14,8 @@ authRouter.post('/signup', async (req, res) => {
   try {
     const userRecord = await admin.auth().createUser({ email, password });
     const userRef = firestore.collection('users').doc(userRecord.uid);
-    const user = new User(userRecord.uid, email, password,name, [fcmToken]);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User(userRecord.uid, email, hashedPassword, name, [fcmToken]);
     await userRef.set({ ...user });
 
     res.status(201).json({ message: 'User signed up successfully', user: userRecord });
@@ -25,13 +26,17 @@ authRouter.post('/signup', async (req, res) => {
 });
 
 
-authRouter.post('/signin', async (req, res) => {
-  console.log("Signin method reached");
-  
+authRouter.post('/signin', async (req, res) => {  
   const { email, password } = req.body;
 
   try {
     const user = await admin.auth().getUserByEmail(email);
+    const actualPassword = user.customClaims.password;
+
+    const isPasswordValid = await bcrypt.compare(password, actualPassword);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
     res.status(200).json({
       message: 'User signed in successfully',
      uid: user.uid,
@@ -42,44 +47,6 @@ authRouter.post('/signin', async (req, res) => {
   }
 });
 
-authRouter.post('/refreshToken', async (req, res) => {
-  const { refreshToken } = req.body;
-
-  try {
-    const response = await axios.post(
-      `https://securetoken.googleapis.com/v1/token?key=${process.env.FIREBASE_API_KEY}`,
-      {
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-      }
-    );
-
-    const { id_token, refresh_token, expires_in } = response.data;
-
-    res.status(200).json({
-      message: 'Token refreshed successfully',
-      idToken: id_token,
-      refreshToken: refresh_token,
-      expiresIn: expires_in
-    });
-  } catch (error) {
-    console.error('Error refreshing token:', error.response?.data || error.message);
-    res.status(401).json({ error: 'Invalid refresh token' });
-  }
-}
-);
-
-
-authRouter.post('/signout', async (req, res) => {
-  const { uid } = req.body;
-  try {
-    await admin.auth().revokeRefreshTokens(uid);
-    res.status(200).json({ message: 'User signed out successfully' });
-  } catch (error) {
-    console.error('Error during sign-out:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
 
 authRouter.put('/updateUserData/:uid', async (req, res) => {
   const { uid } = req.params;
@@ -105,9 +72,7 @@ authRouter.put('/updateUserData/:uid', async (req, res) => {
 
 
 authRouter.get('/:uid', async (req, res) => {
-  const { uid } = req.params;
-  console.log("UID: ", uid);
-  
+  const { uid } = req.params;  
   try {
     const userDoc = await firestore.collection('users').doc(uid).get();
     if (!userDoc.exists) {

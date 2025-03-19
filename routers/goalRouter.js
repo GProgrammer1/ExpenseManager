@@ -10,7 +10,6 @@ goalsRouter.post('/addGoal',  async (req, res) => {
 
     const goalsCollection = firestore.collection('goals');
     const goalRef = goalsCollection.doc();
-    console.log("GFoal ref id",goalRef.id);
     
     const goal = { ...goalData , id: goalRef.id, userId,
       deadline: {
@@ -28,7 +27,7 @@ goalsRouter.post('/addGoal',  async (req, res) => {
     await batch.commit();
     res.status(201).json({ message: 'Goal added successfully', goal });
   } catch (ex) {
-    console.error("🔥 Error adding goal:", ex);
+    console.error(" Error adding goal:", ex);
     res.status(500).json({ error: "Failed to add goal" });
   }
 });
@@ -42,7 +41,7 @@ goalsRouter.get('/:userId',  async (req, res) => {
 
     res.status(200).json(goals);
   } catch (ex) {
-    console.error("🔥 Error getting goals:", ex);
+    console.error(" Error getting goals:", ex);
     res.status(500).json({ error: "Failed to retrieve goals" });
   }
 });
@@ -85,7 +84,7 @@ goalsRouter.put('/:goalId',  async (req, res) => {
     await goalRef.update(req.body);
     res.status(200).json({ message: "Goal updated successfully" });
   } catch (ex) {
-    console.error("🔥 Error updating goal:", ex);
+    console.error(" Error updating goal:", ex);
     res.status(500).json({ error: "Failed to update goal" });
   }
 });

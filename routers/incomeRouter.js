@@ -6,7 +6,6 @@ const firestore = admin.firestore();
 incomeRouter.post('/addIncome',  async (req, res) => {
     try {
         const { userId, ...incomeData } = req.body;
-        console.log("Request body: ", req.body);
         
         if (!userId) return res.status(400).json({ error: "User ID is required" });
 
@@ -18,8 +17,6 @@ incomeRouter.post('/addIncome',  async (req, res) => {
                 nanoseconds: incomeData.date.nanoseconds
             }
          };
-
-         console.log("Income data: ", income);
          
         const batch = firestore.batch();
         batch.set(incomeDocRef, income);
@@ -58,9 +55,7 @@ incomeRouter.delete('/:incomeId',  async (req, res) => {
     }
 });
 
-incomeRouter.get('/incomeData/:uid/:month',  async (req, res) => {
-    console.log("🔥 Fetching income data...");
-    
+incomeRouter.get('/incomeData/:uid/:month',  async (req, res) => {    
     try {
         const { uid, month } = req.params;
         const incomesCollection = firestore.collection('incomes');
@@ -74,7 +69,6 @@ incomeRouter.get('/incomeData/:uid/:month',  async (req, res) => {
                 const timestamp = new Date(income.date.seconds * 1000);
                 return timestamp.getMonth()=== monthNum;
             });
-            console.log("Incomes: ", incomes);
             
         if (incomes.length === 0) {
             return res.status(200).json({});
@@ -88,9 +82,7 @@ incomeRouter.get('/incomeData/:uid/:month',  async (req, res) => {
 
 
 
-incomeRouter.get('/all/:uid',  async (req, res) => {
-    console.log("🔥 Fetching all incomes...");
-    
+incomeRouter.get('/all/:uid',  async (req, res) => {    
     try {
         const { uid } = req.params;
 
@@ -108,9 +100,7 @@ incomeRouter.get('/all/:uid',  async (req, res) => {
             }
             return income;
         }
-    );
-        console.log("Incomes to be fetched");
-        
+    );        
         res.status(200).json(incomes);
     } catch (error) {
         console.error("🔥 Error fetching incomes:", error);
@@ -120,7 +110,6 @@ incomeRouter.get('/all/:uid',  async (req, res) => {
 );
 
 incomeRouter.get('/:uid/:month',  async (req, res) => {
-    console.log("🔥 Fetching incomes...");
     try {
         const { uid, month } = req.params;
         const incomesCollection = firestore.collection('incomes');
@@ -143,10 +132,9 @@ incomeRouter.get('/:uid/:month',  async (req, res) => {
         
         
     );
-    console.log("Incomes: ", incomes);
         res.status(200).json(incomes);
     } catch (ex) {
-        console.error("🔥 Error fetching incomes:", ex);
+        console.error(" Error fetching incomes:", ex);
         res.status(500).json({ error: "Failed to fetch incomes" });
     }
 });

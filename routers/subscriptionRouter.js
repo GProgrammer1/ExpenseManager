@@ -29,7 +29,7 @@ subscriptionsRouter.post('/addSubscription',  async (req, res) => {
 
     res.status(201).json({ message: 'Subscription added successfully', subscription });
   } catch (ex) {
-    console.error("🔥 Error adding subscription:", ex);
+    console.error(" Error adding subscription:", ex);
     res.status(500).json({ error: "Failed to add subscription" });
   }
 });
@@ -42,7 +42,7 @@ subscriptionsRouter.get('/:userId',  async (req, res) => {
 
     res.status(200).json(subscriptions);
   } catch (ex) {
-    console.error("🔥 Error getting subscriptions:", ex);
+    console.error("Error getting subscriptions:", ex);
     res.status(500).json({ error: "Failed to retrieve subscriptions" });
   }
 });
