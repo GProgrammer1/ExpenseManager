@@ -1,0 +1,45 @@
+@if ((note$ | async); as note) {
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/note-list" (click)="saveNote(note)"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ note.title }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleEdit()">
+          <ion-icon name="pencil-outline" id="edit-icon"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="content-container">
+    @if (!isEditing) {
+      <ion-card class="note-card">
+        <ion-card-header>
+          <ion-card-title>{{ note.title }}</ion-card-title>
+          <ion-card-subtitle>{{ formatDate(note.date) }}</ion-card-subtitle>
+        </ion-card-header>
+  
+        <ion-card-content [innerHTML]="note.content"></ion-card-content>
+      </ion-card>
+    } 
+    @else {
+      <div class="edit-container">
+        <ion-input 
+          class="styled-input"
+          [(ngModel)]="note.title"
+          placeholder="Enter title"
+        ></ion-input>
+      
+        <ion-textarea 
+          class="styled-textarea"
+          [(ngModel)]="note.content"
+          placeholder="Enter content"
+          autoGrow="true"
+        ></ion-textarea>
+      </div>
+    }
+  </ion-content>
+  }
+  

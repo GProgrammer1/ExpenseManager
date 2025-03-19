@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import {IonicModule} from '@ionic/angular';
-import { BudgetService } from '../budget.service';
+import { BudgetService } from '../services/budget.service';
 import { Budget } from '../models';
 import { Router, RouterLink } from '@angular/router';
 @Component({
@@ -11,7 +10,7 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './add-budget.page.html',
   styleUrls: ['./add-budget.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterLink]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class AddBudgetPage implements OnInit {
 
@@ -81,13 +80,30 @@ export class AddBudgetPage implements OnInit {
           totalBudget,
           userId: userId!
         };
+
+        console.log("SELECTED MONTH: ", this.selectedMonth);
+        
     
         if (Object.keys(spendings).length === 0) {
           alert('Please add at least one row');
           return;
         }
         console.log("Budget: ", budget);
-        this.budgetService.addBudget(userId!, budget);
+        this.budgetService.addBudget(userId!, budget).subscribe({
+          next: (res: any) => {
+            console.log('Budget added:', res.budget);
+            console.log("Cached budget subject: ", this.budgetService.cachedBudgetSubject.value);
+            if (this.budgetService.budgetSubject.value.some(b => b.month === res.budget.month)) {
+              this.budgetService.budgetSubject.next(this.budgetService.budgetSubject.value.map(b => b.month === res.budget.month ? res.budget : b));
+            }
+            else {
+            this.budgetService.budgetSubject.next([...this.budgetService.budgetSubject.value!, res.budget]);
+            }
+          },
+          error: (error) => {
+            console.error('Error adding budget:', error);
+          }
+        });
         this.router.navigate(['/tabs/budget']);
   }
 }

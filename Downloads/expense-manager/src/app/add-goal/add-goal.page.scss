@@ -51,4 +51,19 @@ ion-header, ion-toolbar {
     padding-top: 8px;
   }
 
+  #note {
+    font-style: italic;
+    font-size: 0.8rem;
+    color: #666;
+    
+  }
+
+  #desc-label {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    bottom: 10px;
+    gap: 7px;
+  }
+
   

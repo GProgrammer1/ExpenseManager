@@ -9,35 +9,27 @@
         <!-- Name Input -->
         <ion-item>
           <ion-label position="floating">Name</ion-label>
-          <ion-input [(ngModel)]="name" type="text" required></ion-input>
+          <ion-input [(ngModel)]="name" type="text" required ></ion-input>
         </ion-item>
 
         <!-- Email Input -->
         <ion-item>
           <ion-label position="floating">Email</ion-label>
-          <ion-input [(ngModel)]="email" type="email" required></ion-input>
+          <ion-input [(ngModel)]="email" type="email" required ></ion-input>
         </ion-item>
 
         <!-- Password Input -->
         <ion-item>
           <ion-label position="floating">Password</ion-label>
-          <ion-input [(ngModel)]="password" [type]="passwordType" required></ion-input>
-          <ion-icon
-            slot="end"
-            [name]="passwordType === 'password' ? 'eye-off' : 'eye'"
-            (click)="togglePasswordVisibility()"
-          ></ion-icon>
+          <ion-input [(ngModel)]="password" [type]="passwordType" required ></ion-input>
+          
         </ion-item>
 
         <!-- Confirm Password Input -->
         <ion-item>
           <ion-label position="floating">Confirm Password</ion-label>
-          <ion-input [(ngModel)]="confirmPassword" [type]="confirmPasswordType" required></ion-input>
-          <ion-icon
-            slot="end"
-            [name]="confirmPasswordType === 'password' ? 'eye-off' : 'eye'"
-            (click)="toggleConfirmPasswordVisibility()"
-          ></ion-icon>
+          <ion-input [(ngModel)]="confirmPassword" [type]="confirmPasswordType" required ></ion-input>
+          
         </ion-item>
 
         <!-- Register Button -->
@@ -50,4 +42,13 @@
       </ion-card-content>
     </ion-card>
   </div>
+
+  @if (redirecting) {
+    <div id="full-container">
+      <div id="redirect-box">
+        <ion-spinner name="crescent"></ion-spinner>
+        <ion-text id="redirect-text">Redirecting...</ion-text>
+      </div>
+  </div>
+  }
 </ion-content>

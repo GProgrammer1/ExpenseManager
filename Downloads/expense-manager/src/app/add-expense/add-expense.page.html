@@ -1,3 +1,5 @@
+
+
 <ion-content [fullscreen]="true">
   <div class="form-container">
     <ion-item>
@@ -11,9 +13,10 @@
       ></ion-input>
     </ion-item>
 
-    <ion-item>
+    <ion-item (click)="openSelect()">
       <ion-label position="floating">Category</ion-label>
       <ion-select
+        #select
         placeholder="Select category"
         name="category"
         [(ngModel)]="categ"

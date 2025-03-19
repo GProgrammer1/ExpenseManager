@@ -18,7 +18,7 @@ ion-tabs {
     position: relative;
     z-index: 10; /* Ensure the content is above other elements */
   }
-  ion-tab-button.selected {
+  ion-tab-button.active-tab {
     background-color: #ffffff;
     color: var(--ion-color-primary); /* Active tab color */
     font-weight: bold;

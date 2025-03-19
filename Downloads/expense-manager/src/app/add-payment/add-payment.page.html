@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/payments"></ion-back-button>
+    </ion-buttons>
     <ion-title>Add Payment</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -20,13 +23,10 @@
   <!-- Date Input -->
   <ion-item>
     <ion-label position="floating" class="form-label">Date</ion-label>
-    <ion-datetime displayFormat="YYYY/MM/DD" [(ngModel)]="selectedDate" [min]="tomorrow" ></ion-datetime>
+    <ion-datetime   displayFormat="YYYY-MM-DD" [(ngModel)]="selectedDate" [min]="tomorrow"  ></ion-datetime>
   </ion-item> 
 
   <!-- Add Button -->
   <ion-button expand="block" class="submit-button" (click)="add()">Add</ion-button>
-  <ion-button expand="block"
-   class="cancel-button"
-  routerLink="/tabs/payments"
-  color="danger" >Cancel</ion-button>
+  
 </ion-content>

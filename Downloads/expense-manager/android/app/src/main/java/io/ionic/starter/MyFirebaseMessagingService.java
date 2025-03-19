@@ -52,7 +52,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     } //Create a notification channel here is mandatory for android versions higher than 8.0
 
     @SuppressLint("DiscouragedApi") NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-      .setSmallIcon(getResources().getIdentifier(notificationIcon,"drawable", getPackageName()))
+      .setSmallIcon(R.drawable.ic_circle)
       .setContentTitle(title)
       .setContentText(body)
       .setAutoCancel(true)

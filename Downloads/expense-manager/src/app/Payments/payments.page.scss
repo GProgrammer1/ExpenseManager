@@ -25,6 +25,11 @@ ion-toolbar {
   }
 }
 
+#calendar-icon {
+  position: relative;
+  top: 4px;
+}
+
 #add-subscription {
   display: flex;
   align-items: center;
@@ -36,17 +41,45 @@ ion-toolbar {
 }
 
 #view-sub-btn {
+  color: var(--ion-color-primary);
+  --background: white;
+  border: none !important;
+  width: 150px;
+  font-size: small;
+  height: 55px;
+  position: relative;
+  right: 5px;
+  margin-top: 7px;
+}
+
+.dropdown-icon {
+  font-size: 1.5rem;
+  margin-right: 2px;
+}
+
+#sub-box {
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+#subscription-list {
+  z-index: 100000;
+}
+
+#debt-btn {
   color: #007aff;;
   --background: white;
   border: none !important;
-  font-size: small;
-  width: 150px;
+  font-size: 12px;
+  width: 140px;
+  position: relative;
+  right: 15px;
+  display: flex;
+  align-items: center;
   margin-top: 7px;
-  
 }
-
-#subscription-list {
-  z-index: 100000;
+#debt-icon {
+  font-size: 2.5rem;
 }
 
 .toolbar-container {
@@ -99,6 +132,8 @@ ion-content {
   font-size: 20px;
   font-weight: bold;
   color: #333;
+  display: flex;
+  align-items: center;
   margin-bottom: 20px; /* Added more space between the date and payments */
 }
 
@@ -119,8 +154,8 @@ ion-content {
 
 #add-sub-btn {
   --color: white;
-  width: 150px;
-  
+  width: 100px;
+  font-size: smaller;
 }
 
 #warning, #warning-sign {
@@ -144,11 +179,10 @@ ion-icon {
     text-align: center;
     color: #888;
     font-size: 16px;
-    padding: 20px;
-    position: fixed; /* Keeps it within the flow */
-    top: 50%; /* Centers it vertically */
-    left: 50%; /* Centers it horizontally */
-    transform: translate(-50%, -50%); /* Centers it perfectly */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     margin-top: 30px;
   
 }
@@ -158,7 +192,6 @@ ion-icon {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 /* Add Button */
@@ -227,6 +260,8 @@ ion-fab-button:hover {
   box-shadow: 
     0px 2px 4px rgba(0, 0, 0, 0.08), 
     0px 6px 12px rgba(0, 0, 0, 0.12); 
+  position: relative;
+  top: 70px;
 }
 
 #noData {

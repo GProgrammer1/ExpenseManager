@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import {tabsRoutes} from './tabs/tabs.routes';
+import { tabsRoutes } from './tabs/tabs.routes';
 import { addTransactionsRoutes } from './add-transactions/add-transactions.routes';
 import { loginResolver } from './login.resolver';
 
@@ -12,51 +12,64 @@ export const routes: Routes = [
   {
     path: 'login',
     resolve: {
-      isLoggedIn: loginResolver},
-    loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
+      isLoggedIn: loginResolver
+    },
+    loadComponent: () => import('./login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'register',
-    loadComponent: () => import('./register/register.page').then( m => m.RegisterPage)
+    loadComponent: () => import('./register/register.page').then(m => m.RegisterPage)
   },
-  
+
   tabsRoutes[0],
   addTransactionsRoutes[0],
   {
     path: 'budget',
-    loadComponent: () => import('./budget/budget.page').then( m => m.BudgetPage)  
+    loadComponent: () => import('./budget/budget.page').then(m => m.BudgetPage)
   },
   {
     path: 'add-payment',
-    loadComponent: () => import('./add-payment/add-payment.page').then( m => m.AddPaymentPage)
+    loadComponent: () => import('./add-payment/add-payment.page').then(m => m.AddPaymentPage)
   },
   {
     path: 'add-budget',
-    loadComponent: () => import('./add-budget/add-budget.page').then( m => m.AddBudgetPage)
+    loadComponent: () => import('./add-budget/add-budget.page').then(m => m.AddBudgetPage)
   },
   {
     path: 'add-goal',
-    loadComponent: () => import('./add-goal/add-goal.page').then( m => m.AddGoalPage)
+    loadComponent: () => import('./add-goal/add-goal.page').then(m => m.AddGoalPage)
   },
   {
     path: 'goals',
-    loadComponent: () => import('./goals/goals.page').then( m => m.GoalsPage)
+    loadComponent: () => import('./goals/goals.page').then(m => m.GoalsPage)
   },
   {
     path: 'add-goal',
-    loadComponent: () => import('./add-goal/add-goal.page').then( m => m.AddGoalPage)
+    loadComponent: () => import('./add-goal/add-goal.page').then(m => m.AddGoalPage)
   },
   {
     path: 'personalinfo',
-    loadComponent: () => import('./personalinfo/personalinfo.page').then( m => m.PersonalinfoPage)
+    loadComponent: () => import('./personalinfo/personalinfo.page').then(m => m.PersonalinfoPage)
   },
   {
     path: 'profile',
-    loadComponent: () => import('./profile/profile.page').then( m => m.ProfilePage)
+    loadComponent: () => import('./profile/profile.page').then(m => m.ProfilePage)
+  },
+  {
+    path: 'debt-planner',
+    loadComponent: () => import('./debt-planner/debt-planner.page').then( m => m.DebtPlannerPage)
+  },
+  {
+    path: 'note-list',
+    loadComponent: () => import('./note-list/note-list.page').then( m => m.NoteListPage)
+  },
+  {
+    path: 'note/:noteId',
+    loadComponent: () => import('./note/note.component').then( m => m.NoteComponent)
   },
   
 
- 
+
 
 
 ];

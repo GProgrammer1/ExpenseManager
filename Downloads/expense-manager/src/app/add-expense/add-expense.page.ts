@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonInput,IonButton, IonSelect,
@@ -7,9 +7,10 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonInpu
 import {IonicModule} from '@ionic/angular';
 import { Timestamp } from 'firebase/firestore';
 import { Expense } from '../models';
-import { FirestoreService } from '../firestore.service';
-import { BudgetService } from '../budget.service';
+import { BudgetService } from '../services/budget.service';
 import { Router, RouterLink } from '@angular/router';
+import { ExpenseService } from '../services/expense.service';
+import { time } from 'ionicons/icons';
 @Component({
   selector: 'app-add-expense',
   templateUrl: './add-expense.page.html',
@@ -18,7 +19,7 @@ import { Router, RouterLink } from '@angular/router';
   imports: [IonicModule, CommonModule,
      FormsModule, RouterLink ]
 })
-export class AddExpensePage implements OnInit {
+export class AddExpensePage  {
 
   amount: number | null = null;
   expense_categories: string[] = ['Food', 'Transportation', 'Entertainment', 'Health', 'Education', 'Other','Housing', 'Utilities',
@@ -26,13 +27,15 @@ export class AddExpensePage implements OnInit {
   ];
   categ: string = '';
   description: string = '';
-  selectedDate: string = new Date().toISOString().split('T')[0];
+  selectedDate: string = new Date().toISOString();
+  @ViewChild('select') select!: IonSelect;
   
-  constructor(private firestoreService: FirestoreService, private budgetService: BudgetService,
-    private router: Router
+  constructor( private budgetService: BudgetService,
+    private router: Router, private expenseService: ExpenseService
   ) { }
 
-  ngOnInit() {
+  openSelect() {
+    this.select.open();
   }
 
   add() {
@@ -56,17 +59,32 @@ export class AddExpensePage implements OnInit {
     const expense: Expense = {
       id: '',
 
-      Date: Timestamp.fromDate(new Date(this.selectedDate)),
-      Description: this.description,
-      Category: this.categ,
-      Amount: this.amount!,
+      date: Timestamp.fromDate(new Date(this.selectedDate)),
+      description: this.description,
+      category: this.categ,
+      amount: this.amount!,
       userId: userId!
     }
-    console.log("Expense date: ", expense.Date.toDate().toISOString());
+    console.log("Expense date: ", expense.date.toDate().toISOString());
     
     
-    this.firestoreService.addExpense(userId!, expense);
-    this.budgetService.signalChange('Expense');
-    this.router.navigate(['/tabs/transactions']);
+    this.expenseService.addExpense(expense).subscribe(
+      {
+        next: (data) => {
+          console.log("Expense added successfully", data);
+          const expense = data.expense;
+          
+          this.expenseService.expenseSubject.next([...this.expenseService.expenseSubject.value, expense]);
+          const spending : {category: string, amount: number} = {category: expense.category, amount: expense.amount};
+          const timestamp = new Timestamp(expense.date.seconds, expense.date.nanoseconds);
+          this.budgetService.signalChange('Expense', spending, timestamp.toDate().getMonth() + 1);
+
+          this.router.navigate(['/tabs/transactions']);
+        },
+        error: (err) => {
+          console.error("Error adding expense", err);
+        }
+      }
+    );
   }
 }

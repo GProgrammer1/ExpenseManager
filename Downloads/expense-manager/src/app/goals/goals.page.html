@@ -1,28 +1,46 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <div class="toolbar-content">
-      <ion-title>Goals</ion-title>
-      <ion-text>Manage your finances wisely</ion-text>
+      <div >
+        <ion-title id="page-title">Goals</ion-title>
+        <ion-text>Manage your finances wisely</ion-text>
+      </div>
+      <ion-select [(ngModel)]="filter"  interface="popover"  (ionChange)="changeFilter($event)" >
+        <ion-select-option value="Priority">Priority</ion-select-option>
+        <ion-select-option value="Deadline">Deadline</ion-select-option>
+        <ion-select-option value="None">None</ion-select-option>
+     </ion-select>
     </div>
+
+    
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="page-container">
     @if (!loading) {
-    @if (goals$ | async; as goals) {
-      @if (goals.length === 0) {
-        <ion-text color="medium" class="no-goals-text">No goals set yet</ion-text>
-      }
-      @else {
+    @if (goals$ | async; as goals ) {
+      @if (goals.length !== 0) {
         <ion-list>
-          <ion-card *ngFor="let goal of goals" class="goal-card">
+          <ion-card *ngFor="let goal of goals" class="goal-card"  #longPressElement >
             <ion-card-header>
-              <ion-item lines="none">
-                <ion-icon src="assets/goal.svg" class="goal-icon"></ion-icon>
-                <ion-label class="goal-name">{{ goal.name }}</ion-label>
-                <ion-icon name="trash" class="delete-icon" (click)="presentDeleteGoalDialog(goal)" color="danger"></ion-icon>
-
+              
+              <ion-item lines="none" >
+               <div id="goal-title">
+                  <div id="title">
+                    <ion-icon src="assets/goal.svg" class="goal-icon"></ion-icon>
+                    <ion-text class="goal-name">{{ goal.name }}</ion-text>
+                  </div>
+                  <div id="delete-btn">
+                    <ion-button fill="clear" color="danger" (click)="presentDeleteGoalDialog(goal)">
+                      <ion-icon name="trash" id="delete-icon"></ion-icon>
+                    </ion-button>
+                  </div>
+                  <div id="date-div">
+                    <ion-icon name="calendar-outline" class="deadline-icon"></ion-icon>
+                    <ion-text id="deadline">{{toDate(goal.deadline)}}</ion-text>
+                  </div>
+              </div>  
               </ion-item>
             </ion-card-header>
             
@@ -30,15 +48,13 @@
               <div id="description" #desc
                 [contentEditable]="allowEdit"
                 (blur)="editDescription($event, goal)"
-                [ngClass]="{'active-div': allowEdit && focusedGoal?.name === goal.name}">
-                <ion-text color="medium" class="goal-category">{{ goal.description }}</ion-text>
-                <ion-icon name="pencil-outline" class="edit-icon" 
-                  (click)="allowEdit = !allowEdit; focusedGoal=goal; focusOnDiv() "
-                  [ngClass]="{'active': allowEdit && focusedGoal?.name === goal.name}"></ion-icon>
+                [ngClass]="{'active-div': allowEdit && focusedGoal?.name === goal.name}"
+                (click)="allowEdit = true; focusedGoal = goal;">
+                <ion-text color="medium" class="goal-description">{{ goal.description }}</ion-text>
+                
               </div>
               
-              <div id="ai-btns">
-                <ion-button  (click)="goalAdvise(goal)" [disabled]="generating">
+                <ion-button  (click)="goalAdvise(goal)" [disabled]="generating" id="advise-button">
                   @if (generating && selectedGoal?.name === goal.name) {
                     <ion-icon name="bulb-outline" slot="start"></ion-icon>
                     Generating content...
@@ -47,25 +63,13 @@
                     Advise
                   }
                 </ion-button>
-                
-                <ion-button (click)="checkGoalProgress(goal)">
-                  <ion-icon name="sync" class="progress-icon" ></ion-icon>
-                  @if (checkingProgress) {Checking...}
-                  @else {Check progress}
-                </ion-button>
-
-              </div>
-              <div id="progress-container">
-                <ion-label>Progress: </ion-label>
-                <span>{{goal.progress | percent}}</span>
-                <ion-progress-bar
-                [value]="goal.progress / 100"
-                [color]="getColor(goal.progress)">
-              </ion-progress-bar>
-              </div>
+                             
             </ion-card-content>
           </ion-card>
         </ion-list>
+      }
+      @else{
+        <ion-text class="no-goals-text">No goals yet. Start tracking your financial journey!</ion-text>
       }
     } 
     @else {
@@ -81,8 +85,13 @@
   <div class="custom-popup" *ngIf="showPopup">
     <div class="popup-content">
       <div class="popup-header">
-        <ion-icon name="close" class="close-icon" (click)="showPopup = false; generated=false; selectedGoal=null"></ion-icon>
-        Goal Report</div>
+        <ion-icon name="close" class="close-icon" (click)="showPopup = false; generated=false; selectedGoal=null" color="danger"></ion-icon>
+        Goal Report
+        <ion-button id="add-note" (click)="presentAddNoteDialog()" fill="clear">
+          <ion-icon [src]="'assets/note.svg'" id="note-img"></ion-icon>
+        </ion-button>
+          
+      </div>
       <div class="popup-section">
         <h4>Advice</h4>
         <ion-text class="response">{{ response }}</ion-text>
@@ -97,72 +106,3 @@
     </ion-fab-button>
   </ion-fab>
 </ion-content>
-
-<style>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-}
-
-.goal-card {
-  width: 100%;
-  border-radius: 12px;
-}
-
-.no-goals-text {
-  font-size: 1rem;
-  text-align: center;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.goal-icon {
-  font-size: 1.9rem;
-  color: var(--ion-color-primary);
-  margin-right: 0.5rem;
-}
-
-.goal-category {
-  max-width: 70%;
-  line-height: 1.5;
-  color: #666;
-}
-
-.delete-icon {
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-ion-header, ion-toolbar { 
-  --background: #007aff;
-  color: white;
-}
-
-.toolbar-content {
-  display: flex;
-  flex-direction: column;
-  padding-left: 0.7rem;
-}
-
-@media screen and (max-width: 700px) {
-  #ai-btns {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    position: relative;
-    top: 10px;
-    width: 100%;
-  }
-  .active-div {
-  border-bottom: 2px solid var(--ion-color-primary);
-  transition: border 0.3s;
-}
-
-}
-
-
-</style>

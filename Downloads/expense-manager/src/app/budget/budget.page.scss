@@ -3,8 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  flex-shrink: 0;
-  flex-grow: 1;
+  flex-shrink: 1;
+  flex-grow: 2;
   padding-left: 0 !important;
 }
 
@@ -15,7 +15,14 @@
 #show-budget {
   font-size: xx-small !important;
 }
-
+.popup-header {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
 .no-data {
   background-color: white; /* Light whitish background */
   color: #959494; /* Slightly dark text for contrast */
@@ -36,8 +43,34 @@
   
 }
 
+@keyframes glow {
+  0% { box-shadow: 0 0 10px rgba(0, 122, 255, 0.8); }
+  50% { box-shadow: 0 0 20px rgba(0, 122, 255, 1); }
+  100% { box-shadow: 0 0 10px rgba(0, 122, 255, 0.8); }
+}
+
+@keyframes fadeInSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+// .glow-effect {
+//   animation: fadeInSlideDown 0.6s ease-in forwards;
+// }
+
+
 #bulb-icon {
   font-size: xx-large !important;
+  
+}
+
+.current {
+  margin-bottom: 30px;
 }
 
 .advice-popup {
@@ -75,6 +108,8 @@
   overflow-y: auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   text-align: left;
+  transition: transform 0.5s ease-in-out;
+  // transform: translateY(-10px);
   font-family: "Arial", sans-serif;
 }
 #budget-title {
@@ -108,16 +143,23 @@ ion-toolbar {
 #personalized-budget {
 background-color: white;
   color: var(--ion-color-primary);
-  font-size: small !important;
+  font-size: 0.7rem!important;
+  display: flex;
+  align-items: center;
   margin : 0.4rem;
   border-radius: 8px;
   width: 170px;
+  --padding: 0;
   outline: none !important;
   font-weight: bold;
 
-  &:disabled {
-    background-color: #ccc !important;
+  &.button-disabled {
+    background-color: #f6f1f1 !important;
+    color: #767474 !important;  // Optional: Change text color for better visibility
+    pointer-events: none;     // Prevent clicking
   }
+
+
 }
 
 #personalized-budget:disabled {
@@ -125,7 +167,9 @@ background-color: white;
 }
 
 .button-spinner {
-  margin-right: 4px;
+  margin-left: 15px;
+  position: relative;
+  top: 19px;
 }
 /* Table Design */
 .table {
@@ -180,7 +224,6 @@ background-color: white;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 
@@ -266,4 +309,8 @@ ion-button.button-disabled {
 }
 .surplus-total {
   --background: red;
+}
+
+#report-title {
+  text-align: center;
 }

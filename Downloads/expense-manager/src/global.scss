@@ -48,12 +48,7 @@
     --height: 50px;
   }
   
-  ion-toolbar {
-    display: flex !important;
-    flex-direction: row;
-    justify-content: space-between !important;
-  }
- 
+
 
   ion-input {
     white-space: pre-wrap !important;
@@ -61,7 +56,7 @@
   }
   
   ion-progress-bar::part(track) {
-    background-color: white !important; /* Sets the unfilled part to white */
+    background-color: green !important; /* Sets the unfilled part to white */
   }
   
   ion-progress-bar {
@@ -74,26 +69,24 @@
     height: 8px;
   }
   
-  ion-progress-bar::part(track) {
-    background-color: white !important; /* White background for the unfilled area */
-    border-radius: 10px; /* Ensures track also has rounded corners */
-  }
+
 
   ion-tab-button.tab-selected{
     color: var(--ion-color-primary);
 
-    ion-icon svg {
-      fill: var(--ion-color-primary) !important;
-    }
+    // ion-icon svg {
+    //   fill: var(--ion-color-primary) !important;
+    // }
   }
   
   ion-spinner {
-    transform: scale(1.5);
+    transform: scale(1.5) translate(-50%, -50%);
   }
-  ion-progress-bar::part(fill) {
-    border-radius: 20px; /* Rounded corners for the filled part */
+ 
+  ion-header, ion-toolbar {
+    --background: #007aff;
+    color: white;
   }
-  
   
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */

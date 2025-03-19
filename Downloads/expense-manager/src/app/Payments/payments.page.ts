@@ -2,27 +2,21 @@ import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatInputModule } from '@angular/material/input';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, User, UserInfo } from 'firebase/auth'; // Import Firebase User type
-import { BehaviorSubject, combineLatest, concat, from, map, merge, Observable, Subscription, switchMap, take } from 'rxjs';
-import { FirestoreService } from '../firestore.service';
+import {  from, map, merge, Observable, Subscription, switchMap, take } from 'rxjs';
 import { Budget, Category, Expense, Income, Payment } from '../models';
-import { Timestamp } from 'firebase/firestore';
-import { AuthService } from '../auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButton, MatButtonModule } from '@angular/material/button';
-import { Auth, user } from '@angular/fire/auth';
-import { BudgetService } from '../budget.service';
-import { PaymentService } from '../payment.service';
+import { PaymentService } from '../services/payment.service';
 import { AlertController } from '@ionic/angular';
 import { Subscription as AppSubscription } from '../models';
-
+import { SubscriptionService } from '../services/subscription.service';
+import { AuthService } from '../services/auth.service';
+import {User as AppUser} from '../models'
+import { Timestamp } from 'firebase/firestore';
+import { time } from 'ionicons/icons';
+import { tap } from 'rxjs';
 @Component({
-  selector: 'app-home',
+  selector: 'app-payments',
   templateUrl: './payments.page.html',
   styleUrls: ['./payments.page.scss'],
   standalone: true,
@@ -30,24 +24,20 @@ import { Subscription as AppSubscription } from '../models';
     IonicModule,
     CommonModule,
     FormsModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatInputModule,
+   
     ReactiveFormsModule,
-    MatIconModule,
-    MatButtonModule,
-    RouterLink,
-    MatIconModule,
+
+    RouterLink
   ],
 })
 export class PaymentPage{
-compareDates(paymentDate: Date, dueDate: Date) {
-
+compareDates(paymentDate: Date, payment: Payment) {
+  const dueDate = new Timestamp(payment.dueDate.seconds, payment.dueDate.nanoseconds).toDate();
   return paymentDate.getDay() === dueDate.getDay(); 
 }
 
-
-  user$: Observable<User | null> = this.firestoreService.user$;
+  //Add a central user observable
+  user$: Observable<AppUser | null> = this.authService.user$;
   minDate = new Date();
   selectedDate: Date = new Date();
   dueDates$! : Observable<Date[]>;
@@ -57,23 +47,20 @@ compareDates(paymentDate: Date, dueDate: Date) {
   totalAmount$!: Observable<number>;
   loading = true;
 
-  auth: Auth;
   userEmail! :string;
   userId!: string;
 payments$!: Observable<Payment[]>;
 
-  constructor( private paymentService: PaymentService,
-     private firestoreService: FirestoreService,
-    private router: Router, private alertController : AlertController
+  constructor( private paymentService: PaymentService, private subscriptionService: SubscriptionService,
+    private router: Router, private alertController : AlertController, private authService: AuthService
     ) {
-
-      this.auth = getAuth();
+      this.loading = true;
       this.bindData();
       this.user$.subscribe((user) => {
         console.log("User in constructor:", user);
         
         if (user) {
-          this.userId = user.uid;
+          this.userId = user.id;
         }
         else {
           this.userId = localStorage.getItem('userId')!;
@@ -93,6 +80,7 @@ payments$!: Observable<Payment[]>;
       const diffDays = diff / (1000 * 3600 * 24);
       return diffDays < 3;
     }
+
     @HostListener('document:click', ['$event'])
     onClickOutside(event: Event) {
       const targetElement = event.target as HTMLElement;
@@ -122,9 +110,16 @@ payments$!: Observable<Payment[]>;
     }
 
 
-    async deleteSubscription(subscription: AppSubscription) { 
-      console.log(`Deleted subscription: ${subscription.name}`);
-     await this.firestoreService.deleteSubscription(subscription);
+   deleteSubscription(subscription: AppSubscription) { 
+      this.subscriptionService.deleteSubscription(subscription).subscribe({
+        next: () => {
+          console.log('Subscription deleted');
+          this.subscriptionService.subscriptionSubject.next([...this.subscriptionService.subscriptionSubject.getValue().filter(sub => sub.id !== subscription.id)]);
+        },
+        error: (err) => {
+          console.error('Error deleting subscription:', err);
+        }
+      });
     }
     
 
@@ -132,10 +127,8 @@ payments$!: Observable<Payment[]>;
       const today = new Date();
       const diff = dueDate.getTime() - today.getTime();
       const diffDays = diff / (1000 * 3600 * 24);
-      const diffHours = diff / (1000 * 3600);
-      const diffMinutes = diff / (1000 * 60);
 
-      return `${Math.ceil(diffDays)} days`;
+      return Math.ceil(diffDays);
     }
 
     async presentAddSubscriptionDialog() {
@@ -195,7 +188,15 @@ payments$!: Observable<Payment[]>;
         dayOfTheMonth
       };
 
-      await this.firestoreService.addSubscription(subscription);
+     this.subscriptionService.addSubscription(subscription).subscribe({
+        next: (response) => {
+          console.log('Subscription added successfully:', response.subscription);
+          this.subscriptionService.subscriptionSubject.next([...this.subscriptionService.subscriptionSubject.getValue(), response.subscription]);
+        },
+        error: (err) => {
+          console.error('Error adding subscription:', err);
+        }
+     });
       // Logic to save subscription (e.g., update state or send to backend)
     }
 
@@ -204,29 +205,40 @@ payments$!: Observable<Payment[]>;
     sortDates(dates: Date[]) {
       return dates.sort((a, b) => a.getTime() - b.getTime());
     }
-getCategoryName(category: string) {
+    getCategoryName(category: string) {
 
-  const categoryObj : Category = JSON.parse(category);
-  return categoryObj.Name;
-}
+      const categoryObj : Category = JSON.parse(category);
+      return categoryObj.name;
+    }
   
-deleteData(item: Payment) {
+    deleteData(item: Payment) {
 
-    this.paymentService.deletePayment(item as Payment,this.userId ??localStorage.getItem('userId'));
+      this.paymentService.deletePayment(item as Payment,this.userId ??localStorage.getItem('userId')).subscribe({
+        next: () => {
+          console.log('Payment deleted');
+          this.paymentService.paymentSubject.next([...this.paymentService.paymentSubject.getValue().filter(payment => payment.id !== item.id)]);
+        },
+        error: (err) => {
+          console.error('Error deleting payment:', err);
+        }
+      });
 
-  }
+    }
 
   async bindData() {
-    this.loading = true;
     console.log("Selected date:", this.selectedDate);
   
-    this.payments$ = this.paymentService.payments$ ;
+    this.payments$ = this.paymentService.payments$.pipe(
+      tap((payments)=> this.loading = false)
+    ) ;
     this.dueDates$ = this.payments$.pipe(
      
       map((payments) => {
         console.log("Payments: ", payments);
     
-        const dueDates = payments.map((payment) => payment.dueDate.toDate());
+        const dueDates = payments.map((payment) =>{
+          const timestamp = new Timestamp(payment.dueDate.seconds, payment.dueDate.nanoseconds);            
+           return timestamp.toDate()});
     
         // Extract parts in local time using options and ensure unique days
         const uniqueDates = Array.from(
@@ -249,22 +261,41 @@ deleteData(item: Payment) {
         });
     
         console.log("Unique Dates: ", uniqueDateObjects);
+        this.loading = false;
         return uniqueDateObjects;
       })
     );
-    this.subscriptions$ = this.firestoreService.subscriptions$;
+    this.subscriptions$ = this.subscriptionService.subscriptions$;
     console.log("Selected month:", this.selectedDate.getMonth() + 1);
     console.log("User id: ", this.userId);
     
-      await this.paymentService.getPayments(this.userId ?? localStorage.getItem('userId')); //expenses emitted a value
-      await this.firestoreService.getUserSubscriptions(this.userId ?? localStorage.getItem('userId')); //inomes emitted  a value
-      this.loading = false;
+      this.paymentService.getPayments(this.userId ?? localStorage.getItem('userId')).subscribe({
+        next: (payments) => {
+          console.log("Payments: ", payments);
+          this.paymentService.paymentSubject.next(payments);
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error("Error getting payments: ", error);
+        }
+
+      }); //expenses emitted a value
+      this.subscriptionService.getUserSubscriptions(this.userId ?? localStorage.getItem('userId')).subscribe({
+        next: (subscriptions) => {
+          console.log("Subscriptions: ", subscriptions);
+          this.subscriptionService.subscriptionSubject.next(subscriptions);
+        },
+        error: (error) => {
+          console.error("Error getting subscriptions: ", error);
+        }
+      }); //inomes emitted  a value
     //expenses emitted a value
     // }, 500);
   }
 
   hasPaymentsForDate(dueDate: Date, payments: Payment[]): boolean {
-    return payments.some(payment => this.compareDates(dueDate, payment.dueDate.toDate()));
+    
+    return payments.some(payment => this.compareDates(dueDate, payment));
   }
   formatDate(dateObj: Date) {
     const day = dateObj.toLocaleString('en-US', { weekday: 'short' });

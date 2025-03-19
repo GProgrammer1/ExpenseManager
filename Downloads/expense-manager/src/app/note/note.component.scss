@@ -1,0 +1,152 @@
+#textarea {
+     min-height: 100vh;
+     width: 90vw;
+     padding: 20px;
+     margin: 20px;
+     margin-right: 80px;
+     border-radius: 8px;
+     border: 1px solid #ccc;
+}
+
+
+#edit-icon {
+    font-size: 1.5rem;
+}
+/* Full content container */
+#content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+}
+
+/* Container for input fields */
+.edit-container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Styled Title Input */
+.styled-input {
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f8f8f8;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styled Textarea */
+#textarea {
+    min-height: 200px;
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: border 0.2s ease-in-out;
+}
+
+/* Focus effect */
+#textarea:focus,
+.styled-input:focus {
+    border-color: var(--ion-color-primary);
+    outline: none;
+    
+}
+
+.note-card {
+    overflow-y: scroll;
+    min-height: 100vh;
+    margin-bottom: 20px;
+}
+
+/* Edit Icon */
+#edit-icon {
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Full-page centering */
+.content-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure full viewport height */
+}
+
+/* Container for input fields */
+.edit-container {
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center; /* Center items horizontally */
+}
+
+/* Styled Title Input */
+.styled-input {
+    width: 100%;
+    max-width: 500px;
+    font-size: 1.4rem;
+    padding: 14px;
+    font-weight: bold;
+    margin-left: 30px;
+    margin-top: 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center text inside input */
+}
+
+/* Styled Textarea */
+.styled-textarea {
+    width: 100%;
+    max-width: 500px;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    padding: 14px;
+    border-radius: 8px;
+    margin-left: 30px;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    resize: none; 
+    min-height: 100vh;
+}
+.keyboard-active {
+    padding-bottom: 50px; /* Adjust based on keyboard height */
+}
+
+/* Adjust ion-content when keyboard is visible */
+ion-content {
+    transition: padding-bottom 0.3s ease-in-out;
+}
+/* Auto-expand textarea based on content */
+.styled-textarea:focus,
+.styled-textarea:active {
+    height: auto !important; /* Allow it to grow */
+}
+
+/* Focus Effect */
+.styled-input:focus,
+.styled-textarea:focus {
+    border-color: var(--ion-color-primary);
+    outline: none;
+}
+
+/* Edit Icon */
+#edit-icon {
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+

@@ -4,8 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import {IonicModule} from '@ionic/angular';
-import { AuthService } from '../auth.service';
-import { User } from '../models';
+import { AuthService } from '../services/auth.service';
 
 
 @Component({
@@ -26,6 +25,7 @@ export class PersonalinfoPage {
   hasDebt: boolean = false;
   debtAmount: number | null = 0;
   currentStep: number = 1;
+  redirecting = false;
   city ='';
   occupation ='';
 
@@ -125,13 +125,18 @@ export class PersonalinfoPage {
       savingsGoal: this.savingsGoal,
     };
   
-    try {
-      await this.authService.updateUserData(userId, userInfo);
-      this.router.navigate(["/tabs"]); // Navigate to the next page
-    } catch (error) {
-      console.error("Error updating user data:", error);
-      await this.showToast("Failed to save data. Please try again.");
-    }
+      this.authService.updateUserData(userId, userInfo).subscribe({
+        next: (user) => {
+          console.log("User data saved:", user);
+          this.router.navigate(["/tabs"]);
+        },
+        error: async(err) => {
+          console.error("Error updating user data:", err);
+          await this.showToast('<ion-icon name="warning-outline"></ion-icon> Failed to save data. Please try again.');
+        }
+      });
+  
+    
   }
   
 
@@ -156,7 +161,7 @@ export class PersonalinfoPage {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
-      position: 'bottom',
+      position: 'top',
       color: 'danger',
     });
     await toast.present();

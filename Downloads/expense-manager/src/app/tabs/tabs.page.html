@@ -1,33 +1,29 @@
-<ion-tabs>
+<ion-tabs #tabsContainer>
+  
+
   <ion-tab-bar slot="bottom">
-    <!-- Transactions Tab -->
     <ion-tab-button tab="transactions" href="/tabs/transactions">
       <ion-icon aria-hidden="true" name="card-outline"></ion-icon>
       <ion-label>Transactions</ion-label>
     </ion-tab-button>
 
-    <!-- Stats Tab -->
     <ion-tab-button tab="stats" href="/tabs/stats">
       <ion-icon aria-hidden="true" name="stats-chart-outline"></ion-icon>
       <ion-label>Stats</ion-label>
     </ion-tab-button>
 
-    <!-- Budgets Tab -->
     <ion-tab-button tab="budget" href="/tabs/budget">
       <ion-icon aria-hidden="true" name="wallet-outline"></ion-icon>
       <ion-label>Budgets</ion-label>
     </ion-tab-button>
 
-    <!-- Payments Tab -->
     <ion-tab-button tab="payments" href="/tabs/payments">
       <ion-icon aria-hidden="true" name="cash-outline"></ion-icon>
       <ion-label>Payments</ion-label>
     </ion-tab-button>
 
-    <!--Goals tab-->
     <ion-tab-button tab="goals" href="/tabs/goals">
-      <ion-icon aria-hidden="true" src="assets/goal.svg"
-      ></ion-icon>
+      <ion-icon aria-hidden="true" src="assets/goal.svg"></ion-icon>
       <ion-label>Goals</ion-label>
     </ion-tab-button>
   </ion-tab-bar>

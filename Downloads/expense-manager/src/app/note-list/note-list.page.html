@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Notes</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="addNote()">
+        <ion-icon name="add" class="icon-add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (!loading) {
+@if ((notes$ | async); as notes) {
+  @if (notes.length > 0) {
+  <ion-list>
+    @for (groupedObject of (groupNotesByDate(notes) | keyvalue); track $index) {
+      <ion-card class="note-card">
+        <ion-card-header>
+          <div id="title">
+          <ion-icon name="calendar-outline" class="icon-calendar"></ion-icon>
+          <ion-card-title>{{ groupedObject.key }}</ion-card-title>
+        </div>
+        </ion-card-header>
+
+        @for (note of groupedObject.value; track $index) {
+        <ion-card-content> 
+          <ion-item button (click)="openNoteDetail(note.id)" class="note-item" lines="none">
+            <div class="note">
+              <ion-title class="note-title">{{ note.title }}</ion-title>
+              <p class="note-content">{{ note.content }}</p>
+            </div>
+            <ion-button fill="clear" id="delete-btn" (click)="presentDeleteDialog(note); $event.stopPropagation()" >
+              <ion-icon name="trash" class="icon-delete" color="danger"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-card-content>
+        }
+      </ion-card>
+    }
+  
+  </ion-list>
+} @else {
+  <div class="no-data">
+    <ion-icon name="document-text-outline"></ion-icon>
+    No notes yet</div>
+
+}
+}
+  } @else {
+    <ion-spinner name="crescent" class="spinner"></ion-spinner>
+  }
+ 
+
+</ion-content>

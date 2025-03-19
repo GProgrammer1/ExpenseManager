@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="tabs/budget"></ion-back-button>
+    </ion-buttons>
     <ion-title>Add Budget</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -64,9 +67,6 @@
 
     <!-- Submit Button -->
     <ion-button expand="block" class="submit-button" (click)="add()">Submit</ion-button>
-    <ion-button expand="block"
-   class="cancel-button"
-  routerLink="/tabs/budget"
-  color="danger" >Cancel</ion-button>
+    
   </ion-grid>
 </ion-content>

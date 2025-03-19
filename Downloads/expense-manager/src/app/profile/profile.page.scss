@@ -7,13 +7,17 @@
   .profile-list {
     background: #ffffff;
     border-radius: 10px;
+  
+    gap: 20px;
   }
   
   .profile-item {
     display: flex;
     flex-direction: column;
     width: 100%;
+
     gap: 5px;
+    padding: 10px;
     margin-bottom: 10px;
   }
 
@@ -21,6 +25,19 @@
   --background: #007aff;
   color: white;
   }
+
+  #debt-icon {
+    font-size: 1.9rem;
+  }
+
+  #notes-btn {
+    background-color: white;
+    color: var(--ion-color-primary) ;
+    padding: 5px;
+    margin-left: 15px;
+  }
+
+  
   
 //   .data-grid {
 //     display: grid;
@@ -110,6 +127,18 @@
     flex-direction: row;
   }
 
+  .save-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-spinner{ 
+      position: relative;
+      left: 15px;
+      top: 18px;
+    }
+  }
+
   ion-row:last-child {
     border-bottom: none;
   }
@@ -119,10 +148,13 @@
     position: fixed;
     top: 50%;
     left: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     transform: translate(-50%, -50%);
     text-align: center;
     background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
+    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
@@ -135,6 +167,33 @@
     animation: fadeInSlideDown 0.6s ease-out forwards;
   }
   
+  #logout-btn {
+    background-color: white;
+    color: var(--ion-color-primary);
+    padding: 5px;
+  }
+
+  #label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #age-range-icon {
+    font-size: 2.2rem;
+  }
+
+  .icon {
+    font-size: 1.7rem;
+  }
+
+  #logout-icon {
+    color: var(--ion-color-primary);
+  }
+
+  #savings-goal-icon {
+    font-size: 2.2rem;
+  }
   @keyframes fadeInSlideDown {
     from {
       opacity: 0;

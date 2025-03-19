@@ -24,8 +24,8 @@
         @else {
           <ion-spinner name="crescent" color="black" class="button-spinner"></ion-spinner>
           Generating...
-        }</ion-button>
-
+        }
+      </ion-button>
   </div>
   </ion-toolbar>
 </ion-header>
@@ -35,9 +35,12 @@
   @if (response) {
   <div class="advice-popup">
     <div class="popup-content">
+      <div class="popup-header">
+      <ion-title id="report-title">Result</ion-title>
+    </div>
       <ion-icon name="close" id="close-icon" color="danger" (click)="closePopup()"></ion-icon>
       After analyzing your financial and personal information, this is what your budget should look like: 
-      <ion-grid>
+      <ion-grid >
         <ion-row class="header-row">
           <ion-col class="header-cell">Category</ion-col>
           <ion-col class="header-cell">Amount</ion-col>
@@ -65,20 +68,20 @@
     
     
     @if (!loading) {
-    @if ((budget$ | async) ; as budgetInfo) {
-    <h2 id="budget-title">Monthly Budget: month {{budgetInfo.month}} of year {{selectedDate.getFullYear()}}</h2>
-    <ion-grid class="table">
+    @if ((filteredBudgets$ | async) ; as budget) {
+    <h2 id="budget-title">Monthly Budget: month {{currentMonth.value + 1}} of year {{selectedDate.getFullYear()}}</h2>
+    <ion-grid class="table" [ngClass]="{'glow-effect': setBudget.shouldGlow, 'no-glow': !setBudget.shouldGlow}" #budgetTable>
       <ion-row class="header-row">
         <ion-col class="header-cell">Category</ion-col>
         <ion-col class="header-cell">Amount</ion-col>
       </ion-row>
-      <ion-row *ngFor="let spending of (budgetInfo.budget.spendings | keyvalue)" class="data-row">
+      <ion-row *ngFor="let spending of (budget.spendings | keyvalue)" class="data-row">
         <ion-col class="data-cell">{{ spending.key }}</ion-col>
         <ion-col class="data-cell">{{ spending.value | currency : 'USD' : 'symbol' : '1.2-2' : 'en' }}</ion-col>
       </ion-row>
       <ion-row class="total-row">
         <ion-col class="data-cell"><strong>Total</strong></ion-col>
-        <ion-col class="data-cell"><strong>{{ budgetInfo.budget.totalBudget| currency }}</strong></ion-col>
+        <ion-col class="data-cell"><strong>{{ budget.totalBudget| currency }}</strong></ion-col>
       </ion-row>
     </ion-grid>
     } @else {
@@ -92,23 +95,24 @@
   @if (!loading) {
     
   
-    @if ((currentBudgetSingle$ | async) ; as currentBudget) {
-      @if (currentPair.budget) {
+    @if ((filteredCurrentBudget$ | async) ; as currentBudget) {
+      @if ((currentBudget.spendings | keyvalue).length > 0) {
       <ion-item-divider class="budget-divider">
         <ion-label id="budget-usage">Budget Usage</ion-label>
         <div class="progress-container">
           <div class="progress-bar">
+          
             <div 
               class="progress-fill" 
-              [ngStyle]="{'background-color': getBudgetColor()}"
-              [style.width.%]= "(setBudget.totalBudget ? (currentPair.budget.totalBudget/ setBudget.totalBudget)* 100 : 0)">
+              [ngStyle]="{'background-color': getBudgetColor(currentBudget)}"
+              [style.width.%]= "(setBudget.totalBudget ? (currentBudget.totalBudget/ setBudget.totalBudget)* 100 : 0)">
             </div>
           </div>
           
         </div>
         <p class="progress-text">
-          <strong [ngStyle]="{'color': getBudgetColor()}">
-            {{ getFormattedPercentage() | percent }}
+          <strong [ngStyle]="{'color': getBudgetColor(currentBudget)}">
+            {{ toScientificNotation(getFormattedPercentage(currentBudget)) | number:'1.2-2'}}%
           </strong>
          </p>
       </ion-item-divider>
@@ -118,26 +122,32 @@
           <ion-col class="header-cell"><strong>Amount</strong></ion-col>
         </ion-row>
     
-        <ion-row *ngFor="let spending of (currentPair.budget.spendings| keyvalue)" class="data-row">
+        <ion-row *ngFor="let spending of (currentBudget.spendings| keyvalue)" class="data-row">
           <ion-col class="data-cell"
-          [ngStyle]="{'color': getSpendingColor(spending.key, spending.value)}">
+          [ngStyle]="{'color': getSpendingColor(spending.key, spending.value, currentBudget)}">
           {{ spending.key }}
         </ion-col>
-          <ion-col class="data-cell"
-          >{{ spending.value | currency: 'USD' : 'symbol' : '1.2-2' : 'en'  }}</ion-col>
+          <ion-col class="data-cell" [ngStyle]="{'color': getSpendingColor(spending.key, spending.value, currentBudget)}"
+         
+          >
+          {{ toScientificNotation(spending.value)|currency }}</ion-col>
+       
         </ion-row>
         <ion-row class="total-row"
         [ngClass]="
-        {'deficit-total': currentPair.budget.totalBudget < setBudget.totalBudget,
-        'surplus-total': currentPair.budget.totalBudget > setBudget.totalBudget}">
+        {'deficit-total': currentBudget.totalBudget < setBudget.totalBudget,
+        'surplus-total': currentBudget.totalBudget > setBudget.totalBudget}">
           <ion-col class="data-cell"><strong>Total</strong></ion-col>
-          <ion-col class="data-cell"><strong>{{ currentPair.budget.totalBudget| currency }}</strong></ion-col>
+          <ion-col class="data-cell"><strong>{{ (currentBudget.totalBudget)|currency }}</strong></ion-col>
         </ion-row>
       </ion-grid>
     }@else {
-      <div class="no-data">No current data available</div>
+      <div class="no-data current">No current data available</div>
       }
-      } 
+      
+      } @else {
+      <div class="no-data current">No current data available</div>
+      }
     } @else {
     <ion-spinner name="crescent" id="spinner"></ion-spinner>
     }

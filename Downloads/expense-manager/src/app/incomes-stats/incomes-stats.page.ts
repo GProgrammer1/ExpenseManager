@@ -1,239 +1,6 @@
-// import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { IonContent, IonHeader, IonTitle, IonToolbar, IonLabel, IonSpinner, IonIcon } from '@ionic/angular/standalone';
-// import { FirestoreService } from '../firestore.service';
-// import { ActivatedRoute } from '@angular/router';
-// import { Chart, PieController } from 'chart.js';
-// import { Observable } from 'rxjs';
-// import { BudgetService } from '../budget.service';
-// import {ViewWillLeave} from '@ionic/angular';
-// import { user } from '@angular/fire/auth';
-
-
-// Chart.register(PieController);
-// @Component({
-//   selector: 'app-incomes-stats',
-//   templateUrl: './incomes-stats.page.html',
-//   styleUrls: ['./incomes-stats.page.scss'],
-//   standalone: true,
-//   imports: [IonIcon,  IonLabel, IonContent, IonTitle, IonSpinner,  CommonModule, FormsModule]
-// })
-// export class IncomesStatsPage implements OnInit,AfterViewInit, OnDestroy {
-
-//     data: Record<string, number> = {};
-//     noData: boolean = false;
-//     loading: boolean = true;
-//     labels: string[] = [];
-//     selectedMonth$!: Observable<number>;
-//     selectedMonth: number = new Date().getMonth();
-//     changedBudget$!: Observable<'Expense' | 'Income' | null>;
-//     incomePercentages!: {category: string, percentage: number}[] ;
-//     @ViewChild('myChart2') myChartComponent: any;
-//     public myChart2: any;
-  
-//     constructor(private firestoreService: FirestoreService, private route: ActivatedRoute,
-//       private budgetService: BudgetService
-//     ) {
-//       this.changedBudget$ = budgetService.changedBudget$;
-//       this.selectedMonth$ = firestoreService.month$; 
-//       this.selectedMonth$.subscribe(month => {
-//         if (this.myChart2) {
-//           this.myChart2.destroy();
-//           this.myChart2 = null;
-//         }
-//       this.selectedMonth = month;
-//       this.createChart();
-//       });
-      
-//       this.changedBudget$.subscribe(type => {
-//         (async() => {
-//           const userId= localStorage.getItem('userId');
-//           this.data = await this.firestoreService.getIncomeData(userId!, this.selectedMonth);
-          
-//           this.updateChart();
-        
-//           });
-        
-//     });
-
-//     }
-
-//     updateChart() {
-      
-//       if (Object.keys(this.data).length === 0) {
-//         this.noData = true;
-//         this.loading = false;
-//         return;
-//       }
-      
-//       let arrayData = []; 
-//       let total = 0;
-//       arrayData = this.labels.map((label) => {
-//         const value = this.data[label] || 0;
-//         total += value;
-//         return value;
-//       });
-  
-//       console.log("Array Data: ", arrayData);
-//       this.incomePercentages = arrayData.map((value, index) => {
-//         return {
-//           category: this.labels[index],
-//           percentage: (value / total)
-//         };
-//       });
-
-//       console.log("My chart2 in updatechart is; ", this.myChart2);
-      
-//       if (this.myChart2){
-//         this.myChart2.data.datasets[0].data = arrayData;
-//         this.myChart2.update();
-//         console.log("My chart2 updated: ", this.myChart2);
-        
-//       }
-//     }
-    
-  
-//     ngOnInit() {
-//       // this.firestoreService.currentTabSubject.next('Incomes');
-//       // this.firestoreService.currentTab$.subscribe(tab => {
-//       //   if (tab === 'Incomes') {
-//       //     this.createChart();
-//       //   }
-//       //   else {
-//       //     if (this.myChart2) {
-//       //       this.myChart2.destroy();
-//       //       this.myChart2 = null;
-//       //     }
-//       //   }
-//       // }
-//       // );
-//     }
-//     ngOnDestroy(): void {
-//       console.log("Destroying chart", this.myChart2);
-      
-//       if (this.myChart2) {
-//         this.myChart2.destroy();
-//         this.myChart2 = null;
-//       }
-//     }
-//     ngAfterViewInit(): void {
-//       // console.log("Create chart method called in ngAfterViewInit");
-//       // if (this.myChart2) {
-//       //   this.myChart2.destroy();
-//       //   this.myChart2 = null;
-//       // }
-//       // this.createChart();
-//       // this.firestoreService.currentTabSubject.next('Incomes');
-//     }
-
-
-//     ViewWillLeave() {
-//       if (this.myChart2) {
-//         this.myChart2.destroy();
-//         this.myChart2 = null;
-//       }
-//     }
-  
-//     async createChart() {
-//       this.loading = true;
-//       this.noData = false;
-  
-//       if (this.myChart2) {
-//         this.myChart2.destroy();
-//         this.myChart2 = null;
-//       }
-  
-//       const uid = localStorage.getItem('userId')!;
-//       this.labels = await this.firestoreService.getCategories('Income');
-//       this.data = await this.firestoreService.getIncomeData(uid, this.selectedMonth);
-  
-//       if (Object.keys(this.data).length === 0) {
-//         this.noData = true;
-//         this.loading = false;
-//         return;
-//       }
-      
-//       let arrayData = []; 
-//       let total = 0;
-//       arrayData = this.labels.map((label) => {
-//         const value = this.data[label] || 0;
-//         total += value;
-//         return value;
-//       });
-  
-//       console.log("Array Data: ", arrayData);
-//       this.incomePercentages = arrayData.map((value, index) => {
-//         return {
-//           category: this.labels[index],
-//           percentage: (value / total)
-//         };
-//       });
-  
-//       const options = {
-//         responsive: true,
-//         maintainAspectRatio: false,
-//         plugins: {
-//           tooltip: {
-//             callbacks: {
-//               // Format the tooltip label to include the '$' symbol
-//               label: function(tooltipItem: any) {
-//                 return '$' + tooltipItem.raw.toFixed(2); // Use toFixed to show two decimal places
-//               }
-//             }
-//           }
-//         }
-//       };
-  
-//       const chartData = {
-//         labels: this.labels,
-//         datasets: [{
-//           data: arrayData,
-//           backgroundColor: this.generateHexColors(this.labels.length)
-//         }]
-//       };
-//       console.log("My chart2 is: ", this.myChart2);
-      
-//       try {
-//         setTimeout(() => {
-//           this.myChart2 = new Chart('myChart2', {
-//           type: 'pie',
-//           data: chartData,
-//           options: options
-//         });
-//         console.log("My chart2 will be: ",this.myChart2);
-        
-//       },500);
-//     } catch (error) {
-//       // this.createChart();
-//     }
-    
-
-//       this.loading = false;
-  
-//     }
-  
-//     generateHexColors(n: number): string[] {
-//       const colors: string[] = [];
-      
-//       for (let i = 0; i < n; i++) {
-//         const hue = (i * 360) / n;  // Evenly distribute colors across the color wheel
-//         const saturation = 70;  // Keep saturation high for vibrancy
-//         const lightness = 50;   // Keep it in the middle to avoid too dark or too light colors
-    
-//         const hslColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-//         colors.push(hslColor);
-//       }
-    
-//       return colors;
-//     }
-    
-
-// }
 import {
   AfterViewInit,
   Component,
-  createComponent,
   ElementRef,
   OnDestroy,
   OnInit,
@@ -243,21 +10,24 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   ArcElement,
+  BarController,
+  BarElement,
   CategoryScale,
   Chart,
   DoughnutController,
   Legend,
   LinearScale,
   PieController,
-  registerables,
   Title,
   Tooltip,
 } from 'chart.js';
-import { FirestoreService } from '../firestore.service';
-import { ActivatedRoute } from '@angular/router';
-import { combineLatest, debounceTime, filter, Observable, tap } from 'rxjs';
-import { BudgetService } from '../budget.service';
+import { Observable, Subscription, combineLatest, debounceTime, defaultIfEmpty, of, switchMap, tap } from 'rxjs';
 import { IonicModule } from '@ionic/angular';
+import { BudgetService } from '../services/budget.service';
+import { IncomeService } from '../services/income.service';
+import { FirestoreService } from '../services/firestore.service';
+import { Income } from '../models';
+import { CategoryService } from '../services/category.service';
 
 Chart.register(
   ArcElement,
@@ -266,9 +36,12 @@ Chart.register(
   Title,
   CategoryScale,
   LinearScale,
-  DoughnutController,
-  PieController
+  PieController,
+  BarController,
+  BarElement,
+
 );
+
 @Component({
   selector: 'app-incomes-stats',
   templateUrl: './incomes-stats.page.html',
@@ -277,171 +50,188 @@ Chart.register(
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class IncomesStatsPage implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('chart') chart!: ElementRef<any>;
-  noData: boolean = false;
-  loading: boolean = true;
-  labels: string[] = [];
+  @ViewChild('chart') chart!: ElementRef;
+  noData = false;
+  loading = true;
+  labels = ['Salary', 'Investment', 'Gift', 'Other', 'Gig', 'Business'];
   selectedMonth$!: Observable<number>;
-  selectedMonth: number = new Date().getMonth();
-
-  changedBudget$!: Observable<'Expense' | 'Income' | null>;
-  incomePercentages!: { category: string; percentage: number }[];
-  public myChart2: any;
+  data: Record<string, number> = {};
+  incomePercentages: { category: string; percentage: number }[] = [];
+  chartType = 'pie';
+  income$!: Observable<Income[]>;
+  chartType$: Observable<string>;
+  chartSubscription!: Subscription;
+  private myChart: Chart | null = null;
 
   constructor(
+    private incomeService: IncomeService,
     private firestoreService: FirestoreService,
-    private route: ActivatedRoute,
-    private budgetService: BudgetService
   ) {
-    this.changedBudget$ = this.budgetService.changedBudget$;
     this.selectedMonth$ = this.firestoreService.month$;
+    this.chartType$ = this.firestoreService.chartType$;
+    this.chartType$.subscribe((chartType) => {
+      this.chartType = chartType;
+      this.createChart();
+    });
   }
 
-  ngOnInit() {
-    // this.createChart();
-  }
+  ngOnInit() {}
 
   ngAfterViewInit(): void {
-    combineLatest([
-      this.selectedMonth$.pipe(
-        tap((month: any) => {
-          this.selectedMonth = month;
-          console.log("Create chart method because of month change");
-          
-          this.createChart();
-        })
-      ),
-      this.changedBudget$.pipe(filter((type: any) => type === 'Income')),
-    ])
-      .pipe(
-        debounceTime(500) // reduce the number of calls - optional
-      )
-      .subscribe(() => {
-        this.createChart();
-      });
-  }
-  ngOnDestroy(): void {
-    if (this.myChart2) {
-      this.myChart2.destroy();
-      this.myChart2 = null;
-    }
+    this.chartSubscription =  this.selectedMonth$
+            .pipe(
+              switchMap((month) => {
+                this.loading = true;
+                return this.incomeService.incomes$.pipe(
+                  defaultIfEmpty([]),
+                  switchMap((incomes) => {
+                   return incomes.length > 0 ? of(incomes.filter((expense) => new Date(expense.date.seconds * 1000).getMonth() === month))
+                     : this.incomeService.fetchIncomes(localStorage.getItem('userId')!, month) as Observable<Income[]>
+                  })
+                
+                )})
+              ,
+              tap((expenses) =>  this.processIncomes(expenses)),
+              debounceTime(500)
+            )
+            .subscribe();
   }
 
-  async createChart() {
-    this.incomePercentages = [];
-    this.loading = true;
-    this.noData = false;
+  private processIncomes(incomes: Income[]): void {
+    this.noData = incomes.length === 0;
+    this.data = this.labels.reduce((acc: {[category: string] : number}, label: any) => {
+      acc[label] =0;
+      return acc as Record<string, number>;
+    }, {});
+    ;
 
-    if (this.myChart2) {
-      this.myChart2.destroy();
-      this.myChart2 = null;
-    }
+    incomes.forEach((income) => {
+      this.data[income.category] += income.amount;
+    });
 
-    const uid = localStorage.getItem('userId')!;
-    this.labels = await this.firestoreService.getCategories('Income');
-    const data = await this.firestoreService.getIncomeData(
-      uid,
-      this.selectedMonth
-    );
-
-    if (Object.keys(data).length === 0) {
-      this.labels.forEach((label) => {
-        this.incomePercentages.push({
-          category: label,
-          percentage: 0,
-        });
-
-      })      
+    const total = Object.values(this.data).reduce((sum, value) => sum + value, 0);
+    if (total === 0) {
       this.noData = true;
+      return;
+    }
+    this.incomePercentages = this.labels.map((label) => ({
+      category: label,
+      percentage: this.data[label] / total,
+    }));
+
+    if (this.myChart) {
+      this.updateChart(this.myChart, Object.values(this.data));
+      return;
+    }
+    this.createChart();
+  }
+
+ updateChart(chart: Chart, newData: number[]) {
+    console.log("New data: ", newData);
+    
+    chart.data.datasets[0].data = newData;
+    chart.data.datasets[0].backgroundColor = this.generateHexColors(this.labels.length);
+    chart.update('none');
+    this.loading = false;
+  }
+  
+  private createChart(): void {
+    if (this.myChart) this.myChart.destroy();
+    this.noData = Object.values(this.data).every((value) => value === 0);
+
+    if (this.noData) {
+      this.incomePercentages = this.labels.map((label) => ({
+        category: label,
+        percentage: 0,
+      }));
       this.loading = false;
       return;
     }
-    let arrayData = [];
-    let total = 0;
-    arrayData = this.labels.map((label) => {
-      const value = data[label] || 0;
-      total += value;
-      return value;
-    });
 
-    console.log('Array Data: ', arrayData);
-    this.incomePercentages = arrayData.map((value, index) => {
-      return {
-        category: this.labels[index],
-        percentage: value / total,
-      };
-    });
+    const total = Object.values(this.data).reduce((sum, value) => sum + value, 0);
+    const arrayData = this.labels.map((label) => this.data[label] || 0);
 
-    console.log("Income percentages: ", this.incomePercentages);
-    
-    const options = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            // Format the tooltip label to include the '$' symbol
-            label: function (tooltipItem: any) {
-              console.log('Tooltip itemraw: ', tooltipItem.raw);
+    this.incomePercentages = arrayData.map((value, index) => ({
+      category: this.labels[index],
+      percentage: value / total,
+    }));
 
-              return '$' + tooltipItem.raw.toFixed(2); // Use toFixed to show two decimal places
+    if (this.chartType === 'bar') {
+      this.myChart = new Chart(this.chart.nativeElement, {
+        type: this.chartType as 'pie' | 'bar' | 'doughnut' | 'line',
+        data: {
+          labels: this.labels,
+          datasets: [
+            {
+              label: 'Expenses',
+              data: arrayData,
+              backgroundColor: this.generateHexColors(this.labels.length)
+            }
+          ],
+        },
+        options: {
+          scales: {
+            x: {
+              ticks: {
+                autoSkip: false,  // Ensures all labels are displayed
+              }
+            },
+            y: {
+              ticks: {
+                callback: function (value: string | number) {
+                  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+                  return `$${numValue >= 1e6 ? numValue.toExponential(2) : numValue.toLocaleString()}`;  // Adds a "$" sign to each y-axis value
+                }
+              },
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+         
+        },
+      });
+    } else {
+      this.myChart = new Chart(this.chart.nativeElement, {
+        type: this.chartType as 'pie' | 'bar' | 'doughnut' | 'line',
+        data: {
+          labels: this.labels,
+          datasets: [
+            {
+              data: arrayData,
+              backgroundColor: this.generateHexColors(this.labels.length),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: (tooltipItem) => {
+                  const value = tooltipItem.raw as number;
+                  return `$${value >= 1e6 ? value.toExponential(2) : value.toLocaleString()}`;
+                },
+              },
             },
           },
         },
-      },
-      layout: {
-        padding: {
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-        },
-      },
-    };
-
-    const chartData = {
-      labels: this.labels,
-      datasets: [
-        {
-          data: arrayData,
-          backgroundColor: this.generateHexColors(this.labels.length),
-        },
-      ],
-    };
-    this.myChart2 = new Chart(this.chart.nativeElement, {
-      type: 'pie',
-      data: chartData,
-      options: options,
-    });
+      });
+    }
     this.loading = false;
   }
 
-  generateHexColors(n: number): string[] {
-    const colors: string[] = [];
-  
-    for (let i = 0; i < n; i++) {
-      const hue = (i * 360) / n; // Spread colors evenly around the color wheel
-      const saturation = 75; // Keep colors vibrant
-      const lightness = 50; // Avoid colors that are too light or dark
-  
-      const hexColor = this.hslToHex(hue, saturation, lightness);
-      colors.push(hexColor);
-    }
-  
-    return colors;
+  private generateHexColors(count: number): string[] {
+    return Array.from({ length: count }, (_, i) => {
+      const hue = (i * (360 / count)) % 360; // Evenly spaced hues
+      const saturation = 80; // Higher saturation for vibrancy
+      const lightness = i % 2 === 0 ? 45 : 55; // Alternate lightness for better contrast
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    });
   }
   
-  // Helper function: Convert HSL to Hex
-  private hslToHex(h: number, s: number, l: number): string {
-    s /= 100;
-    l /= 100;
-  
-    const k = (n: number) => (n + h / 30) % 12;
-    const a = s * Math.min(l, 1 - l);
-    const f = (n: number) =>
-      Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))));
-  
-    return `#${f(0).toString(16).padStart(2, '0')}${f(8).toString(16).padStart(2, '0')}${f(4).toString(16).padStart(2, '0')}`;
+
+  ngOnDestroy(): void {
+    this.myChart?.destroy();
   }
-  
 }

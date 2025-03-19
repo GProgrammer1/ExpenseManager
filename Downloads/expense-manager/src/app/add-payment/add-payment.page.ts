@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import {IonicModule} from '@ionic/angular';
 import { Payment } from '../models';
 import { Timestamp } from 'firebase/firestore';
-import { PaymentService } from '../payment.service';
+import { PaymentService } from '../services/payment.service';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
@@ -13,14 +11,14 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './add-payment.page.html',
   styleUrls: ['./add-payment.page.scss'],
   standalone: true,
-  imports: [IonicModule, FormsModule, RouterLink]
+  imports: [IonicModule, FormsModule]
 })
 export class AddPaymentPage implements OnInit {
 
   description: string = '';
   amount: number | null = null;
-  selectedDate: string = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().toLocaleLowerCase().split('t')[0];
-  tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().toLocaleLowerCase().split('t')[0];
+  selectedDate: string = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString();
+  tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString();
   constructor(private paymentService: PaymentService, private router: Router) { }
 
   ngOnInit() {
@@ -55,8 +53,17 @@ export class AddPaymentPage implements OnInit {
 
     console.log('Payment:', payment
     );
-    this.paymentService.addPayment(payment, userId!);
-    this.router.navigate(['/tabs/payments']);
+    this.paymentService.addPayment(payment, userId!).subscribe({
+      next: (res) => {
+        console.log('Payment added:', res.payment);
+        this.paymentService.paymentSubject.next([...this.paymentService.paymentSubject.value, res.payment]);
+        this.router.navigate(['/tabs/payments']);
+
+      },
+      error: (err) => {
+        console.error('Error adding payment:', err);
+      }
+    });
 
   }
 }

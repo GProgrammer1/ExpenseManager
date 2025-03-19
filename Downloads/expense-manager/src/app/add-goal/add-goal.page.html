@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/goals"></ion-back-button>
+    </ion-buttons>
     <ion-title>Add Goal</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -13,13 +16,16 @@
 
   <!-- Description -->
   <ion-item>
-    <ion-label position="floating" class="form-label">Description</ion-label>
+    <ion-label position="floating" class="form-label" id="desc-label">Description
+    </ion-label>
+    <ion-note id="note">Please quantify your goals as much as possible and provide details so we can give you more personalized advice later on</ion-note>
+
     <ion-textarea placeholder="Enter goal description" [(ngModel)]="description"></ion-textarea>
   </ion-item>
 
   <ion-item>
     <ion-label position="floating" class="form-label">Goal Amount</ion-label>
-    <ion-input type="number" placeholder="Enter end-goal target amount" [(ngModel)]="targetAmount"></ion-input>
+    <ion-input type="number" placeholder="Enter goal target amount" [(ngModel)]="targetAmount"></ion-input>
   </ion-item>
   <!-- Goal Type (Radio Buttons) -->
   <ion-item>
@@ -40,9 +46,21 @@
     </ion-item>
   </ion-list>
 
+  <ion-item>
+    <ion-label class="form-label" position="floating">Deadline</ion-label>
+    <ion-datetime display-format="MMM DD, YYYY" [(ngModel)]="deadline" [min]="today"></ion-datetime>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="form-label" position="floating">Priority</ion-label>
+    <ion-select placeholder="Select priority" [(ngModel)]="priority" interface="popover">
+      <ion-select-option value="Low">Low</ion-select-option>
+      <ion-select-option value="Medium">Medium</ion-select-option>
+      <ion-select-option value="High">High</ion-select-option>
+    </ion-select>
+  </ion-item>
   
 
   <!-- Add & Cancel Buttons -->
   <ion-button expand="block" class="submit-button" (click)="addGoal()">Add Goal</ion-button>
-  <ion-button expand="block" class="cancel-button" routerLink="/tabs/goals" color="danger">Cancel</ion-button>
 </ion-content>

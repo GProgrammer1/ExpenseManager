@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/payments"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Debt Planner</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form (ngSubmit)="generatePlan()" #debtForm="ngForm">
+    <ion-list>
+      <ion-item>
+        <ion-label position="floating">Debt Title</ion-label>
+        <ion-input type="text" [(ngModel)]="debt.title" name="title" required placeholder="Enter debt title"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <div id="interest-rate">
+        <ion-label >Interest Rate (%)</ion-label>
+        <ion-range [(ngModel)]="debt.interestRate" name="interestRate" min="0" max="100" step="1" snaps="true">
+          <ion-label slot="start">0%</ion-label>
+          <ion-label slot="end">100%</ion-label>
+        </ion-range>
+
+        <ion-label>Value: {{ debt.interestRate }}%</ion-label>
+      </div>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Amount Owed</ion-label>
+        <ion-input type="number" [(ngModel)]="debt.amountOwed" name="amountOwed" required placeholder="Enter amount required by the debt"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Due Date</ion-label>
+        <ion-datetime [(ngModel)]="debt.dueDate" name="dueDate" displayFormat="MM/DD/YYYY"
+         required
+         [min]="today"></ion-datetime>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="full" type="submit" [disabled]="!debtForm.form.valid || generatingPlan">
+      @if (!generatingPlan) {
+      Generate Plan
+      }
+      @else {
+      Generating Plan...
+      }
+    </ion-button>
+  </form>
+
+  <ion-card *ngIf="repaymentPlan" #debtPlan>
+    <ion-card-header>
+      <div id="card-header">
+      <ion-card-title id="card-title">Generated Repayment Plan</ion-card-title>
+      <ion-fab horizontal="end" slot="fixed"  >
+        <ion-fab-button id="add-note"(click)="presentAddNoteDialog()" >
+        <ion-icon [src]="'assets/note.svg'" id="note-img"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Plan Summary:</strong></p>
+      <div [innerHTML]="repaymentPlan"></div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

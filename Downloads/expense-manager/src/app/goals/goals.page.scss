@@ -1,369 +1,8 @@
 .page-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
-  }
-  
-  .no-goals-text {
-    font-size: 1rem;
-    text-align: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-  }
-  
-  ion-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  // ion-item {
-  //   display: flex;
-  //   flex-direction: column;
-  //   align-items: flex-start;
-  //   padding: 12px;
-  //   border-radius: 12px;
-  //   background: var(--ion-color-light);
-  //   margin-bottom: 10px;
-  // }
-  
-
-
-  .goal-category {
-    max-width: 70%;
-    text-wrap: normal;
-    line-height: 1.5;
-    color: #666;
-  }
-  .goal-icon {
-    font-size: 1.5rem;
-    color: var(--ion-color-primary);
-    cursor: pointer;
-    // position: relative;
-    // bottom: 18px;
-    // right: 8px;
-  }
-  
-  .goal-description {
-    margin-top: 4px;
-    font-size: 0.9rem;
-  }
-  
-  ion-button {
-    margin-top: 10px;
-    align-self: flex-start;
-  }
-
-  .custom-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
-    backdrop-filter: blur(8px); /* Blurs background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-  }
-  
-  .popup-content {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 75vh;
-    overflow-y: auto;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    text-align: left;
-    font-family: "Arial", sans-serif;
-  }
-  
-  .popup-header {
-    font-size: 1.4rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 12px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-  }
-  
-  .popup-section {
-    margin-bottom: 15px;
-  }
-  
-  .popup-section h4 {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .popup-section p {
-    font-size: 0.95rem;
-    color: #333;
-    line-height: 1.5;
-  }
-  
-  .popup-footer {
-    text-align: center;
-    margin-top: 15px;
-  }
-  
-  ion-button {
-    --background: #007bff;
-    --color: white;
-    font-weight: bold;
-    padding: 8px 16px;
-    border-radius: 6px;
-  }
-
-  ion-header, ion-toolbar{ 
-    --background: #007aff;
-    color: white;
-  }
-  
-  ion-button:hover {
-    --background: #0056b3;
-  }
-
-  .toolbar-content {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: flex-start;
-    width: 100%;
-    padding-left: 0.7rem;
-    ion-title {
-      padding-left: 0 !important;
-    }
-  }
-
-@media screen and (max-width: 700px) {
-  #ai-btns {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    position: relative;
-    top: 10px;
-    width: 100%;
-  }
-
-  #top-layer {
-    display: flex;
-  }
-
-  #description {
-    // width: 100%;
-    align-items:center;
-    border: 1px solid black;
-    border-radius: 8px;
-    justify-content: space-between;
-    padding: 8px;
-    
-    ion-icon { 
-      justify-self: flex-end !important;
-      color: var(--ion-color-primary);
-    }
-
-    &:focus {
-      // border: none !important;
-      outline: none !important; /* Removes the default orange focus border */
-      border-width: 2px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
-      // -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
-    }
-
-  }
-  
-  
-}
-
-@media screen and (min-width: 700px) {
- 
- .custom-item > *{
-  width: 33%;
- }
-#top-layer {
-  display: flex;
-  align-items: center;
-  // width: 100%;
-  gap:6px;
-  font-size: 1.6rem;
-}
-
-#description {
-  width: 100%;
-  display: flex;
-  margin-top: 8px;
-  align-items:center;
-  gap: 4px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  justify-content: space-between;
-  padding: 8px;
-  margin-top: 20px;
-  
-  ion-icon { 
-    justify-self: flex-end !important;
-    color: var(--ion-color-primary);
-  }
-
-}
-#ai-btns {
-  display: flex;
-  align-items: flex-start ;
-  justify-content: flex-end;
-  width: 100%;
-}
-}
-.response {
-  line-height: 1.5;
-}
-.response {
-  white-space: pre-wrap;
-}
-.delete-icon ion-icon {
-  font-size: 1.8rem;
-  color: var(--ion-color-danger);
-  cursor: pointer;
-}
-
-.edit-icon{
-  font-size: 1.6rem;
-  position: absolute;
-  right: 30px;
-  top: 5px;
-&.active::after {
-  content: "Edit";
-  display: block;
-  width: 100%;
-  height: 4px; /* Adjust thickness */
-  background-color: var(--ion-color-primary) !important;
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.6); /* Darker and more intense shadow */
-  transform: scaleX(9);
-  position: absolute;
-  bottom: -2px; /* Adjust spacing */
-  left: 0;
-  // transform: scaleX(1); /* Full width */
-  // transition: transform 0.2s ease-in-out; /* Smooth animation */
-  // box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.6); /* Darker and more intense shadow */
-}
-}
-
-
-/* Mobile styles */
-
-/* Desktop styles */
-@media screen and (min-width: 700px) {
-  .custom-item {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 12px;
-    border-radius: 12px;
-    background: var(--ion-color-light);
-    margin-bottom: 10px;
-    width: 100%;
-    
-    /* Soft border with shadow */
-    border: 1px solid rgba(0, 0, 0, 0.08); /* Light gray, almost invisible */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow like `.payment-item` */
-  }
-  
-
-  .custom-item > * {
-    width: 33%;
-  }
-}
-
-
-
-
-#top-layer {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.goal-icon {
-  font-size: 18px; /* Reduce icon size */
-}
-
-.goal-name {
-  font-size: 16px; /* Smaller font for better fit */
-  font-weight: 600;
-}
-
-#description {
-  font-size: 12px; /* Reduce text size */
-}
-
-
-
-ion-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
   align-items: center;
-
-  ion-item {
-    width: 100% !important;
-  }
-}
-
-ion-button {
-  font-size: 12px; /* Smaller button text */
-  padding: 4px 8px; /* Reduce button size */
-}
-
-
-
-.close-icon {
-  position: absolute;
-  top: 95px;
-  right: 40px;
-  color: red;
-}
-
-.delete-icon {
- font-size: x-large;
-}
-
-#goal-title {
-  display: flex;
-  gap: 0.4rem;
-}
-
-#top-layer {
-  display: flex;
-  align-items: center; /* Vertically center items */
-  justify-content: space-between; /* Space out items */
-  gap: 6px; /* Add gap between items */
-}
-.custom-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  width: 100%;
-  border: 1px solid black;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* More subtle shadow */
-}
-.spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  padding: 16px;
 }
 
 .no-goals-text {
@@ -379,21 +18,328 @@ ion-button {
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 
-#progress-container {
+.close-icon {
+  position: absolute;
+  right: 40px;
+  top: 100px;
+  
+}
+#add-note {
+  --box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+  --border-width: 0px;    
+  --background: white;
+  position: absolute;
+  left: 12%;
+  top: 12%;
+  width: 18%;
+  height: 7%;
+  
+}
+
+
+#note-img {
+  color: var(--ion-color-primary);
+  font-size: 100px;
+  
+}
+
+#add-note-btn {
+  position: absolute;
+  left: 12%;
+  top: 13%;
+}
+
+ion-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.goal-category {
+  max-width: 70%;
+  line-height: 1.5;
+  color: #666;
+}
+
+.goal-name {
+  font-weight: bolder;
+  font-size: 1.1rem;
+  text-wrap: none;
+}
+.goal-icon {
+  font-size: 1.5rem;
+  fill: black !important;
+  cursor: pointer;
+}
+
+.goal-description {
+  margin-top: 4px;
+  
+  font-size: 0.9rem;
+}
+
+#title {
+  display: flex;
+  width: 100%;
+  gap: 5px;
+}
+
+#goal-title {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+#date-div {
+  display: flex;
+
+}
+ion-button {
+  margin-top: 10px;
+  align-self: flex-start;
+  font-size: 12px;
+  padding: 4px 8px;
+  --background: #007bff;
+  --color: white;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+ion-item {
+  width: 100% !important;
+}
+
+ion-button:hover {
+  --background: #0056b3;
+}
+
+ion-header, ion-toolbar {
+  --background: #007aff;
+  color: white;
+}
+
+.toolbar-content {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding-left: 0.7rem;
+}
 
-  ion-label {
-    font-weight: bolder;
-    color: black;
+.custom-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.deadline-icon {
+  margin-right: 4px;
+}
+
+
+
+#advise-button {
+  align-self: flex-end;
+}
+
+#editing-bar {
+  display: flex;
+}
+
+ion-select{
+  --background: #ffffff; /* White background */
+  --color: #343a40; /* Dark text for contrast */
+  --placeholder-color: #6c757d; /* Subtle placeholder color */
+  --border-radius: 8px; /* Rounded corners */
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --height: 15px; /* Adjust height for better touchability */
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+  font-size: 1rem;
+  margin-right: 3px ;
+  position: relative;
+  height: 10px;
+  top: 3px;
+  width: 30%;
+  }
+  
+  #filter-label {
+    position: relative;
+    top: 5px;
+  }
+  
+  /* Enhance the appearance when focused */
+  ion-select:focus {
+  --border-color: #007aff; /* Highlight with primary color */
+  --box-shadow: 0 0 8px rgba(0, 122, 255, 0.5);
+  }
+  
+  /* Add hover effect */
+  ion-select:hover {
+  --background: #f8f9fa; /* Light gray hover background */
+  }
+  
+  /* Style the dropdown (popover) */
+  ion-select::part(icon) {
+  color: #007aff; /* Color of the dropdown arrow */
+  font-size: 1.2rem;
+  }
+  
+  ion-select::part(text) {
+  font-weight: 500;
+  font-size: small;
+  color: black;
+  }
+  
+  #deadline {
+    justify-self: flex-end;
+    font-size: small;
+  }
+
+.popup-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 75vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  font-family: "Arial", sans-serif;
+}
+
+.popup-header {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.popup-footer {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.response {
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.delete-icon ion-icon, .edit-icon {
+  font-size: 1.8rem;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.edit-icon {
+  position: absolute;
+  right: 30px;
+  top: 5px;
+}
+
+.edit-icon.active::after {
+  content: "Edit";
+  display: block;
+  width: 100%;
+  height: 4px;
+  background-color: var(--ion-color-primary);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.6);
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+}
+
+.spinner {
+  position: absolute;
+  left: 50%;
+  top:50%;
+}
+
+
+@media screen and (max-width: 700px) {
+  #ai-btns {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    width: 100%;
+  }
+
+  #top-layer {
+    display: flex;
+  }
+
+  #description {
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    justify-content: space-between;
+    padding: 8px;
   }
 }
 
-.progress-icon {
-   margin-right: 5px;
+@media screen and (min-width: 700px) {
+  .custom-item > * {
+    width: 33%;
+  }
+
+  #top-layer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.6rem;
+  }
 }
 
+#delete-btn {
+  position: absolute;
+  right: 0;
+  
+}
 
+#delete-icon {
+  font-size: 1.5rem;
+}
 
+.goal-card{ 
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  // box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  width: 100%;
+  max-width: 400px;
+}
+
+#page-title {
+  position: relative;
+  right: 20px;
+}
+
+#editing-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

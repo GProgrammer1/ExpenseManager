@@ -1,19 +1,14 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { ArcElement, CategoryScale, Chart, DoughnutController, Legend, LinearScale, PieController, Title, Tooltip } from 'chart.js';
-import { FirestoreService } from '../firestore.service';
-import { AuthService } from '../auth.service';
-import { loadBundle } from 'firebase/firestore';
+import { FirestoreService } from '../services/firestore.service';
+import { AuthService } from '../services/auth.service';
 import { IonicModule } from '@ionic/angular';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatOptionModule, MatOptionSelectionChange } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
-import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 Chart.register(ArcElement, Tooltip, Legend, Title, CategoryScale, LinearScale, DoughnutController, PieController);
 
 @Component({
@@ -21,8 +16,8 @@ Chart.register(ArcElement, Tooltip, Legend, Title, CategoryScale, LinearScale, D
   templateUrl: './stats.page.html',
   styleUrls: ['./stats.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, MatFormFieldModule, MatOptionModule,
-    MatSelectModule, RouterLink
+  imports: [IonicModule, CommonModule, FormsModule,
+   RouterLink
   ]
 })
 export class StatsPage implements OnInit {
@@ -40,17 +35,19 @@ export class StatsPage implements OnInit {
   labels: any;
   expensePercentages: any;
   incomePercentages: any;
+  chartType: 'pie' | 'bar' = 'pie';
 
   ngOnInit() {
    
-    this.router.navigate([`/tabs/stats/expenses/${this.currentMonth.value}`]);
+    this.router.navigate([`/tabs/stats/expenses/${this.currentMonth.value + 1}`]);
   }
 
+  chartType$ : Observable<string> = this.firestoreService.chartType$;
 
   constructor(private firestoreService: FirestoreService, private authService : AuthService,
     private router: Router
   ) {
-    addIcons({chevronBackOutline, chevronForwardOutline})
+    
   }
 
   currentDate: Date = new Date();
@@ -89,6 +86,10 @@ export class StatsPage implements OnInit {
     }
 
     this.onMonthChange(this.currentMonth.value);
+  }
+
+  changeChartType(chartType: string): void {
+    this.firestoreService.changeChartType(chartType);
   }
 
   onMonthChange(selectedMonth: number): void {

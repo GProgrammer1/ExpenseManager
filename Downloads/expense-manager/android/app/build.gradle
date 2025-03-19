@@ -38,11 +38,14 @@ repositories {
 }
 
 dependencies {
-  implementation platform('com.google.firebase:firebase-bom:33.9.0')
+  implementation platform('com.google.firebase:firebase-bom:33.10.0')
   implementation 'androidx.appcompat:appcompat:1.7.0'  // or the latest version
   implementation 'com.google.firebase:firebase-installations:18.0.0' // 🔥 Add this if missing!
-
+  implementation 'com.airbnb.android:lottie:5.2.0'
+  implementation 'androidx.core:core-splashscreen:1.0.1'
   implementation 'com.google.firebase:firebase-firestore:25.1.2'  // Check for the latest version
+  implementation 'com.google.android.material:material:1.12.0' // Use the latest version
+  implementation "androidx.core:core-splashscreen:1.0.1"
 //  implementation "androidx.navigation:navigation-fragment:2.8.5"
 //  implementation "androidx.navigation:navigation-ui:2.8.5"
 

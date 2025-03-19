@@ -2,20 +2,26 @@
   <div class="login-container">
     <ion-card class="login-card">
       <ion-card-header>
-        <ion-card-title>Expense Manager</ion-card-title>
+        <ion-card-title>Login</ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
         <!-- Email Input -->
         <ion-item>
           <ion-label position="floating">Email</ion-label>
-          <ion-input [(ngModel)]="email" type="email" required></ion-input>
+          <ion-input [(ngModel)]="email" type="email" required ></ion-input>
         </ion-item>
 
         <!-- Password Input -->
         <ion-item>
           <ion-label position="floating">Password</ion-label>
-          <ion-input [(ngModel)]="password" type="password" required></ion-input>
+          <ion-input [(ngModel)]="password" [type]="passwordType" required ></ion-input>
+          <ion-icon
+            slot="end"
+            
+            [name]="passwordType === 'password' ? 'eye-off' : 'eye'"
+            (click)="togglePasswordVisibility()"
+          ></ion-icon>
         </ion-item>
 
         <!-- Login Button -->
@@ -28,4 +34,14 @@
       </ion-card-content>
     </ion-card>
   </div>
+
+  @if (redirecting) {
+    <div id="full-container">
+      <div id="redirect-box">
+        <ion-spinner name="crescent"></ion-spinner>
+        <ion-text id="redirect-text">Redirecting...</ion-text>
+      </div>
+    </div>
+  }
+  
 </ion-content>

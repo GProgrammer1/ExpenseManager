@@ -5,3 +5,23 @@ ion-label {
 ion-searchbar {
     width: 105%
 }
+
+#minus-icon {
+    position: relative;
+    top: 10px;
+    font-size: 1.5rem;
+}
+
+#debt-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#question {
+    display: flex;
+    margin-top: 20px;
+}
+
+ion-card{
+    margin: 20px;
+}
