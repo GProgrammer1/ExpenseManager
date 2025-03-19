@@ -50,14 +50,10 @@ export class GoalsPage implements OnInit {
     
     this.goals$ = combineLatest([this.goalsService.goals$, this.filterCriteria$]).pipe(
       map(([goals, filter]) => {
-        console.log("Mapping goals...");
-        
         switch (filter) {
           case 'Priority':
             return goals.sort((a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority));
           case 'Deadline':
-            console.log(goals.sort((a: Goal, b: Goal) => new Date(a.deadline.seconds *1000).getTime() - new Date(b.deadline.seconds * 1000).getTime()));
-            
             return goals.sort((a: Goal, b: Goal) => new Date(a.deadline.seconds *1000).getTime() - new Date(b.deadline.seconds * 1000).getTime());
           default:
             return goals;
@@ -68,16 +64,9 @@ export class GoalsPage implements OnInit {
    }
 
    changeFilter(event: any) {
-    console.log("Method triggered ot change fuiltet");
-    
     this.filter = event.detail.value;
-    console.log("Filter: ", this.filter);
-    
     this.filterCriteriaSubject.next(this.filter);
   }
-
-   
-
 
    toDate(deadline: {seconds: number, nanoseconds: number}) {
     return this.formatDate(new Date(deadline.seconds * 1000));
@@ -105,34 +94,24 @@ export class GoalsPage implements OnInit {
   }
 
   ngOnInit() {
-    
     this.loading = true;
     const userId = localStorage.getItem('userId');
-    console.log("User id: ", userId);
-    
     this.goalsService.getGoals(userId!).subscribe({
       next: (goals) => {
-        console.log("Goals: ", goals);
         this.loading = false;
-      
         this.goalsService.goalSubject.next(goals);
       },
       error: (error) => {
-        console.error("Error getting goals: ", error);
       }
     });
     this.authService.getUserByuid(userId!).subscribe({
       next: (user) => {
-        console.log("User: ", user);
         this.user = user;
       },
       error: (error) => {
-        console.error("Error getting user: ", error);
       }
     });
-    
   }
-
 
   focusOnDiv() {
     this.desc.nativeElement.focus();
@@ -159,9 +138,6 @@ export class GoalsPage implements OnInit {
     });
   }
 
-
- 
-
   addGoal(goal: Goal) {
     this.goalsService.addGoal(goal);
   }
@@ -173,16 +149,13 @@ export class GoalsPage implements OnInit {
     this.allowEdit = false;
   }
 
-  
   deleteGoal(goal: Goal) {
     this.goalsService.deleteGoal(goal).subscribe({
-next: (res) => {
-  console.log("Goal deleted successfully", res);
-  this.goalsService.goalSubject.next(this.goalsService.goalSubject.value.filter(g => g.id !== goal.id));
-},
-error: (err) => {
-  console.error("Error deleting goal: ", err);
-}
+      next: (res) => {
+        this.goalsService.goalSubject.next(this.goalsService.goalSubject.value.filter(g => g.id !== goal.id));
+      },
+      error: (err) => {
+      }
     });
   }
 
@@ -196,40 +169,27 @@ error: (err) => {
     }  
   }
 
-  
   goalAdvise(goal: Goal) {
-    console.log("Getting AI advise");
     this.generating = true;
     this.selectedGoal = goal;
-    console.log("User: ", this.user);
-    
-    this.geminiService.goalAdvise(goal.description, goal.type,this.user).subscribe(
+    this.geminiService.goalAdvise(goal.description, goal.type, goal.deadline, this.user).subscribe(
       {
         next: (res: any) => {
-          console.log("Response from Gemini: ", res);
           this.generating = false;
           this.response = (res?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response')
-  .replace(/\*+/g, '') // Remove all '*' occurrences
-
+            .replace(/\*+/g, '') // Remove all '*' occurrences
           this.generated = true;
           this.showPopup = true;
-          console.log("Response: ", this.response);
-          
-          // this.aiReportModal.present(); // Show the modal
-
         },
-         error: (err: any) => {
+        error: (err: any) => {
           this.generating = false;
-          console.error("AI failed to generate the response: ", err.message);
-          
-         }
+        }
       }
     )
   }
 
   async presentAddNoteDialog() {
     const alert= await this.alertCtrl.create({
-        
       header: 'Give your note a title',
       inputs: [
         {
@@ -244,7 +204,6 @@ error: (err) => {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
           }
         }, {
           text: 'Ok',
@@ -254,51 +213,42 @@ error: (err) => {
         }
       ]
      });
-  
      await alert.present();
-  
-    }
+  }
 
-    saveNote(data: any, repaymentPlan: string) {
-        const userId = localStorage.getItem('userId');
-        const note: Note = {
-          id: '',
-          title: data.title,
-          content: repaymentPlan,
-          userId: userId!,
-          date: Timestamp.fromDate(new Date())
-        };
-        this.noteService.saveNote(note).subscribe({
-          next: (response: any) => {
-            this.presentToast('Note saved successfully', 'success');
-          },
-          error: (error: any) => {
-            console.error("Error saving note: ", error);
-            this.presentToast('Error saving note. Please try again.', 'danger');
-          }
-        });
-    
-      };
-
-      presentToast(message: string, color: 'success' | 'danger') {
-        this.toastController.create({
-          message: message,
-          color,
-          position: 'top',
-          duration: 2000
-        }).then((toast) => {
-          toast.present();
-        })
+  saveNote(data: any, repaymentPlan: string) {
+    const userId = localStorage.getItem('userId');
+    const note: Note = {
+      id: '',
+      title: data.title,
+      content: repaymentPlan,
+      userId: userId!,
+      date: Timestamp.fromDate(new Date())
+    };
+    this.noteService.saveNote(note).subscribe({
+      next: (response: any) => {
+        this.presentToast('Note saved successfully', 'success');
+      },
+      error: (error: any) => {
+        this.presentToast('Error saving note. Please try again.', 'danger');
       }
-    
+    });
+  };
+
+  presentToast(message: string, color: 'success' | 'danger') {
+    this.toastController.create({
+      message: message,
+      color,
+      position: 'top',
+      duration: 2000
+    }).then((toast) => {
+      toast.present();
+    })
+  }
+
   toggleEdit(goal: Goal) {
-    // Toggle edit mode
     this.allowEdit = !this.allowEdit;
-  
-    // Set the focused goal
     this.focusedGoal = this.allowEdit ? goal : null;
-  
-    // Focus on the description div if edit mode is enabled
     if (this.allowEdit) {
       setTimeout(() => {
         this.focusOnDiv();
@@ -306,20 +256,11 @@ error: (err) => {
     }
   }
 
-  // dismissModal() {
-  //   this.aiReportModal.dismiss();
-  // }
-
   saveAdvice() {
     const savedAdvice = localStorage.getItem('savedAdvice') || '[]';
     const adviceList = JSON.parse(savedAdvice);
     adviceList.push(this.response);
     localStorage.setItem('savedAdvice', JSON.stringify(adviceList));
-
-    console.log("Advice saved!");
-    // this.dismissModal();
     this.showPopup = false;
-
   }
-
 }

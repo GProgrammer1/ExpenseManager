@@ -11,8 +11,8 @@ const config: CapacitorConfig = {
       launchAutoHide: true,
     },
     Keyboard: {
-      resize: KeyboardResize.Body, // Options: "native", "body", "ionic", "none"
-      style: KeyboardStyle.Dark, // Optional: "light" or "dark"
+      resize: KeyboardResize.Body, 
+      style: KeyboardStyle.Dark, 
       resizeOnFullScreen: true
     }
   },server: {

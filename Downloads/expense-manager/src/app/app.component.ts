@@ -25,7 +25,6 @@ export class AppComponent  {
       helpCircleOutline, checkmarkCircle
     });
     this.initFirebase();
-    // this.scheduleTokenRefresh(3600);    
 
   }  
 
@@ -40,7 +39,6 @@ export class AppComponent  {
 
       onAuthStateChanged(this.auth, (user) => {
         if (user){
-          console.log("User: ", user);
           localStorage.setItem('userId', user.uid);
         }
       });
@@ -54,42 +52,5 @@ export class AppComponent  {
       setStatusBarTransparent();
    
   }
-
-  async hideStatusBar() {
-    try {
-      await StatusBar.hide();
-    } catch (error) {
-      console.error('Error hiding status bar:', error);
-    }
-  }
-
-  // scheduleTokenRefresh(exp: number) {
-   
-
-  //   if (exp > 0) {
-  //     setTimeout(() => this.refreshJwt(), exp);
-  //   }
-  // }
-
-  // refreshJwt() {
-  //   console.log("Method triggered");
-    
-  //   this.authService.refreshToken().subscribe({
-  //     next: (res: any) => {
-  //       console.log("Response: ", res);
-        
-  //       const idToken = res.idToken;
-  //       localStorage.setItem('idToken', idToken);
-  //       const refreshToken = res.refreshToken;
-  //       console.log("Refresh token: ", refreshToken);
-        
-  //       localStorage.setItem('refreshToken', refreshToken);
-  //       this.scheduleTokenRefresh(3600*1000);
-  //     },
-  //     error: (err) => {
-  //       console.error('Error refreshing token:', err);
-  //     }
-  //   });
-  // }
 
 }

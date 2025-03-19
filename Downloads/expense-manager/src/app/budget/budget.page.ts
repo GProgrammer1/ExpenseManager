@@ -59,11 +59,9 @@ compareDates(paymentDate: Date, dueDate: Date) {
     ) {
       this.loading = true;
       this.user$ = this.authService.user$;
-      // this.bindData();
       
       this.user$.subscribe((user) => {
         if (user) {
-        console.log("User in constructor:", user);
         this.user = user;
         }
       });     
@@ -93,12 +91,10 @@ compareDates(paymentDate: Date, dueDate: Date) {
       if (direction === 'back') {
         this.currentMonth =
           currentIndex > 0 ? this.months[currentIndex - 1] : this.months[this.months.length - 1];
-          console.log("Current month:" , this.currentMonth);
           
       } else if (direction === 'forward') {
         this.currentMonth =
           currentIndex < this.months.length - 1 ? this.months[currentIndex + 1] : this.months[0];
-          console.log("Current month: ", this.currentMonth);
           
       }
       this.showCurrent = false;
@@ -107,7 +103,6 @@ compareDates(paymentDate: Date, dueDate: Date) {
 
     async onMonthChange(selectedMonth: number) {
       this.selectedMonthSubject.next(selectedMonth);
-      console.log('Month changed to:', this.months[selectedMonth-1].display);
     
     }
 
@@ -117,7 +112,7 @@ compareDates(paymentDate: Date, dueDate: Date) {
           this.triggerTableAnimation();
         }
         this.previousBudget = newBudget;
-        this.cdr.detectChanges(); // Ensure Angular detects changes
+        this.cdr.detectChanges(); 
       });    }
 
     ngOnInit(): void {
@@ -130,18 +125,12 @@ compareDates(paymentDate: Date, dueDate: Date) {
         .duration(500)
         .fromTo('opacity', '0', '1')
         .fromTo('transform', 'translateY(-10px)', 'translateY(0)');
-  
-        console.log("Budget table: ", this.budgetTable);
-        
-        console.log("bUDGET TABLE: ", this.budgetTable.el);
         
       animation.play();
-      console.log("Animation played");
       
     }
 
   async bindData() {
-    console.log("Selected date:", this.selectedDate);
 
       this.budgets$= this.budgetService.budgets$;
       this.currentBudgets$ = this.budgetService.currentBudgets$;
@@ -149,13 +138,11 @@ compareDates(paymentDate: Date, dueDate: Date) {
 
     this.filteredBudgets$ = combineLatest([this.budgets$ ?? of([]), this.selectedMonth$]).pipe(
       map(([budgets, selectedMonth]) => {
-        console.log("Budgets: ", budgets);
         
         if (!budgets) {
           return {} as Budget;
         }
         const budget = budgets.find((b) => b.month === selectedMonth) ?? null;
-        //compare setBudget and budget
 
         if (!budget) {
           this.setBudget = {month: selectedMonth, spendings: {}, totalBudget: 0, userId: this.userId, id: ''};
@@ -168,10 +155,7 @@ compareDates(paymentDate: Date, dueDate: Date) {
     );
 
     this.filteredCurrentBudget$ = combineLatest([this.currentBudgets$ ?? of([]), this.selectedMonth$]).pipe(
-      map(([budgets, selectedMonth]) => {
-        console.log("Current budgets to be filtered: ", budgets);
-        console.log("Selected month: ", selectedMonth);
-        
+      map(([budgets, selectedMonth]) => {      
         
         if (!budgets) {
           return {} as Budget;
@@ -179,30 +163,26 @@ compareDates(paymentDate: Date, dueDate: Date) {
         return budgets.find((b) => b.month === selectedMonth) ?? null;
       })
     );
-    console.log("Selected month:", this.selectedDate.getMonth() + 1);
     
       if (!this.userId) {
         this.userId = localStorage.getItem('userId')!;
       }
-      console.log("User id: ", this.userId);
       this.authService.getUserByuid(this.userId).subscribe({
         next: (user) => {
-          console.log("User: ", user);
           this.user = user;
         }
       });
        this.budgetService.getAllBudgets(this.userId).subscribe({
         next: (budgets) => {
-        console.log("Budget: ", budgets);
         this.budgetService.budgetSubject.next(budgets);
       },
     error: (err) => {
+      console.error("Error fetching budgets: ", err);
+      
     }
     });
       this.expenseService.getExpenses(this.userId).subscribe({
-        next: (expenses: Expense[]) => {
-          console.log("Expenses: ", expenses);
-          
+        next: (expenses: Expense[]) => {          
           
           let budgets: Budget[] = [];
           
@@ -221,9 +201,7 @@ compareDates(paymentDate: Date, dueDate: Date) {
             });
             totalBudget += totalExpenses;
             budgets.push({month: i , spendings, totalBudget, userId: this.userId, id: ''});
-          }
-          console.log("CurrentBudgets: ", budgets);
-          
+          }          
           this.budgetService.currentBudgetsSubject.next(budgets);
 
         }
@@ -241,27 +219,24 @@ compareDates(paymentDate: Date, dueDate: Date) {
       const percentage = (currentBudget.totalBudget / this.setBudget.totalBudget) * 100;
     
       if (percentage < 40) {
-        return '#4CAF50'; // Safe Zone ✅ (Deeper Green for contrast)
+        return '#4CAF50';
       } else if (percentage < 60) {
-        return '#FFC107'; // Warning ⚠️ (Vibrant Amber for better visibility)
+        return '#FFC107';
       } else {
-        return '#FF5252'; // Danger! ❌ (Stronger Red for emphasis)
+        return '#FF5252';
       }
     }
   
     getFormattedPercentage(currentBudget: Budget): number {
-     
-      
-      
+       
       if (!this.setBudget?.totalBudget || !currentBudget.totalBudget) {
-        console.log("No setbudget totalbudget or current budget totalbudget");
         const zero = 0;
         return Number(zero.toFixed(2));
       }
 
       
       const percentage = (currentBudget.totalBudget / this.setBudget.totalBudget) * 100;
-      return Number(percentage.toFixed(2)); // Ensures exactly 2 decimal places
+      return Number(percentage.toFixed(2)); 
     }
   
 
@@ -276,17 +251,17 @@ compareDates(paymentDate: Date, dueDate: Date) {
     }
     const percentage = (spendingValue / setSpendingValue) * 100;
     if (percentage < 40) {
-      return 'green'; // Safe Zone ✅
+      return 'green'; 
     } else if (percentage < 60) {
-      return '#FFC107'; // Warning ⚠️
+      return '#FFC107'; 
     } else {
-      return 'red'; // Danger! ❌
+      return 'red'; 
     }
   }
 
   toScientificNotation(value: number): string {
     if (Math.abs(value) < 1_000_000) {
-      return new Intl.NumberFormat().format(value); // Add commas to regular numbers
+      return new Intl.NumberFormat().format(value); 
     }
   
     const exponent = Math.floor(Math.log10(Math.abs(value)));
@@ -295,8 +270,6 @@ compareDates(paymentDate: Date, dueDate: Date) {
     return (`${(new Intl.NumberFormat().format(parseFloat(coefficient)))}E+${exponent}`);
   }
   
-
-  // Example Usage:
 getTypeOf(value: any): string {
   return typeof value;
 }
@@ -304,7 +277,6 @@ getTypeOf(value: any): string {
   async generatePersonalizedBudget() {
     this.generating = true;
     const userId = localStorage.getItem('userId');
-    console.log("User id: ", userId);
     
     const {ageRange, country, debtAmount, fixedExpenses, variableExpenses, savingsGoal, savings, monthlyIncome, hasDebt,
       occupation, city
@@ -312,10 +284,8 @@ getTypeOf(value: any): string {
     const data = {ageRange, country, debtAmount, fixedExpenses, variableExpenses, savingsGoal, savings, monthlyIncome, hasDebt, occupation, city};
     this.geminiService.generateBudget(data).subscribe({
       next: (res: any) => {
-        console.log("AI repsonse successful: ", res);
         this.generating = false;
         this.response = (res?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response');
-        console.log("Response: ", this.response);
         const parsedResponse = JSON.parse(this.response);
         this.advisedBudget.spendings = parsedResponse;
         this.advisedBudget.month = this.currentMonth.value + 1;
@@ -347,7 +317,6 @@ getTypeOf(value: any): string {
     const userId = localStorage.getItem('userId');
     this.budgetService.addBudget(userId!, this.advisedBudget).subscribe({
       next: (res: any) => {
-        console.log("Budget added: ", res.budget);
         let budget = res.budget;
         if (this.budgetService.budgetSubject.value.some(b => b.month === budget.month)) {
         
@@ -362,15 +331,6 @@ getTypeOf(value: any): string {
     this.closePopup();
   }
   
-  // async getCurrentBudget() {
-  //   const uid = localStorage.getItem('userId');
-  //   console.log("User id: ", uid);
-    
-  //   const month = this.currentMonth.value + 1;
-  //   console.log("Month:", month);
-
-  //   await this.budgetService.getCurrentSpendings(month, uid!);
-  // }
 
 
   formatDate(dateObj: Date) {

@@ -76,12 +76,10 @@ export class StatsPage implements OnInit {
     if (direction === 'back') {
       this.currentMonth =
         currentIndex > 0 ? this.months[currentIndex - 1] : this.months[this.months.length - 1];
-        console.log("Current month:" , this.currentMonth);
         
     } else if (direction === 'forward') {
       this.currentMonth =
         currentIndex < this.months.length - 1 ? this.months[currentIndex + 1] : this.months[0];
-        console.log("Current month: ", this.currentMonth);
         
     }
 
@@ -93,7 +91,6 @@ export class StatsPage implements OnInit {
   }
 
   onMonthChange(selectedMonth: number): void {
-    console.log('Month changed to:', this.months[selectedMonth].display);
     this.firestoreService.changeMonth(selectedMonth);
     // Fetch data based on the selected month
   }

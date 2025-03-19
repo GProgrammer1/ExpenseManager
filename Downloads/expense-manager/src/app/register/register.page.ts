@@ -49,7 +49,6 @@ export class RegisterPage implements OnInit {
     this.redirecting = true;
 
     if (this.password !== this.confirmPassword) {
-      console.error('Passwords do not match');
       const toast = await this.toastController.create({
         message: 'Passwords do not match. Please try again.',
         duration: 2000,
@@ -65,10 +64,8 @@ export class RegisterPage implements OnInit {
       this.authService.signup(this.email, this.password, this.name, this.fcmToken!).subscribe({
         next: (res: any) => {
           this.redirecting = false;
-          console.log('User signed up:', res.user)
           const user = res.user;
           const uid = user.uid;
-          console.log("NEW USER ID: ", uid);
           localStorage.setItem('userId', uid);
           this.router.navigate(['/personalinfo']);
         },

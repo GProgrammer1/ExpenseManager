@@ -55,6 +55,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
       .setSmallIcon(R.drawable.ic_circle)
       .setContentTitle(title)
       .setContentText(body)
+      .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
       .setAutoCancel(true)
       .setPriority(NotificationCompat.PRIORITY_HIGH); //set the notification's priority, it may affect the display
     int notificationId = (int) System.currentTimeMillis(); // Generate unique notification ID

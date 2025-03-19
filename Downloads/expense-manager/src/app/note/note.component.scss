@@ -47,6 +47,7 @@
     width: 100%;
     font-size: 1rem;
     padding: 12px;
+    margin: 30px;
     border-radius: 8px;
     border: 1px solid #ccc;
     background: #f8f8f8;
@@ -62,11 +63,6 @@
     
 }
 
-.note-card {
-    overflow-y: scroll;
-    min-height: 100vh;
-    margin-bottom: 20px;
-}
 
 /* Edit Icon */
 #edit-icon {
@@ -149,4 +145,12 @@ ion-content {
     font-size: 1.5rem;
     cursor: pointer;
 }
+
+.note-card {
+    max-height: 70vh; /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    display: flex;
+    flex-direction: column;
+  }
+  
 

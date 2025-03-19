@@ -61,6 +61,14 @@
         
         </ion-item>
 
+        @if (isLoggingOut) {
+          <div class="logout-overlay">
+            <div class="logout-content">
+              <ion-spinner name="crescent"></ion-spinner>
+              <p>Logging out...</p>
+            </div>  
+          </div>
+        }
 
         <ion-item lines="none">
           <div class="profile-item">

@@ -39,7 +39,6 @@ Chart.register(
   PieController,
   BarController,
   BarElement,
-
 );
 
 @Component({
@@ -78,32 +77,31 @@ export class IncomesStatsPage implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {}
 
   ngAfterViewInit(): void {
-    this.chartSubscription =  this.selectedMonth$
-            .pipe(
-              switchMap((month) => {
-                this.loading = true;
-                return this.incomeService.incomes$.pipe(
-                  defaultIfEmpty([]),
-                  switchMap((incomes) => {
-                   return incomes.length > 0 ? of(incomes.filter((expense) => new Date(expense.date.seconds * 1000).getMonth() === month))
-                     : this.incomeService.fetchIncomes(localStorage.getItem('userId')!, month) as Observable<Income[]>
-                  })
-                
-                )})
-              ,
-              tap((expenses) =>  this.processIncomes(expenses)),
-              debounceTime(500)
-            )
-            .subscribe();
+    this.chartSubscription = this.selectedMonth$
+      .pipe(
+        switchMap((month) => {
+          this.loading = true;
+          return this.incomeService.incomes$.pipe(
+            defaultIfEmpty([]),
+            switchMap((incomes) => {
+              return incomes.length > 0
+                ? of(incomes.filter((expense) => new Date(expense.date.seconds * 1000).getMonth() === month))
+                : (this.incomeService.fetchIncomes(localStorage.getItem('userId')!, month) as Observable<Income[]>);
+            })
+          );
+        }),
+        tap((expenses) => this.processIncomes(expenses)),
+        debounceTime(500)
+      )
+      .subscribe();
   }
 
   private processIncomes(incomes: Income[]): void {
     this.noData = incomes.length === 0;
-    this.data = this.labels.reduce((acc: {[category: string] : number}, label: any) => {
-      acc[label] =0;
+    this.data = this.labels.reduce((acc: { [category: string]: number }, label: any) => {
+      acc[label] = 0;
       return acc as Record<string, number>;
     }, {});
-    ;
 
     incomes.forEach((income) => {
       this.data[income.category] += income.amount;
@@ -126,15 +124,13 @@ export class IncomesStatsPage implements OnInit, OnDestroy, AfterViewInit {
     this.createChart();
   }
 
- updateChart(chart: Chart, newData: number[]) {
-    console.log("New data: ", newData);
-    
+  updateChart(chart: Chart, newData: number[]) {
     chart.data.datasets[0].data = newData;
     chart.data.datasets[0].backgroundColor = this.generateHexColors(this.labels.length);
     chart.update('none');
     this.loading = false;
   }
-  
+
   private createChart(): void {
     if (this.myChart) this.myChart.destroy();
     this.noData = Object.values(this.data).every((value) => value === 0);
@@ -165,29 +161,28 @@ export class IncomesStatsPage implements OnInit, OnDestroy, AfterViewInit {
             {
               label: 'Expenses',
               data: arrayData,
-              backgroundColor: this.generateHexColors(this.labels.length)
-            }
+              backgroundColor: this.generateHexColors(this.labels.length),
+            },
           ],
         },
         options: {
           scales: {
             x: {
               ticks: {
-                autoSkip: false,  // Ensures all labels are displayed
-              }
+                autoSkip: false,
+              },
             },
             y: {
               ticks: {
                 callback: function (value: string | number) {
                   const numValue = typeof value === 'string' ? parseFloat(value) : value;
-                  return `$${numValue >= 1e6 ? numValue.toExponential(2) : numValue.toLocaleString()}`;  // Adds a "$" sign to each y-axis value
-                }
+                  return `$${numValue >= 1e6 ? numValue.toExponential(2) : numValue.toLocaleString()}`;
+                },
               },
-            }
+            },
           },
           responsive: true,
           maintainAspectRatio: false,
-         
         },
       });
     } else {
@@ -223,13 +218,12 @@ export class IncomesStatsPage implements OnInit, OnDestroy, AfterViewInit {
 
   private generateHexColors(count: number): string[] {
     return Array.from({ length: count }, (_, i) => {
-      const hue = (i * (360 / count)) % 360; // Evenly spaced hues
-      const saturation = 80; // Higher saturation for vibrancy
-      const lightness = i % 2 === 0 ? 45 : 55; // Alternate lightness for better contrast
+      const hue = (i * (360 / count)) % 360;
+      const saturation = 80;
+      const lightness = i % 2 === 0 ? 45 : 55;
       return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     });
   }
-  
 
   ngOnDestroy(): void {
     this.myChart?.destroy();

@@ -28,7 +28,6 @@ bootstrapApplication(AppComponent, {
     provideAuth(() => getAuth()), // Auth Service
     provideFirestore(() => getFirestore()), // Firestore
     importProvidersFrom(AngularFireModule),
-    // importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
     importProvidersFrom(AngularFireMessagingModule),
     importProvidersFrom(IonicModule.forRoot()),
     provideHttpClient(withInterceptors([httpInterceptor])),

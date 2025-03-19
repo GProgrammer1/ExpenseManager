@@ -10,10 +10,7 @@ export class ConfigService {
   private config: any = {};
 
   constructor(private http: HttpClient) {
-    this.loadConfig().subscribe((data) =>{
-      console.log("Config loaded: ", data);
-      
-    });
+    this.loadConfig().subscribe();
   }
 
   loadConfig(): Observable<any> {
@@ -24,7 +21,6 @@ export class ConfigService {
 
   getConfig(key: string): string {
     const res =  this.config[key] || '';
-    console.log("Config for key: ", key, " is: ", res);
     return res;
     
   }

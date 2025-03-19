@@ -18,19 +18,14 @@ export class FcmService {
   }
 
   async getToken(): Promise<string | null> {
-    try {
-      console.log("Requesting FCM Token");
-  
-      // Ensure permission is granted
+    try {  
       if (!(await this.requestPermission())) {
         console.warn("Push Notification permission not granted");
         return null;
       }
   
-      // Register for push notifications
       await PushNotifications.register();
   
-      // Wait for the token registration event
       return new Promise<string | null>((resolve) => {
         const onRegistration = (token: { value: string }) => {
           console.log("FCM Token:", token.value);
@@ -61,21 +56,6 @@ export class FcmService {
 
   addToken(uid: string, fcmToken: string) {
     return this.http.post<any>(`${environment.fcmUrl}/add`, {uid, fcmToken});
-    // try {
-    //   const usersCollection = collection(firestore, 'users');
-    //   const q = query(usersCollection, where('uid','==', uid));
-    //   const querySnapshot = await getDocs(q);
-
-    //   for (const doc of querySnapshot.docs) {
-    //     const userData = doc.data() as import('./models.ts').User;
-    //     await updateDoc(doc.ref, {fcmTokens: [...userData.fcmTokens, fcmToken]});
-    //     return;
-    //   }
-    // } catch(ex) {
-    //   console.log("Error adding token: ", ex);
-    //   Promise.reject(ex);
-      
-    // }
   }
 
   async refreshToken() {
@@ -90,19 +70,5 @@ export class FcmService {
 
   removeToken(uid: string, fcmToken: string) {
     return this.http.delete<any>(`${environment.fcmUrl}/remove/${uid}/${fcmToken}`);
-    // try {
-    //   const usersCollection = collection(firestore, 'users');
-    //   const q = query(usersCollection, where('uid','==', uid));
-    //   const querySnapshot = await getDocs(q);
-
-    //   for (const doc of querySnapshot.docs) {
-    //     const userData = doc.data() as import('./models.ts').User;
-    //     await updateDoc(doc.ref, {fcmTokens: userData.fcmTokens.filter(token => token !== fcmToken)});
-    //     return;
-    //   }
-    // } catch(ex) {
-    //   console.log("Error removing token: ", ex);
-    //   Promise.reject(ex);
-    // }
   }
 }

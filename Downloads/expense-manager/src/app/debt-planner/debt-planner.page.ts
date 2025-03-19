@@ -5,13 +5,13 @@ import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { GeminiService } from '../services/gemini.service';
 import { ConfigService } from '../services/config.service';
 import { AuthService } from '../services/auth.service';
-import {User as AppUser, Expense, Income, Note} from '../models';
+import { User as AppUser, Expense, Income, Note } from '../models';
 import { ExpenseService } from '../services/expense.service';
 import { IncomeService } from '../services/income.service';
-import { combineLatest, map, Observable, switchMap } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { Timestamp } from 'firebase/firestore';
 import { NoteService } from '../services/note.service';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-debt-planner',
   templateUrl: './debt-planner.page.html',
@@ -20,16 +20,14 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   imports: [IonicModule, CommonModule, FormsModule]
 })
 export class DebtPlannerPage implements OnInit, AfterViewChecked {
-
   personalInfo!: AppUser;
   savings: number | null = 0;
   generatingPlan = false;
   today = new Date().toISOString();
-  totalBalance$ : Observable<number>;
-  totalBalance: number = 0;
+  totalBalance$!: Observable<number>;
+  totalBalance = 0;
   hasScrolled = false;
-  ngOnInit() {
-  }
+
   debt = {
     title: '',
     interestRate: 0,
@@ -37,11 +35,13 @@ export class DebtPlannerPage implements OnInit, AfterViewChecked {
     amountOwed: null,
   };
 
-  @ViewChild('debtPlan', {static: false}) debtPlan!: any;
+  @ViewChild('debtPlan', { static: false }) debtPlan!: any;
 
   repaymentPlan!: string;
-  expenses$: Observable<Expense[]>;
-  incomes$: Observable<Income[]>;
+  expenses$!: Observable<Expense[]>;
+  incomes$!: Observable<Income[]>;
+
+  ngOnInit() {}
 
   ngAfterViewChecked() {
     if (this.repaymentPlan && this.debtPlan && !this.hasScrolled) {
@@ -51,35 +51,28 @@ export class DebtPlannerPage implements OnInit, AfterViewChecked {
   }
 
   async presentAddNoteDialog() {
-  const alert= await this.alertCtrl.create({
-      
-    header: 'Give your note a title',
-    inputs: [
-      {
+    const alert = await this.alertCtrl.create({
+      header: 'Give your note a title',
+      inputs: [{
         name: 'title',
         type: 'text',
         placeholder: 'Title'
-      }
-    ],
-    buttons: [
-      {
-        text: 'Cancel',
-        role: 'cancel',
-        cssClass: 'secondary',
-        handler: () => {
-          console.log('Confirm Cancel');
+      }],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Ok',
+          handler: (data) => {
+            this.saveNote(data, this.repaymentPlan);
+          }
         }
-      }, {
-        text: 'Ok',
-        handler: (data) => {
-          this.saveNote(data, this.repaymentPlan);
-        }
-      }
-    ]
-   });
-
-   await alert.present();
-
+      ]
+    });
+    await alert.present();
   }
 
   saveNote(data: any, repaymentPlan: string) {
@@ -92,117 +85,88 @@ export class DebtPlannerPage implements OnInit, AfterViewChecked {
       date: Timestamp.fromDate(new Date())
     };
     this.noteService.saveNote(note).subscribe({
-      next: (response: any) => {
-        this.presentToast('✔️ Note saved successfully','success');
-      },
-      error: (error: any) => {
-        console.error("Error saving note: ", error);
-        this.presentToast('⚠️ Error saving note. Please try again.','danger');
-      }
+      next: () => this.presentToast('✔️ Note saved successfully', 'success'),
+      error: () => this.presentToast('⚠️ Error saving note. Please try again.', 'danger')
     });
-
-  };
+  }
 
   presentToast(message: string, color: 'success' | 'danger') {
     this.toastController.create({
-      message: message,
+      message,
       duration: 2000,
       position: 'top',
-      
       color
-    }).then((toast) => {
-      toast.present();
-    })
+    }).then(toast => toast.present());
   }
 
-  constructor(private toastController: ToastController, private geminiService: GeminiService, private configService: ConfigService,
-    private authService: AuthService, private expenseService: ExpenseService, private incomeService: IncomeService, private alertCtrl:  AlertController,
-    private noteService:NoteService) {
-   
-   {
+  constructor(
+    private toastController: ToastController,
+    private geminiService: GeminiService,
+    private configService: ConfigService,
+    private authService: AuthService,
+    private expenseService: ExpenseService,
+    private incomeService: IncomeService,
+    private alertCtrl: AlertController,
+    private noteService: NoteService
+  ) {
     const id = localStorage.getItem('userId');
-    authService.getUserByuid(id!).subscribe({
-      next: (user: AppUser) => {
-        this.personalInfo = JSON.parse(JSON.stringify(user));
-        this.savings = this.personalInfo.savings;
-      }
-    });
-
-    this.expenses$ = expenseService.getExpenses(id!);
-    this.incomes$ = incomeService.getIncomes(id!);
-
-    this.totalBalance$ = combineLatest([this.expenses$, this.incomes$]).pipe(
-      map(([expenses, incomes]) => {
-        return incomes.reduce((acc, income) => acc + income.amount, 0) - expenses.reduce((acc, expense) => acc + expense.amount, 0) + this.savings!;
-      }
-    ));
-
-    this.totalBalance$.subscribe({
-      next: (balance: number) => {
-        this.totalBalance = balance;
-      }
-    });
-
-
-  }
+    if (id) {
+      this.authService.getUserByuid(id).subscribe({
+        next: (user: AppUser) => {
+          this.personalInfo = user;
+          this.savings = this.personalInfo.savings;
+        }
+      });
+      this.expenses$ = this.expenseService.getExpenses(id);
+      this.incomes$ = this.incomeService.getIncomes(id);
+      this.totalBalance$ = combineLatest([this.expenses$, this.incomes$]).pipe(
+        map(([expenses, incomes]) => incomes.reduce((acc, income) => acc + income.amount, 0) -
+          expenses.reduce((acc, expense) => acc + expense.amount, 0) + (this.savings || 0))
+      );
+      this.totalBalance$.subscribe({
+        next: (balance: number) => this.totalBalance = balance
+      });
+    }
   }
 
   async generatePlan() {
     this.generatingPlan = true;
-    // Simulate calling the AI backend (Gemini or another service)
     try {
       this.getRepaymentPlanFromAI();
-     
-    } catch (error) {
+    } catch {
       const toast = await this.toastController.create({
         message: 'Error generating repayment plan. Please try again.',
         duration: 2000,
-        color: 'danger',
+        color: 'danger'
       });
       toast.present();
     }
   }
 
-  getRepaymentPlanFromAI()  {
+  getRepaymentPlanFromAI() {
     this.geminiService.debtPlanAdvice(this.debt, this.personalInfo, this.totalBalance).subscribe({
       next: (response: any) => {
-        console.log("Response from Gemini: ", response);
         this.generatingPlan = false;
-        
         this.repaymentPlan = (response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response')
-          .replace(/\*+/g, ''); 
-  
-        this.repaymentPlan = this.repaymentPlan
+          .replace(/\*+/g, '')
           .split('\n')
-          .map(line => {
-            const match = line.match(/^(\d+\.)?\s*(.*?):\s*(.*)/);  
-            if (match) {
-              
-              return `${match[2]}: ${match[3]}`;
-            }
-            return line; 
+          .map((line: any) => {
+            const match = line.match(/^(\d+\.)?\s*(.*?):\s*(.*)/);
+            return match ? `${match[2]}: ${match[3]}` : line;
           })
-          .join('\n\n'); 
-  
-        console.log("Formatted Repayment Plan: ", this.repaymentPlan);
+          .join('\n\n');
         this.scrollToRepaymentPlan();
-      },
-      error: (error: any) => {
-        console.error("Error from Gemini: ", error);
       }
-    }); 
+    });
   }
 
   scrollToRepaymentPlan() {
-    console.log("Debt Plan: ", this.debtPlan);
-    
     if (this.debtPlan) {
       this.debtPlan.el.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
-      window.scrollBy(0, -100); // Adjust the offset as needed
-
+      window.scrollBy(0, -100);
     }
   }
 }

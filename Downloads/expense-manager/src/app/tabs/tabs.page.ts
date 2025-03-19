@@ -1,16 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EnvironmentInjector, inject, NO_ERRORS_SCHEMA, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, GestureController } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { cardOutline, statsChartOutline, walletOutline, cashOutline } from 'ionicons/icons';
-import {Swiper} from 'swiper';
 
-import { IonRouterOutlet } from '@ionic/angular/standalone';
-import { TransactionsPage } from '../transactions/transactions.page';
-import { StatsPage } from '../Stats/stats.page';
-import { BudgetPage } from '../budget/budget.page';
-import { PaymentPage } from '../Payments/payments.page';
-import { GoalsPage } from '../goals/goals.page';
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -30,15 +20,5 @@ export class TabsPage implements OnInit {
   ngOnInit(): void {
       
   }
-  @ViewChild('swiper', { static: false }) swiper?: Swiper;
 
-  onSlideChange(event: any) {
-    const swiperInstance = event.swiper as Swiper;
-    const activeIndex = swiperInstance.activeIndex;
-    // Update active tab based on activeIndex
-  }
-
-  goToSlide(index: number) {
-    this.swiper?.slideTo(index);
-  }
 }

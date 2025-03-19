@@ -8,36 +8,35 @@ import { NoteService } from '../services/note.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-note-list',
   templateUrl: './note-list.page.html',
   styleUrls: ['./note-list.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule],
 })
 export class NoteListPage implements OnInit {
-
-  constructor(private noteService: NoteService, private router: Router, private sanitizer: DomSanitizer,
-     private alertCtrl: AlertController
-  ) { }
+  constructor(
+    private noteService: NoteService,
+    private router: Router,
+    private sanitizer: DomSanitizer,
+    private alertCtrl: AlertController
+  ) {}
 
   notesSubject = new BehaviorSubject<Note[]>([]);
   notes$ = this.notesSubject.asObservable();
 
   noData = false;
   loading = true;
-  notes: Note[] = [
-    
-  ];
+  notes: Note[] = [];
 
   ngOnInit() {
     const userId = localStorage.getItem('userId');
     this.noteService.getNotes(userId!).subscribe((notes: any) => {
       this.notesSubject.next(notes);
       this.loading = false;
-      
     });
-    
   }
 
   sanitizeHtml(html: string): SafeHtml {
@@ -45,37 +44,33 @@ export class NoteListPage implements OnInit {
   }
 
   openNoteDetail(noteId: string) {
-    console.log('Note ID:', noteId);
-    
     this.router.navigate([`/note/${noteId}`]);
   }
 
-
-
   formatDate(dateObj: Timestamp) {
-    const date = new Date(dateObj.seconds * 1000);    
+    const date = new Date(dateObj.seconds * 1000);
     const day = date.toLocaleString('en-US', { weekday: 'short' });
     const month = date.toLocaleString('en-US', { month: 'short' });
     const dayOfMonth = date.getDate();
     const year = date.getFullYear();
 
     return `${day} ${month} ${dayOfMonth}, ${year}`;
-}
+  }
 
   groupNotesByDate(notes: Note[]) {
     const groupedNotes = notes.reduce((acc, note) => {
       const formattedDate = this.formatDate(note.date);
       if (!acc[formattedDate]) {
-        acc[formattedDate] = [note]
+        acc[formattedDate] = [note];
       } else {
         acc[formattedDate].push(note);
       }
-      return acc
-    }, {} as {[key:string] : Note[]});
+      return acc;
+    }, {} as { [key: string]: Note[] });
+
     if (Object.keys(groupedNotes).length === 0) {
       this.noData = true;
-    }
-    else {
+    } else {
       this.noData = false;
     }
     return groupedNotes;
@@ -88,18 +83,15 @@ export class NoteListPage implements OnInit {
       id: '',
       date: Timestamp.fromDate(new Date()),
       userId: localStorage.getItem('userId')!,
-    }
+    };
 
     this.noteService.saveNote(note).subscribe({
       next: (res: any) => {
-        console.log("Note saved:", res.note);
-        
-        
         this.router.navigate([`/note/${res.note.id}`]);
         this.notesSubject.next([...this.notesSubject.value, res.note]);
-      }, error: (error) => {
-        console.error('Error saving note:', error);
-      }
+      },
+      error: (error) => {
+      },
     });
   }
 
@@ -111,30 +103,25 @@ export class NoteListPage implements OnInit {
         {
           text: 'Cancel',
           role: 'cancel',
-          handler: () => {
-            console.log('Delete cancelled');
-          }
         },
         {
           text: 'Delete',
           handler: () => {
             this.deleteNote(note.id);
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
-
   }
 
   deleteNote(id: string) {
     this.noteService.deleteNote(id).subscribe({
       next: (res: any) => {
-        console.log("Note deleted:", res);
-        this.notesSubject.next(this.notesSubject.value.filter(note => note.id !== id));
-      }, error: (error) => {
-        console.error('Error deleting note:', error);
-      }
+        this.notesSubject.next(this.notesSubject.value.filter((note) => note.id !== id));
+      },
+      error: (error) => {
+      },
     });
   }
 }

@@ -97,14 +97,6 @@ export class PersonalinfoPage {
     }
 
   
-  
-    console.log("Saved data:", {
-      income: this.monthlyIncome ? this.monthlyIncome : 0,
-      fixedExpenses: this.fixedExpenses,
-      variableExpenses: this.variableExpenses,
-      savings: this.savingsGoal,
-    });
-  
     const userId = localStorage.getItem("userId");
     if (!userId) {
       await this.showToast("User ID not found. Please log in again.");
@@ -127,12 +119,11 @@ export class PersonalinfoPage {
   
       this.authService.updateUserData(userId, userInfo).subscribe({
         next: (user) => {
-          console.log("User data saved:", user);
           this.router.navigate(["/tabs"]);
         },
         error: async(err) => {
           console.error("Error updating user data:", err);
-          await this.showToast('<ion-icon name="warning-outline"></ion-icon> Failed to save data. Please try again.');
+          await this.showToast('Failed to save data. Please try again.');
         }
       });
   

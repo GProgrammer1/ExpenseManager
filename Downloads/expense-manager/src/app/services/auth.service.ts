@@ -29,7 +29,6 @@ export class AuthService {
 
   refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');
-    console.log("Refresh toke in auth service: ", refreshToken);
     
     if (!refreshToken) {
       return new Observable();

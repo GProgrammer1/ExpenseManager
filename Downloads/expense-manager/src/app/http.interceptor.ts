@@ -2,7 +2,6 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const idToken = localStorage.getItem('idToken');
-  console.log("Id token: ", idToken);
   
   if (idToken) {
     const cloned = req.clone({

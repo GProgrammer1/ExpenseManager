@@ -301,7 +301,7 @@ totalExpense$!: Observable<number>;
     deleteData(item: Expense | Income) {
       if (item.type === 'expense') {
       
-          this.expenseService.deleteExpense(this.userId, item as Expense).subscribe({
+          this.expenseService.deleteExpense(item as Expense).subscribe({
             next: (res: any) => {
               console.log("Expense deleted: ", res);
               this.expenseService.expenseSubject.next(this.expenseService.expenseSubject.value.filter(expense => expense.id !== item.id));

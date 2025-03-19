@@ -21,7 +21,7 @@ export class ProfilePage implements OnInit {
   editableUser!: AppUser;
   isEditing = false;
   isSaving = false;
-
+  isLoggingOut = false;
   fixedExpensesRows : {category: string, amount: number}[] = [];
   variableExpensesRows : {category: string, amount: number}[] = [];
   constructor( private authService: AuthService, private alertController: AlertController, private router: Router,
@@ -37,14 +37,10 @@ export class ProfilePage implements OnInit {
     if (userId) {
       this.authService.getUserByuid(userId).subscribe({
         next: (user: AppUser) => {
-          this.user = user;
-          console.log('User fetched:', this.user);
-          
+          this.user = user;          
           this.fixedExpensesRows = this.user.fixedExpenses;
           this.variableExpensesRows = this.user.variableExpenses;
-          this.editableUser = JSON.parse(JSON.stringify(user)); // Create a copy for editing
-          console.log("Editable user created: ", this.editableUser);
-          
+          this.editableUser = JSON.parse(JSON.stringify(user)); // Create a copy for editing          
         },
         error: (err) => {
           console.error('Error fetching user:', err);
@@ -62,9 +58,7 @@ export class ProfilePage implements OnInit {
     this.isEditing = !this.isEditing;
     if (!this.isEditing) {
       
-      this.editableUser = JSON.parse(JSON.stringify(this.user)); // Reset changes on cancel
-      console.log("Resetting changes: ", this.editableUser);
-      
+      this.editableUser = JSON.parse(JSON.stringify(this.user)); // Reset changes on cancel      
       this.fixedExpensesRows = this.editableUser.fixedExpenses;
       this.variableExpensesRows = this.editableUser.variableExpenses;
 
@@ -78,16 +72,12 @@ export class ProfilePage implements OnInit {
         next: (user: AppUser )=> {
           this.isSaving = false;
           this.user = JSON.parse(JSON.stringify(this.editableUser)); // Update the user object
-          console.log('User parsed:', this.user);
           
           this.isEditing = false;
-          console.log("Profile updated successfully");
-
         },
         error: (err: any) => {
           console.error('Error updating user:', err);
           this.isSaving = false;
-          console.log("Error updating profile");
         }
       });
   }
@@ -99,8 +89,8 @@ export class ProfilePage implements OnInit {
       switchMap((message) => this.fcmService.removeToken(this.user.id!, localStorage.getItem('fcmToken')!))
     ).subscribe({
       next: (res: any) => {
-        console.log("User signed out: ", res);
         localStorage.removeItem('fcmToken');
+        this.isLoggingOut = false;
         this.navCtrl.navigateRoot('/login', {replaceUrl: true});
       },
       error: (err) => {
@@ -128,7 +118,7 @@ export class ProfilePage implements OnInit {
           text: 'Sign out',
           role: 'destructive',
           handler: () => {
-            console.log('User signed out');
+            this.isLoggingOut = true;
             this.signout();
           }
         }
@@ -139,9 +129,7 @@ export class ProfilePage implements OnInit {
   }
   
   
-  addFixedExpense() {
-    console.log("Editable user fixed expenses: ", this.editableUser.fixedExpenses);
-    
+  addFixedExpense() {    
     this.editableUser.fixedExpenses.push({ category: '', amount: 0 });
   }
 
