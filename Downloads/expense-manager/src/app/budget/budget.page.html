@@ -130,7 +130,7 @@
           <ion-col class="data-cell" [ngStyle]="{'color': getSpendingColor(spending.key, spending.value, currentBudget)}"
          
           >
-          {{ toScientificNotation(spending.value)|currency }}</ion-col>
+          {{ (spending.value)|currency }}</ion-col>
        
         </ion-row>
         <ion-row class="total-row"

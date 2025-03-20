@@ -174,22 +174,67 @@ export class ExpensesStatsPage implements OnInit, OnDestroy, AfterViewInit {
       percentage: value / total,
     }));
 
-    this.myChart1 = new Chart(this.chart.nativeElement, {
-      type: this.chartType as 'pie' | 'bar' | 'doughnut' | 'line',
-      data: {
-        labels: this.labels,
-        datasets: [
-          {
-            data: arrayData,
-            backgroundColor: this.generateHexColors(this.labels.length),
+    if (this.chartType === 'bar') {
+      this.myChart1 = new Chart(this.chart.nativeElement, {
+        type: this.chartType as 'pie' | 'bar' ,
+        data: {
+          labels: this.labels,
+          datasets: [
+            {
+              label: 'Expenses',
+              data: arrayData,
+              backgroundColor: this.generateHexColors(this.labels.length),
+            },
+          ],
+        },
+        options: {
+          scales: {
+            x: {
+              ticks: {
+                autoSkip: false,
+              },
+            },
+            y: {
+              ticks: {
+                callback: function (value: string | number) {
+                  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+                  return `$${numValue >= 1e6 ? numValue.toExponential(2) : numValue.toLocaleString()}`;
+                },
+              },
+            },
           },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
-    });
+          responsive: true,
+          maintainAspectRatio: false,
+        },
+      });
+    } else {
+      this.myChart1 = new Chart(this.chart.nativeElement, {
+        type: this.chartType as 'pie' | 'bar' ,
+        data: {
+          labels: this.labels,
+          datasets: [
+            {
+              data: arrayData,
+              backgroundColor: this.generateHexColors(this.labels.length),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: (tooltipItem) => {
+                  const value = tooltipItem.raw as number;
+                  return `$${value >= 1e6 ? value.toExponential(2) : value.toLocaleString()}`;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
     this.loading = false;
   }
 

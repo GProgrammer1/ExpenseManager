@@ -82,23 +82,11 @@ export class ProfilePage implements OnInit {
       });
   }
   async signout() {
-
     localStorage.removeItem('userId');
-    
-    this.authService.signout(this.user.id).pipe(
-      switchMap((message) => this.fcmService.removeToken(this.user.id!, localStorage.getItem('fcmToken')!))
-    ).subscribe({
-      next: (res: any) => {
-        localStorage.removeItem('fcmToken');
-        this.isLoggingOut = false;
-        this.navCtrl.navigateRoot('/login', {replaceUrl: true});
-      },
-      error: (err) => {
-        console.error("Error signing out:", err);
-      }
-    }
-    );
-    
+    this.fcmService.removeToken(this.user.id!, localStorage.getItem('fcmToken')!)
+    localStorage.removeItem('fcmToken');
+    this.isLoggingOut = false;
+    this.navCtrl.navigateRoot('/login', {replaceUrl: true});   
   }
 
   async presentSignoutDialog() {

@@ -159,7 +159,7 @@ export class IncomesStatsPage implements OnInit, OnDestroy, AfterViewInit {
           labels: this.labels,
           datasets: [
             {
-              label: 'Expenses',
+              label: 'Incomes',
               data: arrayData,
               backgroundColor: this.generateHexColors(this.labels.length),
             },
