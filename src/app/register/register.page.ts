@@ -40,14 +40,14 @@ export class RegisterPage implements OnInit {
   ) { }
 
  async  ngOnInit() {
-    this.fcmToken  = await this.fcmService.getToken();
-    localStorage.setItem('fcmToken', this.fcmToken!);
+   
 
   }
 
   async register() {
     this.redirecting = true;
-
+    this.fcmToken  = await this.fcmService.getToken();
+    localStorage.setItem('fcmToken', this.fcmToken!);
     if (this.password !== this.confirmPassword) {
       const toast = await this.toastController.create({
         message: 'Passwords do not match. Please try again.',

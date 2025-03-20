@@ -18,11 +18,8 @@ export class AddTransactionsPage implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit() {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.selectedTab = event.url.includes('income') ? 'income' : 'expense';
-      }
-    });
+   
+    this.router.navigate(['add-transactions/expense']);
   }
 
   navigate(route: 'expense' | 'income') {

@@ -33,13 +33,9 @@ export class LoginPage implements OnInit, OnDestroy {
     private toastController: ToastController,
   ) {
     this.auth = getAuth();
-    this.fetchToken();
   }
 
-  async fetchToken() {
-    this.token = await this.fcmService.getToken();
-    localStorage.setItem('fcmToken', this.token!);
-  }
+
 
   ngOnInit() {
     // Ensure auth state is always checked on initialization
@@ -57,6 +53,8 @@ export class LoginPage implements OnInit, OnDestroy {
   }
 
   async login() {
+    this.token = await this.fcmService.getToken();
+    localStorage.setItem('fcmToken', this.token!);
     this.redirecting = true;
     try {
       this.loginSubscription = this.authService.signin(this.email, this.password)
