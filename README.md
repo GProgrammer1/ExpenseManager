@@ -1,2 +1,2 @@
-# ExpenseManager
+# FinWise
 An AI assisted smart-budgeting application that allows users to save their daily transactions,plan their monthly budget and see where they stand on their current budget (and get a personalized studied budget based on their financial situatuon), get stats about their spendings and incomes including each category of transactions and the percentage spent on each, and track future payments and recurring subscriptions and be reminded of them. Not only that but by combining personal financial info of the user with the AI tool, it provides tailored financial advice to the user concerning his goals, and provides a plan to deal with debts and the user can save these AI generated reports and add personal notes in an appropriate section.
