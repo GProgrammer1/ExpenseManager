@@ -8,6 +8,7 @@ import {IonicModule, AlertController, NavController} from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs';
 import { FcmService } from '../services/fcm.service';
+import { logIn } from 'ionicons/icons';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -83,8 +84,13 @@ export class ProfilePage implements OnInit {
   }
   async signout() {
     localStorage.removeItem('userId');
-    this.fcmService.removeToken(this.user.id!, localStorage.getItem('fcmToken')!)
+    this.fcmService.removeToken(this.user.id!, localStorage.getItem('fcmToken')!).subscribe((msg) => {
+      console.log('Token removed:', msg);
+      
+    })
+    setTimeout(() => {
     localStorage.removeItem('fcmToken');
+    }, 1000);
     this.isLoggingOut = false;
     this.navCtrl.navigateRoot('/login', {replaceUrl: true});   
   }
